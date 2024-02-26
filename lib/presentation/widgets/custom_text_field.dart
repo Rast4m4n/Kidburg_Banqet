@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
 
 class CustomTextField extends StatelessWidget {
@@ -7,14 +8,14 @@ class CustomTextField extends StatelessWidget {
     required this.controller,
     required this.maxWidth,
     required this.maxHeight,
-    required this.label,
+    required this.hint,
     this.onTap,
   });
 
   final double maxWidth;
   final double maxHeight;
   final TextEditingController controller;
-  final Text label;
+  final String hint;
   final VoidCallback? onTap;
 
   @override
@@ -26,9 +27,16 @@ class CustomTextField extends StatelessWidget {
       ),
       child: TextField(
         onTap: onTap,
+        readOnly: onTap != null ? true : false,
         controller: controller,
         decoration: InputDecoration(
-          label: label,
+          hintText: hint,
+          hintMaxLines: 1,
+          contentPadding: const EdgeInsets.only(
+            left: AppPadding.low,
+            bottom: AppPadding.low,
+          ),
+          // hintStyle: TextStyle(fontSize: 12),
           filled: true,
           fillColor: AppColor.textFieldColor,
           border: InputBorder.none,

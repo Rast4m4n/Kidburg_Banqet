@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:kidburg_banquet/presentation/screens/create_banquet_vm.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/widgets/custom_text_field.dart';
+import 'package:provider/provider.dart';
 
 class CreateBanquetScreen extends StatelessWidget {
-  const CreateBanquetScreen({super.key});
+  CreateBanquetScreen({super.key});
+
+  final CreateBanquetVM vm = CreateBanquetVM();
 
   @override
   Widget build(BuildContext context) {
@@ -18,67 +22,54 @@ class CreateBanquetScreen extends StatelessWidget {
       ),
       body: Padding(
         padding: const EdgeInsets.all(AppPadding.low),
-        child: ListView(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                CustomTextField(
-                  controller: TextEditingController(),
-                  maxWidth: 137,
-                  maxHeight: 40,
-                  label: const Text('Имя заказчика'),
-                ),
-                _TextFieldDatePicker(),
-                CustomTextField(
-                  controller: TextEditingController(),
-                  maxWidth: 65,
-                  maxHeight: 40,
-                  label: const Text('Дети'),
-                ),
-              ],
-            )
-          ],
+        child: ChangeNotifierProvider(
+          create: (context) => vm,
+          child: ListView(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  CustomTextField(
+                    controller: TextEditingController(),
+                    maxWidth: 137,
+                    maxHeight: 40,
+                    hint: 'Имя заказчика',
+                  ),
+                  const _TextFieldDatePicker(),
+                  CustomTextField(
+                    controller: TextEditingController(),
+                    maxWidth: 65,
+                    maxHeight: 40,
+                    hint: 'Дети',
+                  ),
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _TextFieldDatePicker extends StatefulWidget {
+class _TextFieldDatePicker extends StatelessWidget {
   const _TextFieldDatePicker({
     super.key,
   });
 
   @override
-  State<_TextFieldDatePicker> createState() => _TextFieldDatePickerState();
-}
-
-class _TextFieldDatePickerState extends State<_TextFieldDatePicker> {
-  DateTime selectedDate = DateTime.now();
-
-  Future<void> _showDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2100),
-    );
-    if (picked != null && picked != selectedDate) {
-      setState(() {
-        selectedDate = picked;
-      });
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    print(selectedDate);
+    final CreateBanquetVM vm = Provider.of<CreateBanquetVM>(context);
+    final String isPickedDate = vm.selectedDate != null
+        ? "${vm.selectedDate!.day}.${vm.selectedDate!.month}.${vm.selectedDate!.year}"
+        : 'Дата мероприятия';
+
     return CustomTextField(
       controller: TextEditingController(),
-      maxWidth: 140,
+      maxWidth: 160,
       maxHeight: 40,
-      label: const Text('Дата мероприятия'),
-      onTap: () async => _showDate(context),
+      hint: isPickedDate,
+      onTap: () => vm.showDate(context),
     );
   }
 }

@@ -24,7 +24,7 @@ class MainApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: appTheme.appThemeLight,
-        home: const CreateBanquetScreen(),
+        home: CreateBanquetScreen(),
       ),
     );
   }
