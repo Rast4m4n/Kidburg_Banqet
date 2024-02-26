@@ -1,3 +1,4 @@
+import 'package:kidburg_banquet/domain/model/place_event_enum.dart';
 import 'package:kidburg_banquet/domain/model/product_model.dart';
 
 class BanqetModel {
@@ -12,7 +13,7 @@ class BanqetModel {
   });
 
   final String nameClient;
-  final String place;
+  final PlaceEventEnum place;
   final String date;
   final String time;
   final int amountOfChildren;
