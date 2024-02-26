@@ -22,6 +22,7 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         theme: appTheme.appThemeLight,
         home: const CreateBanquetScreen(),
       ),
