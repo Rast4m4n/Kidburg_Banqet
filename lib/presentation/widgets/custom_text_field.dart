@@ -20,6 +20,8 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final InputDecorationTheme textFieldTheme =
+        Theme.of(context).inputDecorationTheme;
     return ConstrainedBox(
       constraints: BoxConstraints(
         maxWidth: maxWidth,
@@ -31,12 +33,13 @@ class CustomTextField extends StatelessWidget {
         controller: controller,
         decoration: InputDecoration(
           hintText: hint,
-          hintMaxLines: 1,
+          hintStyle: textFieldTheme.hintStyle,
           contentPadding: const EdgeInsets.only(
             left: AppPadding.low,
             bottom: AppPadding.low,
           ),
-          // hintStyle: TextStyle(fontSize: 12),
+          enabledBorder: textFieldTheme.border,
+          focusedBorder: textFieldTheme.focusedBorder,
           filled: true,
           fillColor: AppColor.textFieldColor,
           border: InputBorder.none,
