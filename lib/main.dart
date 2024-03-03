@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kidburg_banquet/presentation/screens/main_banquet_screen.dart';
+import 'package:kidburg_banquet/presentation/screens/main_banquet/main_banquet_screen.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
 
 void main() {

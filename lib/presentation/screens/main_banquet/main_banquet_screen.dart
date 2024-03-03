@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kidburg_banquet/domain/model/place_event_enum.dart';
-import 'package:kidburg_banquet/presentation/screens/main_screen_banquet_vm.dart';
+import 'package:kidburg_banquet/presentation/screens/main_banquet/main_screen_banquet_vm.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
 import 'package:kidburg_banquet/presentation/widgets/custom_text_field.dart';
