@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kidburg_banquet/presentation/screens/create_banquet_screen.dart';
+import 'package:kidburg_banquet/presentation/screens/main_banquet_screen.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
 
 void main() {
@@ -24,7 +24,7 @@ class MainApp extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: appTheme.appThemeLight,
-        home: CreateBanquetScreen(),
+        home: MainBanquetScreen(),
       ),
     );
   }

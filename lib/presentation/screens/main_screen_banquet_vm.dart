@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 class CreateBanquetVM extends ChangeNotifier {
   CreateBanquetVM();
-
   DateTime? selectedDate;
 
   Future<void> showDate(BuildContext context) async {

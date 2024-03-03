@@ -22,7 +22,18 @@ class AppTheme {
           Radius.circular(8),
         ),
       ),
-      hintStyle: TextStyle(color: AppColor.textFieldInsideColor),
+      labelStyle: TextStyle(color: AppColor.textFieldInsideColor),
+    ),
+    filledButtonTheme: FilledButtonThemeData(
+      style: ButtonStyle(
+        shape: MaterialStateProperty.resolveWith(
+          (states) => const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(8),
+            ),
+          ),
+        ),
+      ),
     ),
   );
 
