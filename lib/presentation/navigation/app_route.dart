@@ -12,6 +12,6 @@ class AppNavigation {
 
   Map<String, WidgetBuilder> routes(context) => {
         initialRoute: (context) => MainBanquetScreen(),
-        AppRoute.preOrderFormPage: (context) => const PreOrderFormScreen(),
+        AppRoute.preOrderFormPage: (context) => PreOrderFormScreen(),
       };
 }

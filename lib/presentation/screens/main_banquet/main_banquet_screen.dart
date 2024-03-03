@@ -32,7 +32,7 @@ class MainBanquetScreen extends StatelessWidget {
               SizedBox(
                 width: MediaQuery.of(context).size.width,
                 child: FilledButton(
-                  onPressed: () {},
+                  onPressed: () => vm.routingToPreOrder(context),
                   child: const Text('Далее'),
                 ),
               ),

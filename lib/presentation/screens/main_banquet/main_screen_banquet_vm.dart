@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kidburg_banquet/presentation/navigation/app_route.dart';
 
 class CreateBanquetVM extends ChangeNotifier {
   CreateBanquetVM();
@@ -14,5 +15,9 @@ class CreateBanquetVM extends ChangeNotifier {
       selectedDate = picked;
       notifyListeners();
     }
+  }
+
+  void routingToPreOrder(BuildContext context) {
+    Navigator.of(context).pushNamed(AppRoute.preOrderFormPage);
   }
 }

@@ -7,6 +7,7 @@ environment:
   sdk: '>=3.2.3 <4.0.0'
 
 dependencies:
+  excel: ^4.0.2
   flutter:
     sdk: flutter
   provider: ^6.1.1
@@ -18,3 +19,7 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/
+    - assets/template_banquet.xlsx
+  
