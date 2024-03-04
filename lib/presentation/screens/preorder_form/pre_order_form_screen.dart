@@ -13,7 +13,7 @@ class PreOrderFormScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(vm.excelRepository.readExcelFile());
+    print(vm.excelRepository.readTemplateExcelFile());
     return Scaffold(
       appBar: AppBar(
         title: Text(
