@@ -21,6 +21,7 @@ class ExcelRepository {
         if (row[0]?.value is IntCellValue) {
           productModel.add(
             ProductModel(
+              id: row[0]?.value.toString(),
               nameProduct: row[1]?.value.toString(),
               weight: row[3]?.value.toString(),
               price: row[6]?.value.toString(),

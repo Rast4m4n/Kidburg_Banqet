@@ -1,20 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:kidburg_banquet/data/repository/excel_repository.dart';
+import 'package:kidburg_banquet/domain/model/product_model.dart';
 import 'package:kidburg_banquet/presentation/screens/preorder_form/pre_order_form_vm.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
 import 'package:kidburg_banquet/presentation/widgets/custom_text_field.dart';
 
-class PreOrderFormScreen extends StatelessWidget {
-  PreOrderFormScreen({super.key});
+class PreOrderFormScreen extends StatefulWidget {
+  const PreOrderFormScreen({super.key});
 
+  @override
+  State<PreOrderFormScreen> createState() => _PreOrderFormScreenState();
+}
+
+class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
   final PreOrderFormVM vm = PreOrderFormVM(
     excelRepository: ExcelRepository(),
   );
 
+  List<Widget> generateRowProduct(List<ProductModel> products) {
+    final List<Widget> widgets = [];
+    for (var el in products) {
+      print("id - ${el.id}: name - ${el.nameProduct}");
+      widgets.add(
+        RowProduct(name: el.nameProduct ?? ''),
+      );
+      if (el != products.last) {
+        widgets.add(
+          const SizedBox(height: AppPadding.low),
+        );
+      }
+    }
+    return widgets;
+  }
+
   @override
   Widget build(BuildContext context) {
-    print(vm.excelRepository.readTemplateExcelFile());
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -27,10 +48,27 @@ class PreOrderFormScreen extends StatelessWidget {
       body: Padding(
         padding: const EdgeInsets.all(AppPadding.low),
         child: ListView(
-          children: const [
-            _TitleTableForAdult(),
-            SizedBox(height: AppPadding.low),
-            RowProduct(),
+          children: [
+            const _TitleTableForAdult(),
+            const SizedBox(height: AppPadding.low),
+            FutureBuilder(
+              future: vm.getProductModelFromExcel(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final products = snapshot.data!;
+                  return Column(
+                    children: generateRowProduct(products),
+                  );
+                } else {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+              },
+            ),
+            // RowProduct(
+            //   name: 'Салат оливье',
+            // ),
           ],
         ),
       ),
@@ -41,16 +79,17 @@ class PreOrderFormScreen extends StatelessWidget {
 class RowProduct extends StatelessWidget {
   const RowProduct({
     super.key,
+    required this.name,
   });
-
+  final String name;
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        const Expanded(
+        Expanded(
           flex: 2,
           child: _BoxInformationProduct(
-            name: 'Салат оливье',
+            name: name,
           ),
         ),
         const SizedBox(width: AppPadding.low),
@@ -64,7 +103,9 @@ class RowProduct extends StatelessWidget {
         const SizedBox(width: AppPadding.low),
         const Expanded(
           flex: 2,
-          child: _BoxInformationProduct(name: 'Сумма'),
+          child: _BoxInformationProduct(
+            name: 'Сумма',
+          ),
         ),
       ],
     );
