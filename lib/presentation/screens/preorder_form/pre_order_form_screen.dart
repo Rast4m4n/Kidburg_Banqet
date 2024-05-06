@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kidburg_banquet/data/repository/excel_repository.dart';
-import 'package:kidburg_banquet/domain/model/product_model.dart';
+import 'package:kidburg_banquet/domain/model/table_model.dart';
 import 'package:kidburg_banquet/presentation/screens/preorder_form/pre_order_form_vm.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
@@ -18,17 +18,19 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
     excelRepository: ExcelRepository(),
   );
 
-  List<Widget> generateRowProduct(List<ProductModel> products) {
+  List<Widget> generateRowProduct(List<TableModel> tableWithFood) {
     final List<Widget> widgets = [];
-    for (var el in products) {
-      print("id - ${el.id}: name - ${el.nameProduct}");
-      widgets.add(
-        RowProduct(name: el.nameProduct ?? ''),
-      );
-      if (el != products.last) {
-        widgets.add(
-          const SizedBox(height: AppPadding.low),
-        );
+
+    for (var table in tableWithFood) {
+      widgets.add(_TitleTableForAdult(name: table.name));
+      widgets.add(const SizedBox(height: AppPadding.low));
+      for (var category in table.categories) {
+        widgets.add(_CategoryOfProduct(name: category.name));
+        widgets.add(const SizedBox(height: AppPadding.low));
+        for (var product in category.products) {
+          widgets.add(RowProduct(name: product.nameProduct!));
+          widgets.add(const SizedBox(height: AppPadding.low));
+        }
       }
     }
     return widgets;
@@ -49,15 +51,13 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
         padding: const EdgeInsets.all(AppPadding.low),
         child: ListView(
           children: [
-            const _TitleTableForAdult(),
-            const SizedBox(height: AppPadding.low),
             FutureBuilder(
               future: vm.getProductModelFromExcel(),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  final products = snapshot.data!;
+                  final tableWithFood = snapshot.data!;
                   return Column(
-                    children: generateRowProduct(products),
+                    children: generateRowProduct(tableWithFood),
                   );
                 } else {
                   return const Center(
@@ -136,8 +136,9 @@ class _BoxInformationProduct extends StatelessWidget {
 class _TitleTableForAdult extends StatelessWidget {
   const _TitleTableForAdult({
     super.key,
+    required this.name,
   });
-
+  final String name;
   @override
   Widget build(BuildContext context) {
     return DecoratedBox(
@@ -153,7 +154,7 @@ class _TitleTableForAdult extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Стол для взрослых на начало',
+              name,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -162,6 +163,40 @@ class _TitleTableForAdult extends StatelessWidget {
               onPressed: () {},
               icon: const Icon(Icons.arrow_drop_down_sharp),
             )
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CategoryOfProduct extends StatelessWidget {
+  const _CategoryOfProduct({
+    super.key,
+    required this.name,
+  });
+
+  final String name;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: const BoxDecoration(
+        color: Colors.blueGrey,
+        borderRadius: BorderRadius.all(
+          Radius.circular(8),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppPadding.low),
+        child: Row(
+          children: [
+            Text(
+              name,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
           ],
         ),
       ),
