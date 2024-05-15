@@ -56,9 +56,7 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   final tableWithFood = snapshot.data!;
-                  return Column(
-                    children: generateRowProduct(tableWithFood),
-                  );
+                  return Column(children: generateRowProduct(tableWithFood));
                 } else {
                   return const Center(
                     child: CircularProgressIndicator(),
@@ -84,30 +82,33 @@ class RowProduct extends StatelessWidget {
   final String name;
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          flex: 2,
-          child: _BoxInformationProduct(
-            name: name,
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            flex: 2,
+            child: _BoxInformationProduct(
+              name: name,
+            ),
           ),
-        ),
-        const SizedBox(width: AppPadding.low),
-        Expanded(
-          flex: 1,
-          child: CustomTextField(
-            controller: TextEditingController(),
-            label: 'Кол-во',
+          const SizedBox(width: AppPadding.low),
+          Expanded(
+            flex: 1,
+            child: CustomTextField(
+              controller: TextEditingController(),
+              label: 'Кол-во',
+            ),
           ),
-        ),
-        const SizedBox(width: AppPadding.low),
-        const Expanded(
-          flex: 2,
-          child: _BoxInformationProduct(
-            name: 'Сумма',
+          const SizedBox(width: AppPadding.low),
+          const Expanded(
+            flex: 2,
+            child: _BoxInformationProduct(
+              name: 'Сумма',
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

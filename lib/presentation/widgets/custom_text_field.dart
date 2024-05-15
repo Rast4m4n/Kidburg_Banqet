@@ -23,6 +23,9 @@ class CustomTextField extends StatelessWidget {
     final InputDecorationTheme textFieldTheme =
         Theme.of(context).inputDecorationTheme;
     return TextField(
+      maxLines: null,
+      minLines: null,
+      expands: true,
       onTap: onTap,
       readOnly: onTap != null ? true : false,
       controller: controller,
