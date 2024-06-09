@@ -12,3 +12,8 @@ final class PreOrderLoaded extends PreOrderState {
 
   final List<TableModel> tableModel;
 }
+
+final class PreOrderFailure extends PreOrderState {
+  PreOrderFailure(this.exception);
+  final Object? exception;
+}
