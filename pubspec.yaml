@@ -7,9 +7,11 @@ environment:
   sdk: '>=3.2.3 <4.0.0'
 
 dependencies:
+  bloc: ^8.1.4
   excel: ^4.0.2
   flutter:
     sdk: flutter
+  flutter_bloc: ^8.1.5
   provider: ^6.1.1
 
 dev_dependencies:
