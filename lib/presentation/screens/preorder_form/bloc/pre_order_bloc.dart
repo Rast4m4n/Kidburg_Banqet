@@ -10,10 +10,17 @@ class PreOrderBloc extends Bloc<PreOrderEvent, PreOrderState> {
   PreOrderBloc({
     required this.excelRepository,
   }) : super(PreOrderInitial()) {
-    on<LoadListDishesEvent>((event, emit) async {
+    on<LoadListDishesEvent>(readDataExcel);
+  }
+
+  final ExcelRepository excelRepository;
+
+  void readDataExcel(event, emit) async {
+    try {
       final listDishes = await excelRepository.readDataExcel();
       emit(PreOrderLoaded(listDishes));
-    });
+    } catch (e) {
+      emit(PreOrderFailure(e));
+    }
   }
-  final ExcelRepository excelRepository;
 }

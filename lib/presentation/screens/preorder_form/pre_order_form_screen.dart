@@ -64,6 +64,12 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
                 if (state is PreOrderLoaded) {
                   final tableWithFood = state.tableModel;
                   return Column(children: generateRowProduct(tableWithFood));
+                } else if (state is PreOrderFailure) {
+                  return Center(
+                    child: Text(
+                      'Ошибка вывода данных: ${state.exception?.toString()}',
+                    ),
+                  );
                 } else {
                   return const Center(
                     child: CircularProgressIndicator(),
