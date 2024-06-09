@@ -29,6 +29,7 @@ class MainBanquetScreen extends StatelessWidget {
           child: Column(
             children: [
               const _GridActionFields(),
+              const SizedBox(height: AppPadding.low),
               SizedBox(
                 width: MediaQuery.of(context).size.width,
                 child: FilledButton(
@@ -52,11 +53,13 @@ class _GridActionFields extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 185,
+      height: 190,
       child: GridView.count(
         crossAxisCount: 2,
         crossAxisSpacing: AppPadding.medium,
-        childAspectRatio: 3.2,
+        childAspectRatio: 3.4,
+        mainAxisSpacing: AppPadding.low,
+        primary: false,
         children: [
           CustomTextField(
             controller: TextEditingController(),
