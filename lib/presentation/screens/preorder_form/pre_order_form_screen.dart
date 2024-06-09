@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidburg_banquet/data/repository/excel_repository.dart';
 import 'package:kidburg_banquet/domain/model/table_model.dart';
-import 'package:kidburg_banquet/presentation/screens/preorder_form/pre_order_form_vm.dart';
+import 'package:kidburg_banquet/presentation/screens/preorder_form/bloc/pre_order_bloc.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
 import 'package:kidburg_banquet/presentation/widgets/custom_text_field.dart';
@@ -14,7 +15,7 @@ class PreOrderFormScreen extends StatefulWidget {
 }
 
 class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
-  final PreOrderFormVM vm = PreOrderFormVM(
+  final preOrderBloc = PreOrderBloc(
     excelRepository: ExcelRepository(),
   );
 
@@ -37,6 +38,12 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
   }
 
   @override
+  void initState() {
+    preOrderBloc.add(LoadListDishesEvent());
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -51,11 +58,11 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
         padding: const EdgeInsets.all(AppPadding.low),
         child: ListView(
           children: [
-            FutureBuilder(
-              future: vm.getProductModelFromExcel(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  final tableWithFood = snapshot.data!;
+            BlocBuilder<PreOrderBloc, PreOrderState>(
+              bloc: preOrderBloc,
+              builder: (context, state) {
+                if (state is PreOrderLoaded) {
+                  final tableWithFood = state.tableModel;
                   return Column(children: generateRowProduct(tableWithFood));
                 } else {
                   return const Center(
@@ -63,7 +70,7 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
                   );
                 }
               },
-            ),
+            )
           ],
         ),
       ),
