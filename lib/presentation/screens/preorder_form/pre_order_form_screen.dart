@@ -64,9 +64,6 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
                 }
               },
             ),
-            // RowProduct(
-            //   name: 'Салат оливье',
-            // ),
           ],
         ),
       ),
