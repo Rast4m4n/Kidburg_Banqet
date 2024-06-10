@@ -1,6 +1,6 @@
 part of 'pre_order_bloc.dart';
 
 @immutable
-sealed class PreOrderEvent {}
+sealed class ExcelDataEvent {}
 
-final class LoadListDishesEvent extends PreOrderEvent {}
+final class LoadedListDishesEvent extends ExcelDataEvent {}

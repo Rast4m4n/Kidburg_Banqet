@@ -6,11 +6,11 @@ import 'package:meta/meta.dart';
 part 'pre_order_event.dart';
 part 'pre_order_state.dart';
 
-class PreOrderBloc extends Bloc<PreOrderEvent, PreOrderState> {
-  PreOrderBloc({
+class ExcelDataBloc extends Bloc<ExcelDataEvent, ExcelDataState> {
+  ExcelDataBloc({
     required this.excelRepository,
-  }) : super(PreOrderInitial()) {
-    on<LoadListDishesEvent>(readDataExcel);
+  }) : super(ExcelDataInitial()) {
+    on<LoadedListDishesEvent>(readDataExcel);
   }
 
   final ExcelRepository excelRepository;
@@ -18,9 +18,9 @@ class PreOrderBloc extends Bloc<PreOrderEvent, PreOrderState> {
   void readDataExcel(event, emit) async {
     try {
       final listDishes = await excelRepository.readDataExcel();
-      emit(PreOrderLoaded(listDishes));
+      emit(ExcelDataLoaded(listDishes));
     } catch (e) {
-      emit(PreOrderFailure(e));
+      emit(ExcelDataFailure(e));
     }
   }
 }
