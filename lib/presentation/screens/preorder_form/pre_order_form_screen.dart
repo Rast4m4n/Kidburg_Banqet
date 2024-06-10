@@ -15,7 +15,7 @@ class PreOrderFormScreen extends StatefulWidget {
 }
 
 class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
-  final preOrderBloc = PreOrderBloc(
+  final excelDataBloc = ExcelDataBloc(
     excelRepository: ExcelRepository(),
   );
 
@@ -39,7 +39,7 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
 
   @override
   void initState() {
-    preOrderBloc.add(LoadListDishesEvent());
+    excelDataBloc.add(LoadedListDishesEvent());
     super.initState();
   }
 
@@ -58,13 +58,13 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
         padding: const EdgeInsets.all(AppPadding.low),
         child: ListView(
           children: [
-            BlocBuilder<PreOrderBloc, PreOrderState>(
-              bloc: preOrderBloc,
+            BlocBuilder<ExcelDataBloc, ExcelDataState>(
+              bloc: excelDataBloc,
               builder: (context, state) {
-                if (state is PreOrderLoaded) {
+                if (state is ExcelDataLoaded) {
                   final tableWithFood = state.tableModel;
                   return Column(children: generateRowProduct(tableWithFood));
-                } else if (state is PreOrderFailure) {
+                } else if (state is ExcelDataFailure) {
                   return Center(
                     child: Text(
                       'Ошибка вывода данных: ${state.exception?.toString()}',

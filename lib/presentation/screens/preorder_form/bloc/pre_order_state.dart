@@ -1,19 +1,19 @@
 part of 'pre_order_bloc.dart';
 
 @immutable
-sealed class PreOrderState {}
+sealed class ExcelDataState {}
 
-final class PreOrderInitial extends PreOrderState {}
+final class ExcelDataInitial extends ExcelDataState {}
 
-final class PreOrderLoading extends PreOrderState {}
+final class ExcelDataLoading extends ExcelDataState {}
 
-final class PreOrderLoaded extends PreOrderState {
-  PreOrderLoaded(this.tableModel);
+final class ExcelDataLoaded extends ExcelDataState {
+  ExcelDataLoaded(this.tableModel);
 
   final List<TableModel> tableModel;
 }
 
-final class PreOrderFailure extends PreOrderState {
-  PreOrderFailure(this.exception);
+final class ExcelDataFailure extends ExcelDataState {
+  ExcelDataFailure(this.exception);
   final Object? exception;
 }
