@@ -3,10 +3,12 @@ import 'package:kidburg_banquet/data/repository/excel_repository.dart';
 import 'package:kidburg_banquet/domain/model/category_model.dart';
 import 'package:kidburg_banquet/domain/model/product_model.dart';
 import 'package:kidburg_banquet/domain/model/table_model.dart';
+import 'package:kidburg_banquet/presentation/screens/preorder_form/vm/dish_vm.dart';
 import 'package:kidburg_banquet/presentation/screens/preorder_form/vm/pre_order_vm.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
 import 'package:kidburg_banquet/presentation/widgets/custom_text_field.dart';
+import 'package:provider/provider.dart';
 
 class PreOrderFormScreen extends StatefulWidget {
   const PreOrderFormScreen({super.key});
@@ -36,18 +38,21 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(AppPadding.low),
-        child: FutureBuilder(
-          future: vm.readDataFromExcel(),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              final tableData = snapshot.data!;
-              return _TableListWidget(tableData: tableData);
-            } else {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-          },
+        child: ChangeNotifierProvider(
+          create: (context) => vm,
+          child: FutureBuilder(
+            future: vm.readDataFromExcel(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                final tableData = snapshot.data!;
+                return _TableListWidget(tableData: tableData);
+              } else {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+            },
+          ),
         ),
       ),
     );
@@ -122,8 +127,12 @@ class _ProductListWidget extends StatelessWidget {
       shrinkWrap: true,
       itemCount: products.length,
       itemBuilder: (context, index) {
-        return RowProduct(
-          name: products[index].nameProduct!,
+        return ChangeNotifierProvider(
+          create: (context) => DishViewModel(
+            name: products[index].nameProduct!,
+            price: int.parse(products[index].price!),
+          ),
+          child: const RowProduct(),
         );
       },
     );
@@ -133,11 +142,11 @@ class _ProductListWidget extends StatelessWidget {
 class RowProduct extends StatelessWidget {
   const RowProduct({
     super.key,
-    required this.name,
   });
-  final String name;
+
   @override
   Widget build(BuildContext context) {
+    final dishVM = context.watch<DishViewModel>();
     return Column(
       children: [
         const SizedBox(height: AppPadding.low),
@@ -148,22 +157,24 @@ class RowProduct extends StatelessWidget {
               Expanded(
                 flex: 2,
                 child: _PriceBoxWidget(
-                  name: name,
+                  name: dishVM.name,
                 ),
               ),
               const SizedBox(width: AppPadding.low),
               Expanded(
                 flex: 1,
                 child: CustomTextField(
-                  controller: TextEditingController(),
+                  onChanged: (value) => dishVM.updateCount(
+                    (int.tryParse(value) ?? 0).toString(),
+                  ),
                   label: 'Кол-во',
                 ),
               ),
               const SizedBox(width: AppPadding.low),
-              const Expanded(
+              Expanded(
                 flex: 2,
                 child: _PriceBoxWidget(
-                  name: 'Сумма',
+                  name: "Сумма: ${dishVM.totalPrice}",
                 ),
               ),
             ],
