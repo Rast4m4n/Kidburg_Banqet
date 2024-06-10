@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidburg_banquet/data/repository/excel_repository.dart';
+import 'package:kidburg_banquet/domain/model/category_model.dart';
+import 'package:kidburg_banquet/domain/model/product_model.dart';
 import 'package:kidburg_banquet/domain/model/table_model.dart';
-import 'package:kidburg_banquet/presentation/screens/preorder_form/bloc/pre_order_bloc.dart';
+import 'package:kidburg_banquet/presentation/screens/preorder_form/vm/pre_order_vm.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
 import 'package:kidburg_banquet/presentation/widgets/custom_text_field.dart';
@@ -15,31 +16,10 @@ class PreOrderFormScreen extends StatefulWidget {
 }
 
 class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
-  final excelDataBloc = ExcelDataBloc(
-    excelRepository: ExcelRepository(),
-  );
-
-  List<Widget> generateRowProduct(List<TableModel> tableWithFood) {
-    final List<Widget> widgets = [];
-
-    for (var table in tableWithFood) {
-      widgets.add(_TitleTableForAdult(name: table.name));
-      widgets.add(const SizedBox(height: AppPadding.low));
-      for (var category in table.categories) {
-        widgets.add(_CategoryOfProduct(name: category.name));
-        widgets.add(const SizedBox(height: AppPadding.low));
-        for (var product in category.products) {
-          widgets.add(RowProduct(name: product.nameProduct!));
-          widgets.add(const SizedBox(height: AppPadding.low));
-        }
-      }
-    }
-    return widgets;
-  }
+  final vm = PreOrderViewModel(excelRepository: ExcelRepository());
 
   @override
   void initState() {
-    excelDataBloc.add(LoadedListDishesEvent());
     super.initState();
   }
 
@@ -56,30 +36,96 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(AppPadding.low),
-        child: ListView(
-          children: [
-            BlocBuilder<ExcelDataBloc, ExcelDataState>(
-              bloc: excelDataBloc,
-              builder: (context, state) {
-                if (state is ExcelDataLoaded) {
-                  final tableWithFood = state.tableModel;
-                  return Column(children: generateRowProduct(tableWithFood));
-                } else if (state is ExcelDataFailure) {
-                  return Center(
-                    child: Text(
-                      'Ошибка вывода данных: ${state.exception?.toString()}',
-                    ),
-                  );
-                } else {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-              },
-            )
-          ],
+        child: FutureBuilder(
+          future: vm.readDataFromExcel(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              final tableData = snapshot.data!;
+              return _TableListWidget(tableData: tableData);
+            } else {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+          },
         ),
       ),
+    );
+  }
+}
+
+class _TableListWidget extends StatelessWidget {
+  const _TableListWidget({
+    super.key,
+    required this.tableData,
+  });
+
+  final List<TableModel> tableData;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: tableData.length,
+      itemBuilder: (context, index) {
+        final categories = tableData[index].categories;
+        return Column(
+          children: [
+            _TitleTableWidget(name: tableData[index].name),
+            const SizedBox(height: AppPadding.low),
+            _CategoryListWidget(categories: categories),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _CategoryListWidget extends StatelessWidget {
+  const _CategoryListWidget({
+    super.key,
+    required this.categories,
+  });
+
+  final List<CategoryModel> categories;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      itemCount: categories.length,
+      itemBuilder: (context, index) {
+        final products = categories[index].products;
+        return Column(
+          children: [
+            _CategoryNameWidget(name: categories[index].name),
+            _ProductListWidget(products: products),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _ProductListWidget extends StatelessWidget {
+  const _ProductListWidget({
+    super.key,
+    required this.products,
+  });
+
+  final List<ProductModel> products;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      itemCount: products.length,
+      itemBuilder: (context, index) {
+        return RowProduct(
+          name: products[index].nameProduct!,
+        );
+      },
     );
   }
 }
@@ -92,39 +138,45 @@ class RowProduct extends StatelessWidget {
   final String name;
   @override
   Widget build(BuildContext context) {
-    return IntrinsicHeight(
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Expanded(
-            flex: 2,
-            child: _BoxInformationProduct(
-              name: name,
-            ),
+    return Column(
+      children: [
+        const SizedBox(height: AppPadding.low),
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                flex: 2,
+                child: _PriceBoxWidget(
+                  name: name,
+                ),
+              ),
+              const SizedBox(width: AppPadding.low),
+              Expanded(
+                flex: 1,
+                child: CustomTextField(
+                  controller: TextEditingController(),
+                  label: 'Кол-во',
+                ),
+              ),
+              const SizedBox(width: AppPadding.low),
+              const Expanded(
+                flex: 2,
+                child: _PriceBoxWidget(
+                  name: 'Сумма',
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: AppPadding.low),
-          Expanded(
-            flex: 1,
-            child: CustomTextField(
-              controller: TextEditingController(),
-              label: 'Кол-во',
-            ),
-          ),
-          const SizedBox(width: AppPadding.low),
-          const Expanded(
-            flex: 2,
-            child: _BoxInformationProduct(
-              name: 'Сумма',
-            ),
-          ),
-        ],
-      ),
+        ),
+        const SizedBox(height: AppPadding.low),
+      ],
     );
   }
 }
 
-class _BoxInformationProduct extends StatelessWidget {
-  const _BoxInformationProduct({
+class _PriceBoxWidget extends StatelessWidget {
+  const _PriceBoxWidget({
     super.key,
     required this.name,
   });
@@ -144,8 +196,8 @@ class _BoxInformationProduct extends StatelessWidget {
   }
 }
 
-class _TitleTableForAdult extends StatelessWidget {
-  const _TitleTableForAdult({
+class _TitleTableWidget extends StatelessWidget {
+  const _TitleTableWidget({
     super.key,
     required this.name,
   });
@@ -181,8 +233,8 @@ class _TitleTableForAdult extends StatelessWidget {
   }
 }
 
-class _CategoryOfProduct extends StatelessWidget {
-  const _CategoryOfProduct({
+class _CategoryNameWidget extends StatelessWidget {
+  const _CategoryNameWidget({
     super.key,
     required this.name,
   });
