@@ -5,6 +5,7 @@ import 'package:kidburg_banquet/domain/model/product_model.dart';
 import 'package:kidburg_banquet/domain/model/table_model.dart';
 import 'package:kidburg_banquet/presentation/screens/preorder_form/vm/dish_vm.dart';
 import 'package:kidburg_banquet/presentation/screens/preorder_form/vm/pre_order_vm.dart';
+import 'package:kidburg_banquet/presentation/screens/preorder_form/vm/table_vm.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
 import 'package:kidburg_banquet/presentation/widgets/custom_text_field.dart';
@@ -18,12 +19,9 @@ class PreOrderFormScreen extends StatefulWidget {
 }
 
 class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
-  final vm = PreOrderViewModel(excelRepository: ExcelRepository());
-
-  @override
-  void initState() {
-    super.initState();
-  }
+  final vm = PreOrderViewModel(
+    excelRepository: ExcelRepository(),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -69,18 +67,43 @@ class _TableListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: tableData.length,
-      itemBuilder: (context, index) {
-        final categories = tableData[index].categories;
-        return Column(
-          children: [
-            _TitleTableWidget(name: tableData[index].name),
-            const SizedBox(height: AppPadding.low),
-            _CategoryListWidget(categories: categories),
-          ],
-        );
-      },
+    return SingleChildScrollView(
+      child: Column(
+        children: tableData.map(
+          (table) {
+            return Column(
+              children: [
+                ChangeNotifierProvider(
+                  create: (context) => TableViewModel(tableModel: table),
+                  child: const _TableWidget(),
+                ),
+              ],
+            );
+          },
+        ).toList(),
+      ),
+    );
+  }
+}
+
+class _TableWidget extends StatelessWidget {
+  const _TableWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final vm = context.watch<TableViewModel>();
+    return Column(
+      children: [
+        const _TitleTableWidget(),
+        const SizedBox(height: AppPadding.low),
+        Visibility(
+          maintainState: true,
+          visible: vm.isVisibleTable,
+          child: _CategoryListWidget(categories: vm.tableModel.categories),
+        ),
+      ],
     );
   }
 }
@@ -95,19 +118,18 @@ class _CategoryListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      itemCount: categories.length,
-      itemBuilder: (context, index) {
-        final products = categories[index].products;
-        return Column(
-          children: [
-            _CategoryNameWidget(name: categories[index].name),
-            _ProductListWidget(products: products),
-          ],
-        );
-      },
+    return Column(
+      children: categories.map(
+        (category) {
+          final products = category.products;
+          return Column(
+            children: [
+              _CategoryNameWidget(name: category.name),
+              _ProductListWidget(products: products),
+            ],
+          );
+        },
+      ).toList(),
     );
   }
 }
@@ -122,19 +144,22 @@ class _ProductListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      itemCount: products.length,
-      itemBuilder: (context, index) {
-        return ChangeNotifierProvider(
-          create: (context) => DishViewModel(
-            name: products[index].nameProduct!,
-            price: int.parse(products[index].price!),
-          ),
-          child: const RowProduct(),
-        );
-      },
+    return Column(
+      children: products.map(
+        (product) {
+          return Column(
+            children: [
+              ChangeNotifierProvider(
+                create: (context) => DishViewModel(
+                  name: product.nameProduct!,
+                  price: int.parse(product.price!),
+                ),
+                child: const RowProduct(),
+              ),
+            ],
+          );
+        },
+      ).toList(),
     );
   }
 }
@@ -210,11 +235,10 @@ class _PriceBoxWidget extends StatelessWidget {
 class _TitleTableWidget extends StatelessWidget {
   const _TitleTableWidget({
     super.key,
-    required this.name,
   });
-  final String name;
   @override
   Widget build(BuildContext context) {
+    final vm = context.watch<TableViewModel>();
     return DecoratedBox(
       decoration: const BoxDecoration(
         color: AppColor.tableForAdult,
@@ -228,14 +252,16 @@ class _TitleTableWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              name,
+              vm.tableModel.name,
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
             ),
             IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.arrow_drop_down_sharp),
+              onPressed: vm.expandTable,
+              icon: vm.isVisibleTable
+                  ? const Icon(Icons.arrow_drop_down_sharp)
+                  : const Icon(Icons.arrow_drop_up_sharp),
             )
           ],
         ),
