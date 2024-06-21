@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:kidburg_banquet/domain/model/product_model.dart';
 
 class DishViewModel with ChangeNotifier {
-  DishViewModel({
-    required this.name,
-    required this.price,
-    this.count = 0,
-  });
+  DishViewModel({required this.product});
 
-  final String name;
-  final int price;
-  int count;
+  ProductModel product;
 
   void updateCount(String count) {
-    this.count = int.parse(count);
+    product = product.copyWith(count: int.parse(count));
     notifyListeners();
   }
 
-  int get totalPrice => count * price;
+  int get totalPrice => (product.count ?? 0) * int.parse(product.price!);
 }
