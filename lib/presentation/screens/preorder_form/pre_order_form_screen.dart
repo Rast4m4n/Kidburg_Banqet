@@ -147,16 +147,16 @@ class _ProductListWidget extends StatelessWidget {
     return Column(
       children: products.map(
         (product) {
-          return Column(
-            children: [
-              ChangeNotifierProvider(
-                create: (context) => DishViewModel(
-                  name: product.nameProduct!,
-                  price: int.parse(product.price!),
-                ),
-                child: const RowProduct(),
+          return ChangeNotifierProvider(
+            create: (context) => DishViewModel(
+              product: ProductModel(
+                idRow: product.idRow,
+                nameProduct: product.nameProduct,
+                weight: product.weight,
+                price: product.price,
               ),
-            ],
+            ),
+            child: const RowProduct(),
           );
         },
       ).toList(),
@@ -171,7 +171,7 @@ class RowProduct extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final dishVM = context.watch<DishViewModel>();
+    final vm = context.watch<DishViewModel>();
     return Column(
       children: [
         const SizedBox(height: AppPadding.low),
@@ -181,15 +181,15 @@ class RowProduct extends StatelessWidget {
             children: [
               Expanded(
                 flex: 2,
-                child: _PriceBoxWidget(
-                  name: dishVM.name,
+                child: _InfoProductBoxWidget(
+                  name: vm.product.nameProduct!,
                 ),
               ),
               const SizedBox(width: AppPadding.low),
               Expanded(
                 flex: 1,
                 child: CustomTextField(
-                  onChanged: (value) => dishVM.updateCount(
+                  onChanged: (value) => vm.updateCount(
                     (int.tryParse(value) ?? 0).toString(),
                   ),
                   label: 'Кол-во',
@@ -198,8 +198,8 @@ class RowProduct extends StatelessWidget {
               const SizedBox(width: AppPadding.low),
               Expanded(
                 flex: 2,
-                child: _PriceBoxWidget(
-                  name: "Сумма: ${dishVM.totalPrice}",
+                child: _InfoProductBoxWidget(
+                  name: "Сумма: ${vm.totalPrice}",
                 ),
               ),
             ],
@@ -211,8 +211,8 @@ class RowProduct extends StatelessWidget {
   }
 }
 
-class _PriceBoxWidget extends StatelessWidget {
-  const _PriceBoxWidget({
+class _InfoProductBoxWidget extends StatelessWidget {
+  const _InfoProductBoxWidget({
     super.key,
     required this.name,
   });
