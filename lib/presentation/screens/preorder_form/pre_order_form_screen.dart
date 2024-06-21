@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:kidburg_banquet/data/repository/excel_repository.dart';
 import 'package:kidburg_banquet/domain/model/category_model.dart';
 import 'package:kidburg_banquet/domain/model/product_model.dart';
@@ -23,9 +24,53 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
     excelRepository: ExcelRepository(),
   );
 
+  late ScrollController _controller;
+  bool _isVisible = true;
+  FloatingActionButtonLocation get _buttonLocation => _isVisible
+      ? FloatingActionButtonLocation.miniEndDocked
+      : FloatingActionButtonLocation.endFloat;
+
+  void _listen() {
+    switch (_controller.position.userScrollDirection) {
+      case ScrollDirection.idle:
+        break;
+      case ScrollDirection.forward:
+        _show();
+      case ScrollDirection.reverse:
+        _hide();
+    }
+  }
+
+  void _show() {
+    if (!_isVisible) setState(() => _isVisible = true);
+  }
+
+  void _hide() {
+    if (_isVisible) setState(() => _isVisible = false);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = ScrollController();
+    _controller.addListener(_listen);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _controller.removeListener(_listen);
+    _controller.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        child: const Icon(Icons.save),
+      ),
+      floatingActionButtonLocation: _buttonLocation,
       appBar: AppBar(
         title: Text(
           'Кидбург банкеты',
@@ -43,7 +88,10 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 final tableData = snapshot.data!;
-                return _TableListWidget(tableData: tableData);
+                return _TableListWidget(
+                  tableData: tableData,
+                  controller: _controller,
+                );
               } else {
                 return const Center(
                   child: CircularProgressIndicator(),
@@ -51,6 +99,32 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
               }
             },
           ),
+        ),
+      ),
+      bottomNavigationBar: _BottomNavigationBar(isVisible: _isVisible),
+    );
+  }
+}
+
+class _BottomNavigationBar extends StatelessWidget {
+  const _BottomNavigationBar({
+    super.key,
+    required this.isVisible,
+  });
+
+  final bool isVisible;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      height: isVisible ? 60 : 0,
+      child: BottomAppBar(
+        shape: CircularNotchedRectangle(),
+        child: const Row(
+          children: [
+            Text("Сумма"),
+          ],
         ),
       ),
     );
@@ -61,13 +135,15 @@ class _TableListWidget extends StatelessWidget {
   const _TableListWidget({
     super.key,
     required this.tableData,
+    required this.controller,
   });
 
   final List<TableModel> tableData;
-
+  final ScrollController controller;
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      controller: controller,
       child: Column(
         children: tableData.map(
           (table) {
@@ -172,6 +248,7 @@ class RowProduct extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<DishViewModel>();
+    final totalPrice = vm.totalPrice != 0 ? "${vm.totalPrice}" : null;
     return Column(
       children: [
         const SizedBox(height: AppPadding.low),
@@ -198,15 +275,44 @@ class RowProduct extends StatelessWidget {
               const SizedBox(width: AppPadding.low),
               Expanded(
                 flex: 2,
-                child: _InfoProductBoxWidget(
-                  name: "Сумма: ${vm.totalPrice}",
-                ),
+                child: PriceBoxWidget(totalPrice: totalPrice),
               ),
             ],
           ),
         ),
         const SizedBox(height: AppPadding.low),
       ],
+    );
+  }
+}
+
+class PriceBoxWidget extends StatelessWidget {
+  const PriceBoxWidget({
+    super.key,
+    required this.totalPrice,
+  });
+
+  final String? totalPrice;
+
+  @override
+  Widget build(BuildContext context) {
+    final InputDecorationTheme textFieldTheme =
+        Theme.of(context).inputDecorationTheme;
+    return TextField(
+      textAlign: TextAlign.center,
+      decoration: InputDecoration(
+        floatingLabelAlignment: FloatingLabelAlignment.center,
+        labelText: 'Сумма',
+        enabledBorder: textFieldTheme.border,
+        focusedBorder: InputBorder.none,
+        filled: true,
+        fillColor: AppColor.textFieldColor,
+        border: InputBorder.none,
+      ),
+      readOnly: true,
+      controller: TextEditingController(
+        text: totalPrice,
+      ),
     );
   }
 }
