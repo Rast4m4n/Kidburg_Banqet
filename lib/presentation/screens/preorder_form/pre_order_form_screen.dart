@@ -20,71 +20,47 @@ class PreOrderFormScreen extends StatefulWidget {
 }
 
 class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
-  final vm = PreOrderViewModel(
-    excelRepository: ExcelRepository(),
-  );
-
-  late ScrollController _controller;
-  late ValueNotifier<bool> _isVisible;
-  FloatingActionButtonLocation get _buttonLocation => _isVisible.value
-      ? FloatingActionButtonLocation.miniEndDocked
-      : FloatingActionButtonLocation.endFloat;
-
-  void _listen() {
-    switch (_controller.position.userScrollDirection) {
-      case ScrollDirection.idle:
-        break;
-      case ScrollDirection.forward:
-        _show();
-      case ScrollDirection.reverse:
-        _hide();
-    }
-  }
-
-  void _show() {
-    if (!_isVisible.value) _isVisible.value = true;
-  }
-
-  void _hide() {
-    if (_isVisible.value) _isVisible.value = false;
-  }
+  late final PreOrderViewModel vm;
 
   @override
   void initState() {
     super.initState();
-    _controller = ScrollController();
-    _controller.addListener(_listen);
-    _isVisible = ValueNotifier<bool>(true);
+    vm = PreOrderViewModel(
+      excelRepository: ExcelRepository(),
+      scrollController: ScrollController(),
+    );
+    vm.scrollController.addListener(vm.listenScrollController);
+    vm.isVisible = ValueNotifier<bool>(true);
   }
 
   @override
   void dispose() {
     super.dispose();
-    _controller.removeListener(_listen);
-    _controller.dispose();
-    _isVisible.dispose();
+    vm.scrollController.removeListener(vm.listenScrollController);
+    vm.scrollController.dispose();
+    vm.isVisible.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        child: const Icon(Icons.save),
-      ),
-      floatingActionButtonLocation: _buttonLocation,
-      appBar: AppBar(
-        title: Text(
-          'Кидбург банкеты',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+    return ChangeNotifierProvider(
+      create: (context) => vm,
+      child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {},
+          child: const Icon(Icons.save),
         ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(AppPadding.low),
-        child: ChangeNotifierProvider(
-          create: (context) => vm,
+        floatingActionButtonLocation: vm.buttonLocation,
+        appBar: AppBar(
+          title: Text(
+            'Кидбург банкеты',
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+          ),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(AppPadding.low),
           child: FutureBuilder(
             future: vm.readDataFromExcel(),
             builder: (context, snapshot) {
@@ -92,7 +68,7 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
                 final tableData = snapshot.data!;
                 return _TableListWidget(
                   tableData: tableData,
-                  controller: _controller,
+                  controller: vm.scrollController,
                 );
               } else {
                 return const Center(
@@ -102,12 +78,12 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
             },
           ),
         ),
-      ),
-      bottomNavigationBar: ValueListenableBuilder<bool>(
-        valueListenable: _isVisible,
-        builder: (context, isVisible, child) {
-          return _BottomNavigationBar(isVisible: isVisible);
-        },
+        bottomNavigationBar: ValueListenableBuilder<bool>(
+          valueListenable: vm.isVisible,
+          builder: (context, isVisible, child) {
+            return _BottomNavigationBar(isVisible: isVisible);
+          },
+        ),
       ),
     );
   }
