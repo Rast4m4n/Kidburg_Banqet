@@ -25,8 +25,8 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
   );
 
   late ScrollController _controller;
-  bool _isVisible = true;
-  FloatingActionButtonLocation get _buttonLocation => _isVisible
+  late ValueNotifier<bool> _isVisible;
+  FloatingActionButtonLocation get _buttonLocation => _isVisible.value
       ? FloatingActionButtonLocation.miniEndDocked
       : FloatingActionButtonLocation.endFloat;
 
@@ -42,11 +42,11 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
   }
 
   void _show() {
-    if (!_isVisible) setState(() => _isVisible = true);
+    if (!_isVisible.value) _isVisible.value = true;
   }
 
   void _hide() {
-    if (_isVisible) setState(() => _isVisible = false);
+    if (_isVisible.value) _isVisible.value = false;
   }
 
   @override
@@ -54,6 +54,7 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
     super.initState();
     _controller = ScrollController();
     _controller.addListener(_listen);
+    _isVisible = ValueNotifier<bool>(true);
   }
 
   @override
@@ -61,6 +62,7 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
     super.dispose();
     _controller.removeListener(_listen);
     _controller.dispose();
+    _isVisible.dispose();
   }
 
   @override
@@ -101,7 +103,12 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: _BottomNavigationBar(isVisible: _isVisible),
+      bottomNavigationBar: ValueListenableBuilder<bool>(
+        valueListenable: _isVisible,
+        builder: (context, isVisible, child) {
+          return _BottomNavigationBar(isVisible: isVisible);
+        },
+      ),
     );
   }
 }
@@ -119,9 +126,9 @@ class _BottomNavigationBar extends StatelessWidget {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       height: isVisible ? 60 : 0,
-      child: BottomAppBar(
+      child: const BottomAppBar(
         shape: CircularNotchedRectangle(),
-        child: const Row(
+        child: Row(
           children: [
             Text("Сумма"),
           ],
