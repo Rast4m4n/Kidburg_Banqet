@@ -273,6 +273,8 @@ class RowProduct extends StatelessWidget {
               Expanded(
                 flex: 1,
                 child: CustomTextField(
+                  textAlign: TextAlign.center,
+                  floatingLabelAlignment: FloatingLabelAlignment.center,
                   onChanged: (value) => vm.updateCount(
                     (int.tryParse(value) ?? 0).toString(),
                   ),
@@ -306,6 +308,9 @@ class PriceBoxWidget extends StatelessWidget {
     final InputDecorationTheme textFieldTheme =
         Theme.of(context).inputDecorationTheme;
     return TextField(
+      maxLines: null,
+      minLines: null,
+      expands: true,
       textAlign: TextAlign.center,
       decoration: InputDecoration(
         floatingLabelAlignment: FloatingLabelAlignment.center,

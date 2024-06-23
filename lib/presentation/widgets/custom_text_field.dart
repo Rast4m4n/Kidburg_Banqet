@@ -12,6 +12,10 @@ class CustomTextField extends StatelessWidget {
     this.onTap,
     this.suffixIcon,
     this.onChanged,
+    this.textAlign,
+    this.maxLines,
+    this.minLines,
+    this.floatingLabelAlignment,
   });
 
   // final double maxWidth;
@@ -21,19 +25,25 @@ class CustomTextField extends StatelessWidget {
   final VoidCallback? onTap;
   final Icon? suffixIcon;
   final Function(String)? onChanged;
+  final TextAlign? textAlign;
+  final int? maxLines;
+  final int? minLines;
+  final FloatingLabelAlignment? floatingLabelAlignment;
   @override
   Widget build(BuildContext context) {
     final InputDecorationTheme textFieldTheme =
         Theme.of(context).inputDecorationTheme;
     return TextField(
-      maxLines: null,
-      minLines: null,
+      maxLines: maxLines,
+      minLines: minLines,
       expands: true,
       onTap: onTap,
+      textAlign: textAlign ?? TextAlign.start,
       readOnly: onTap != null ? true : false,
       onChanged: (value) => onChanged!(value),
       controller: controller,
       decoration: InputDecoration(
+        floatingLabelAlignment: floatingLabelAlignment,
         suffixIcon: suffixIcon,
         labelText: label,
         labelStyle: textFieldTheme.labelStyle,
