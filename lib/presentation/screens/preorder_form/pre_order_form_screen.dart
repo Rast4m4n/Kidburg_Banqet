@@ -152,17 +152,27 @@ class _TableWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final vm = context.watch<TableViewModel>();
-    return Column(
-      children: [
-        const _TitleTableWidget(),
-        const SizedBox(height: AppPadding.low),
-        Visibility(
-          maintainState: true,
-          visible: vm.isVisibleTable,
-          child: _CategoryListWidget(categories: vm.tableModel.categories),
-        ),
-      ],
+    return Consumer<TableViewModel>(
+      builder: (BuildContext context, TableViewModel vm, Widget? child) {
+        return Column(
+          children: [
+            child!,
+            Visibility(
+              maintainState: true,
+              visible: vm.isVisibleTable,
+              child: _CategoryListWidget(
+                categories: vm.tableModel.categories,
+              ),
+            ),
+          ],
+        );
+      },
+      child: const Column(
+        children: [
+          _TitleTableWidget(),
+          SizedBox(height: AppPadding.low),
+        ],
+      ),
     );
   }
 }
