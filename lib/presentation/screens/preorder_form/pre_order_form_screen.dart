@@ -103,11 +103,15 @@ class _BottomNavigationBar extends StatelessWidget {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       height: isVisible ? 60 : 0,
-      child: const BottomAppBar(
-        shape: CircularNotchedRectangle(),
+      child: BottomAppBar(
+        shape: const CircularNotchedRectangle(),
         child: Row(
           children: [
-            Text("Сумма"),
+            Consumer<PreOrderViewModel>(
+              builder: (context, vm, child) {
+                return Text("Сумма: ${vm.totalSumOfProducts}");
+              },
+            ),
           ],
         ),
       ),
@@ -255,6 +259,7 @@ class _ProductListWidget extends StatelessWidget {
                 weight: product.weight,
                 price: product.price,
               ),
+              preOrderViewModel: context.read<PreOrderViewModel>(),
             ),
             child: const RowProduct(),
           );
@@ -292,9 +297,11 @@ class RowProduct extends StatelessWidget {
                 child: CustomTextField(
                   textAlign: TextAlign.center,
                   floatingLabelAlignment: FloatingLabelAlignment.center,
-                  onChanged: (value) => vm.updateCount(
-                    (int.tryParse(value) ?? 0).toString(),
-                  ),
+                  onChanged: (value) {
+                    vm.updateCount(
+                      (int.tryParse(value) ?? 0).toString(),
+                    );
+                  },
                   label: 'Кол-во',
                 ),
               ),

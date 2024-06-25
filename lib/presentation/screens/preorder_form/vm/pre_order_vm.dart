@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:kidburg_banquet/data/repository/excel_repository.dart';
+import 'package:kidburg_banquet/domain/model/product_model.dart';
 import 'package:kidburg_banquet/domain/model/table_model.dart';
 
 class PreOrderViewModel with ChangeNotifier {
@@ -10,10 +11,12 @@ class PreOrderViewModel with ChangeNotifier {
   });
 
   final ExcelRepository excelRepository;
+  final List<ProductModel> products = [];
+  int _totalSumOfProducts = 0;
+  int get totalSumOfProducts => _totalSumOfProducts;
 
   final ScrollController scrollController;
   ValueNotifier<bool> isVisible = ValueNotifier(true);
-
   FloatingActionButtonLocation get buttonLocation => isVisible.value
       ? FloatingActionButtonLocation.miniEndDocked
       : FloatingActionButtonLocation.endFloat;
@@ -39,5 +42,15 @@ class PreOrderViewModel with ChangeNotifier {
 
   Future<List<TableModel>> readDataFromExcel() async {
     return await excelRepository.readDataExcel();
+  }
+
+  void calculateSumOfProducts() {
+    _totalSumOfProducts = products.fold(
+      0,
+      (previousProduct, currentProduct) =>
+          previousProduct +
+          (int.parse(currentProduct.price!) * currentProduct.count!),
+    );
+    notifyListeners();
   }
 }
