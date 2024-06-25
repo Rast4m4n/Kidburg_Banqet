@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:kidburg_banquet/data/repository/excel_repository.dart';
 import 'package:kidburg_banquet/domain/model/category_model.dart';
 import 'package:kidburg_banquet/domain/model/product_model.dart';
@@ -45,21 +44,29 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => vm,
-      child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {},
-          child: const Icon(Icons.save),
-        ),
-        floatingActionButtonLocation: vm.buttonLocation,
-        appBar: AppBar(
-          title: Text(
-            'Кидбург банкеты',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
-        ),
-        body: Padding(
+      child: ValueListenableBuilder<bool>(
+        valueListenable: vm.isVisible,
+        builder: (BuildContext context, bool isVisible, Widget? child) {
+          return Scaffold(
+            floatingActionButton: FloatingActionButton(
+              mini: isVisible,
+              onPressed: () {},
+              child: const Icon(Icons.save),
+            ),
+            floatingActionButtonLocation: vm.buttonLocation,
+            appBar: AppBar(
+              title: Text(
+                'Кидбург банкеты',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+            ),
+            body: child!,
+            bottomNavigationBar: _BottomNavigationBar(isVisible: isVisible),
+          );
+        },
+        child: Padding(
           padding: const EdgeInsets.all(AppPadding.low),
           child: FutureBuilder(
             future: vm.readDataFromExcel(),
@@ -77,12 +84,6 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
               }
             },
           ),
-        ),
-        bottomNavigationBar: ValueListenableBuilder<bool>(
-          valueListenable: vm.isVisible,
-          builder: (context, isVisible, child) {
-            return _BottomNavigationBar(isVisible: isVisible);
-          },
         ),
       ),
     );
@@ -145,21 +146,51 @@ class _TableListWidget extends StatelessWidget {
   }
 }
 
-class _TableWidget extends StatelessWidget {
+class _TableWidget extends StatefulWidget {
   const _TableWidget({
     super.key,
   });
 
   @override
+  State<_TableWidget> createState() => _TableWidgetState();
+}
+
+class _TableWidgetState extends State<_TableWidget>
+    with TickerProviderStateMixin {
+  late final animationController = AnimationController(
+    duration: const Duration(milliseconds: 200),
+    vsync: this,
+  );
+
+  @override
+  void dispose() {
+    super.dispose();
+    animationController.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Consumer<TableViewModel>(
       builder: (BuildContext context, TableViewModel vm, Widget? child) {
+        if (vm.isVisibleTable) {
+          animationController.forward();
+        } else {
+          animationController.reverse();
+        }
         return Column(
           children: [
             child!,
-            Visibility(
-              maintainState: true,
-              visible: vm.isVisibleTable,
+            AnimatedBuilder(
+              animation: animationController,
+              builder: (context, child) {
+                return SizeTransition(
+                  sizeFactor: CurvedAnimation(
+                    parent: animationController,
+                    curve: Curves.linear,
+                  ),
+                  child: child,
+                );
+              },
               child: _CategoryListWidget(
                 categories: vm.tableModel.categories,
               ),
