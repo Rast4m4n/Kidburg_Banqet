@@ -1,6 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-class ProductModel {
-  ProductModel({
+class DishModel {
+  DishModel({
     required this.idRow,
     required this.nameProduct,
     required this.weight,
@@ -13,14 +13,14 @@ class ProductModel {
   final int? count;
   final String? price;
 
-  ProductModel copyWith({
+  DishModel copyWith({
     int? idRow,
     String? nameProduct,
     String? weight,
     int? count,
     String? price,
   }) {
-    return ProductModel(
+    return DishModel(
       idRow: idRow ?? this.idRow,
       nameProduct: nameProduct ?? this.nameProduct,
       weight: weight ?? this.weight,

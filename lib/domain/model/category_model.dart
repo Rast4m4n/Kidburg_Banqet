@@ -7,11 +7,11 @@ class CategoryModel {
   });
 
   final String name;
-  final List<ProductModel> products;
+  final List<DishModel> products;
 
   CategoryModel copywith({
     String? name,
-    List<ProductModel>? products,
+    List<DishModel>? products,
   }) {
     return CategoryModel(
       name: name ?? this.name,

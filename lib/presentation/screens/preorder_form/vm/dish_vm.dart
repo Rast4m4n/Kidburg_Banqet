@@ -8,7 +8,7 @@ class DishViewModel with ChangeNotifier {
     required this.preOrderViewModel,
   });
 
-  ProductModel product;
+  DishModel product;
   late final PreOrderViewModel preOrderViewModel;
 
   int get totalPrice => _tempProductCount * int.parse(product.price!);

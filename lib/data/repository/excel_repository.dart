@@ -26,7 +26,7 @@ class ExcelRepository {
     String categoryNameTmp = '';
 
     List<TableModel> tableModel = [];
-    List<ProductModel> productModel = [];
+    List<DishModel> productModel = [];
     List<CategoryModel> categoryModel = [];
 
     for (var row in excelData) {
@@ -34,7 +34,7 @@ class ExcelRepository {
 
       if (cellValue is IntCellValue) {
         productModel.add(
-          ProductModel(
+          DishModel(
             idRow: row[0]!.rowIndex,
             nameProduct: row[1]?.value.toString(),
             weight: row[3]?.value.toString(),

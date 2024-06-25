@@ -18,5 +18,5 @@ class BanqetModel {
   final String time;
   final int amountOfChildren;
   final int amountOfAdult;
-  final List<ProductModel> products;
+  final List<DishModel> products;
 }

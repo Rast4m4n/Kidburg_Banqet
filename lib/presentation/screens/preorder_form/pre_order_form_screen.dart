@@ -244,7 +244,7 @@ class _ProductListWidget extends StatelessWidget {
     required this.products,
   });
 
-  final List<ProductModel> products;
+  final List<DishModel> products;
 
   @override
   Widget build(BuildContext context) {
@@ -253,7 +253,7 @@ class _ProductListWidget extends StatelessWidget {
         (product) {
           return ChangeNotifierProvider(
             create: (context) => DishViewModel(
-              product: ProductModel(
+              product: DishModel(
                 idRow: product.idRow,
                 nameProduct: product.nameProduct,
                 weight: product.weight,

@@ -11,7 +11,7 @@ class PreOrderViewModel with ChangeNotifier {
   });
 
   final ExcelRepository excelRepository;
-  final List<ProductModel> products = [];
+  final List<DishModel> products = [];
   int _totalSumOfProducts = 0;
   int get totalSumOfProducts => _totalSumOfProducts;
 
