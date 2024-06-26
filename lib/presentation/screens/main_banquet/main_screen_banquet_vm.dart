@@ -68,7 +68,7 @@ class MainBanquetVM extends ChangeNotifier {
         nameClient: nameController.text,
         place: placeEventController.text,
         dateStart: selectedDate!,
-        timeStart: selectedTime!,
+        firstTimeServing: selectedTime!,
         amountOfChildren: int.parse(childrenController.text),
         amountOfAdult: int.parse(adultController.text),
       ),
