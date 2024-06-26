@@ -17,7 +17,7 @@ class TableViewModel with ChangeNotifier {
   ///Если index 1, то выведется время подачи на детский стол
   String addTimeServing(BuildContext context, int indexTimeServing) {
     final args = ModalRoute.of(context)!.settings.arguments as BanqetModel;
-    final firstTimeServing = args.timeStart;
+    final firstTimeServing = args.firstTimeServing;
     final secondTimeServing = _calculateNextServingTime(firstTimeServing);
     return _convertToUTC24Format(
       indexTimeServing == 0 ? firstTimeServing : secondTimeServing,
