@@ -26,14 +26,14 @@ class ExcelRepository {
     String categoryNameTmp = '';
 
     List<TableModel> tableModel = [];
-    List<DishModel> productModel = [];
+    List<DishModel> dishModel = [];
     List<CategoryModel> categoryModel = [];
 
     for (var row in excelData) {
       CellValue? cellValue = row[0]?.value;
 
       if (cellValue is IntCellValue) {
-        productModel.add(
+        dishModel.add(
           DishModel(
             idRow: row[0]!.rowIndex,
             nameDish: row[1]?.value.toString(),
@@ -50,14 +50,14 @@ class ExcelRepository {
       // categoryNameTmp, а потом меняет на новый
       for (var category in CategoryEnum.values) {
         if (cellValue.toString() == category.name) {
-          if (productModel.isNotEmpty) {
+          if (dishModel.isNotEmpty) {
             categoryModel.add(
               CategoryModel(
                 name: categoryNameTmp,
-                dishes: productModel,
+                dishes: dishModel,
               ),
             );
-            productModel = [];
+            dishModel = [];
           }
           categoryNameTmp = cellValue.toString();
           continue;
@@ -76,7 +76,7 @@ class ExcelRepository {
           cellValue.toString() == "ДЕТСКИЙ СТОЛ") {
         if (categoryModel.isNotEmpty) {
           categoryModel.add(
-            CategoryModel(name: categoryNameTmp, dishes: productModel),
+            CategoryModel(name: categoryNameTmp, dishes: dishModel),
           );
           tableModel.add(
             TableModel(
@@ -85,7 +85,7 @@ class ExcelRepository {
             ),
           );
           categoryModel = [];
-          productModel = [];
+          dishModel = [];
         }
         tableNameTmp = cellValue.toString();
         continue;
@@ -95,7 +95,7 @@ class ExcelRepository {
     // Для вывода детского стола и последней категории с блюдами
     if (categoryModel.isNotEmpty) {
       categoryModel.add(
-        CategoryModel(name: categoryNameTmp, dishes: productModel),
+        CategoryModel(name: categoryNameTmp, dishes: dishModel),
       );
       tableModel.add(
         TableModel(
