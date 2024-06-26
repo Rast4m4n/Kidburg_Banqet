@@ -1,21 +1,21 @@
-import 'package:kidburg_banquet/domain/model/product_model.dart';
+import 'package:kidburg_banquet/domain/model/dish_model.dart';
 
 class CategoryModel {
   CategoryModel({
     required this.name,
-    required this.products,
+    required this.dishes,
   });
 
   final String name;
-  final List<DishModel> products;
+  final List<DishModel> dishes;
 
   CategoryModel copywith({
     String? name,
-    List<DishModel>? products,
+    List<DishModel>? dishes,
   }) {
     return CategoryModel(
       name: name ?? this.name,
-      products: products ?? this.products,
+      dishes: dishes ?? this.dishes,
     );
   }
 }

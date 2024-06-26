@@ -2,7 +2,7 @@ import 'package:excel/excel.dart';
 import 'package:flutter/services.dart';
 import 'package:kidburg_banquet/domain/model/category_enum.dart';
 import 'package:kidburg_banquet/domain/model/category_model.dart';
-import 'package:kidburg_banquet/domain/model/product_model.dart';
+import 'package:kidburg_banquet/domain/model/dish_model.dart';
 import 'package:kidburg_banquet/domain/model/table_model.dart';
 
 class ExcelRepository {
@@ -36,7 +36,7 @@ class ExcelRepository {
         productModel.add(
           DishModel(
             idRow: row[0]!.rowIndex,
-            nameProduct: row[1]?.value.toString(),
+            nameDish: row[1]?.value.toString(),
             weight: row[3]?.value.toString(),
             price: row[6]?.value.toString(),
           ),
@@ -54,7 +54,7 @@ class ExcelRepository {
             categoryModel.add(
               CategoryModel(
                 name: categoryNameTmp,
-                products: productModel,
+                dishes: productModel,
               ),
             );
             productModel = [];
@@ -76,7 +76,7 @@ class ExcelRepository {
           cellValue.toString() == "ДЕТСКИЙ СТОЛ") {
         if (categoryModel.isNotEmpty) {
           categoryModel.add(
-            CategoryModel(name: categoryNameTmp, products: productModel),
+            CategoryModel(name: categoryNameTmp, dishes: productModel),
           );
           tableModel.add(
             TableModel(
@@ -95,7 +95,7 @@ class ExcelRepository {
     // Для вывода детского стола и последней категории с блюдами
     if (categoryModel.isNotEmpty) {
       categoryModel.add(
-        CategoryModel(name: categoryNameTmp, products: productModel),
+        CategoryModel(name: categoryNameTmp, dishes: productModel),
       );
       tableModel.add(
         TableModel(

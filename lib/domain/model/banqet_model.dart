@@ -1,5 +1,5 @@
 import 'package:kidburg_banquet/domain/model/place_event_enum.dart';
-import 'package:kidburg_banquet/domain/model/product_model.dart';
+import 'package:kidburg_banquet/domain/model/dish_model.dart';
 
 class BanqetModel {
   const BanqetModel({
@@ -9,7 +9,7 @@ class BanqetModel {
     required this.time,
     required this.amountOfChildren,
     required this.amountOfAdult,
-    required this.products,
+    required this.dishes,
   });
 
   final String nameClient;
@@ -18,5 +18,5 @@ class BanqetModel {
   final String time;
   final int amountOfChildren;
   final int amountOfAdult;
-  final List<DishModel> products;
+  final List<DishModel> dishes;
 }

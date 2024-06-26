@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:kidburg_banquet/data/repository/excel_repository.dart';
-import 'package:kidburg_banquet/domain/model/product_model.dart';
+import 'package:kidburg_banquet/domain/model/dish_model.dart';
 import 'package:kidburg_banquet/domain/model/table_model.dart';
 
 class PreOrderViewModel with ChangeNotifier {
@@ -11,9 +11,9 @@ class PreOrderViewModel with ChangeNotifier {
   });
 
   final ExcelRepository excelRepository;
-  final List<DishModel> products = [];
-  int _totalSumOfProducts = 0;
-  int get totalSumOfProducts => _totalSumOfProducts;
+  final List<DishModel> dishes = [];
+  int _totalSumOfDishes = 0;
+  int get totalSumOfProducts => _totalSumOfDishes;
 
   final ScrollController scrollController;
   ValueNotifier<bool> isVisible = ValueNotifier(true);
@@ -45,11 +45,10 @@ class PreOrderViewModel with ChangeNotifier {
   }
 
   void calculateSumOfProducts() {
-    _totalSumOfProducts = products.fold(
+    _totalSumOfDishes = dishes.fold(
       0,
-      (previousProduct, currentProduct) =>
-          previousProduct +
-          (int.parse(currentProduct.price!) * currentProduct.count!),
+      (previousDish, currentDish) =>
+          previousDish + (int.parse(currentDish.price!) * currentDish.count!),
     );
     notifyListeners();
   }

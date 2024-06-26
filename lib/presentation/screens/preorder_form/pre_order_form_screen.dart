@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kidburg_banquet/data/repository/excel_repository.dart';
 import 'package:kidburg_banquet/domain/model/category_model.dart';
-import 'package:kidburg_banquet/domain/model/product_model.dart';
+import 'package:kidburg_banquet/domain/model/dish_model.dart';
 import 'package:kidburg_banquet/domain/model/table_model.dart';
 import 'package:kidburg_banquet/presentation/screens/preorder_form/vm/dish_vm.dart';
 import 'package:kidburg_banquet/presentation/screens/preorder_form/vm/pre_order_vm.dart';
@@ -225,11 +225,11 @@ class _CategoryListWidget extends StatelessWidget {
     return Column(
       children: categories.map(
         (category) {
-          final products = category.products;
+          final products = category.dishes;
           return Column(
             children: [
               _CategoryNameWidget(name: category.name),
-              _ProductListWidget(products: products),
+              _DishListWidget(products: products),
             ],
           );
         },
@@ -238,8 +238,8 @@ class _CategoryListWidget extends StatelessWidget {
   }
 }
 
-class _ProductListWidget extends StatelessWidget {
-  const _ProductListWidget({
+class _DishListWidget extends StatelessWidget {
+  const _DishListWidget({
     super.key,
     required this.products,
   });
@@ -253,15 +253,15 @@ class _ProductListWidget extends StatelessWidget {
         (product) {
           return ChangeNotifierProvider(
             create: (context) => DishViewModel(
-              product: DishModel(
+              dish: DishModel(
                 idRow: product.idRow,
-                nameProduct: product.nameProduct,
+                nameDish: product.nameDish,
                 weight: product.weight,
                 price: product.price,
               ),
               preOrderViewModel: context.read<PreOrderViewModel>(),
             ),
-            child: const RowProduct(),
+            child: const RowDish(),
           );
         },
       ).toList(),
@@ -269,8 +269,8 @@ class _ProductListWidget extends StatelessWidget {
   }
 }
 
-class RowProduct extends StatelessWidget {
-  const RowProduct({
+class RowDish extends StatelessWidget {
+  const RowDish({
     super.key,
   });
 
@@ -287,8 +287,8 @@ class RowProduct extends StatelessWidget {
             children: [
               Expanded(
                 flex: 2,
-                child: _InfoProductBoxWidget(
-                  name: vm.product.nameProduct!,
+                child: _InfoDishBoxWidget(
+                  name: vm.dish.nameDish!,
                 ),
               ),
               const SizedBox(width: AppPadding.low),
@@ -353,8 +353,8 @@ class PriceBoxWidget extends StatelessWidget {
   }
 }
 
-class _InfoProductBoxWidget extends StatelessWidget {
-  const _InfoProductBoxWidget({
+class _InfoDishBoxWidget extends StatelessWidget {
+  const _InfoDishBoxWidget({
     super.key,
     required this.name,
   });

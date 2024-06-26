@@ -1,41 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:kidburg_banquet/domain/model/product_model.dart';
+import 'package:kidburg_banquet/domain/model/dish_model.dart';
 import 'package:kidburg_banquet/presentation/screens/preorder_form/vm/pre_order_vm.dart';
 
 class DishViewModel with ChangeNotifier {
   DishViewModel({
-    required this.product,
+    required this.dish,
     required this.preOrderViewModel,
   });
 
-  DishModel product;
+  DishModel dish;
   late final PreOrderViewModel preOrderViewModel;
 
-  int get totalPrice => _tempProductCount * int.parse(product.price!);
-  int get _tempProductCount => product.count ?? 0;
+  int get totalPrice => (dish.count ?? 0) * int.parse(dish.price!);
 
   void _calculateDish() {
-    bool productExists = preOrderViewModel.products
-        .any((existingProduct) => existingProduct.idRow == product.idRow);
+    bool dishExists = preOrderViewModel.dishes
+        .any((existingDish) => existingDish.idRow == dish.idRow);
 
-    if (productExists) {
+    if (dishExists) {
       _updateExistingDish();
     } else {
-      preOrderViewModel.products.add(product);
+      preOrderViewModel.dishes.add(dish);
     }
   }
 
   void _updateExistingDish() {
-    preOrderViewModel.products.removeWhere(
-        (existingProduct) => existingProduct.idRow == product.idRow);
+    preOrderViewModel.dishes
+        .removeWhere((existingDish) => existingDish.idRow == dish.idRow);
 
-    if (product.count != null && product.count! > 0) {
-      preOrderViewModel.products.add(product);
+    if (dish.count != null && dish.count! > 0) {
+      preOrderViewModel.dishes.add(dish);
     }
   }
 
   void updateCount(String count) {
-    product = product.copyWith(count: int.parse(count));
+    dish = dish.copyWith(count: int.parse(count));
     _calculateDish();
     preOrderViewModel.calculateSumOfProducts();
     notifyListeners();
