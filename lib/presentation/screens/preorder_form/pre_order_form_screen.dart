@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:kidburg_banquet/data/repository/excel_repository.dart';
-import 'package:kidburg_banquet/domain/model/category_model.dart';
 import 'package:kidburg_banquet/domain/model/dish_model.dart';
 import 'package:kidburg_banquet/domain/model/table_model.dart';
 import 'package:kidburg_banquet/presentation/screens/preorder_form/vm/dish_vm.dart';
@@ -139,7 +138,8 @@ class _TableListWidget extends StatelessWidget {
               children: [
                 ChangeNotifierProvider(
                   create: (context) => TableViewModel(tableModel: table),
-                  child: const _TableWidget(),
+                  child:
+                      _TableWidget(indexTimeServing: tableData.indexOf(table)),
                 ),
               ],
             );
@@ -153,8 +153,10 @@ class _TableListWidget extends StatelessWidget {
 class _TableWidget extends StatefulWidget {
   const _TableWidget({
     super.key,
+    required this.indexTimeServing,
   });
 
+  final int indexTimeServing;
   @override
   State<_TableWidget> createState() => _TableWidgetState();
 }
@@ -195,17 +197,15 @@ class _TableWidgetState extends State<_TableWidget>
                   child: child,
                 );
               },
-              child: _CategoryListWidget(
-                categories: vm.tableModel.categories,
-              ),
+              child: const _CategoryListWidget(),
             ),
           ],
         );
       },
-      child: const Column(
+      child: Column(
         children: [
-          _TitleTableWidget(),
-          SizedBox(height: AppPadding.low),
+          _TitleTableWidget(indexTimeServing: widget.indexTimeServing),
+          const SizedBox(height: AppPadding.low),
         ],
       ),
     );
@@ -215,15 +215,14 @@ class _TableWidgetState extends State<_TableWidget>
 class _CategoryListWidget extends StatelessWidget {
   const _CategoryListWidget({
     super.key,
-    required this.categories,
   });
-
-  final List<CategoryModel> categories;
 
   @override
   Widget build(BuildContext context) {
+    final vm = context.read<TableViewModel>();
+
     return Column(
-      children: categories.map(
+      children: vm.tableModel.categories.map(
         (category) {
           final products = category.dishes;
           return Column(
@@ -377,11 +376,13 @@ class _InfoDishBoxWidget extends StatelessWidget {
 class _TitleTableWidget extends StatelessWidget {
   const _TitleTableWidget({
     super.key,
+    required this.indexTimeServing,
   });
+
+  final int indexTimeServing;
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<TableViewModel>();
-
     return DecoratedBox(
       decoration: const BoxDecoration(
         color: AppColor.tableForAdult,
@@ -395,7 +396,7 @@ class _TitleTableWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              vm.tableModel.name,
+              "${vm.tableModel.name} ${vm.addTimeServing(context, indexTimeServing)}",
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
