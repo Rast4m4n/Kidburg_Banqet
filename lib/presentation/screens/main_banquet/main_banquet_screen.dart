@@ -6,10 +6,28 @@ import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
 import 'package:kidburg_banquet/presentation/widgets/custom_text_field.dart';
 import 'package:provider/provider.dart';
 
-class MainBanquetScreen extends StatelessWidget {
-  MainBanquetScreen({super.key});
+class MainBanquetScreen extends StatefulWidget {
+  const MainBanquetScreen({super.key});
 
-  final CreateBanquetVM vm = CreateBanquetVM();
+  @override
+  State<MainBanquetScreen> createState() => _MainBanquetScreenState();
+}
+
+class _MainBanquetScreenState extends State<MainBanquetScreen> {
+  late final MainBanquetVM vm;
+
+  @override
+  void initState() {
+    super.initState();
+    vm = MainBanquetVM(
+      nameController: TextEditingController(),
+      timeController: TextEditingController(),
+      dateController: TextEditingController(),
+      placeEventController: TextEditingController(),
+      childrenController: TextEditingController(),
+      adultController: TextEditingController(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +70,7 @@ class _GridActionFields extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final vm = context.read<MainBanquetVM>();
     return SizedBox(
       height: 190,
       child: GridView.count(
@@ -62,21 +81,21 @@ class _GridActionFields extends StatelessWidget {
         primary: false,
         children: [
           CustomTextField(
-            controller: TextEditingController(),
+            controller: vm.nameController,
             label: 'Имя заказчика',
           ),
           const _TextFieldDatePicker(),
           const _PlaceEventDropDownMenu(),
           CustomTextField(
-            controller: TextEditingController(),
+            controller: vm.timeController,
             label: 'Время начало',
           ),
           CustomTextField(
-            controller: TextEditingController(),
+            controller: vm.childrenController,
             label: 'Дети',
           ),
           CustomTextField(
-            controller: TextEditingController(),
+            controller: vm.adultController,
             label: 'Взрослые',
           ),
         ],
@@ -92,6 +111,7 @@ class _PlaceEventDropDownMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final vm = context.read<MainBanquetVM>();
     return DropdownMenu(
       expandedInsets: const EdgeInsets.all(0),
       inputDecorationTheme: const InputDecorationTheme(
@@ -105,6 +125,7 @@ class _PlaceEventDropDownMenu extends StatelessWidget {
         'Место проведения',
         style: Theme.of(context).inputDecorationTheme.labelStyle,
       ),
+      controller: vm.placeEventController,
       dropdownMenuEntries:
           PlaceEventEnum.values.map<DropdownMenuEntry<PlaceEventEnum>>(
         (PlaceEventEnum place) {
@@ -125,13 +146,9 @@ class _TextFieldDatePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final CreateBanquetVM vm = Provider.of<CreateBanquetVM>(context);
-    final String? isPickedDate = vm.selectedDate != null
-        ? "${vm.selectedDate!.day}.${vm.selectedDate!.month}.${vm.selectedDate!.year}"
-        : null;
-
+    final MainBanquetVM vm = Provider.of<MainBanquetVM>(context);
     return CustomTextField(
-      controller: TextEditingController(text: isPickedDate),
+      controller: vm.dateController,
       label: 'Дата проведения',
       onTap: () => vm.showDate(context),
     );

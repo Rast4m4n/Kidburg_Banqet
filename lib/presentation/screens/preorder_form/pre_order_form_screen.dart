@@ -381,6 +381,7 @@ class _TitleTableWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<TableViewModel>();
+
     return DecoratedBox(
       decoration: const BoxDecoration(
         color: AppColor.tableForAdult,

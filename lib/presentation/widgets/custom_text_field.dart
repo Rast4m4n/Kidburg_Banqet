@@ -40,7 +40,7 @@ class CustomTextField extends StatelessWidget {
       onTap: onTap,
       textAlign: textAlign ?? TextAlign.start,
       readOnly: onTap != null ? true : false,
-      onChanged: (value) => onChanged!(value),
+      onChanged: onChanged,
       controller: controller,
       decoration: InputDecoration(
         floatingLabelAlignment: floatingLabelAlignment,

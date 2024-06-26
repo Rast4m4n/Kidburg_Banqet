@@ -1,22 +1,17 @@
-import 'package:kidburg_banquet/domain/model/place_event_enum.dart';
-import 'package:kidburg_banquet/domain/model/dish_model.dart';
-
 class BanqetModel {
   const BanqetModel({
     required this.nameClient,
     required this.place,
-    required this.date,
-    required this.time,
+    required this.dateStart,
+    required this.timeStart,
     required this.amountOfChildren,
     required this.amountOfAdult,
-    required this.dishes,
   });
 
   final String nameClient;
-  final PlaceEventEnum place;
-  final String date;
-  final String time;
+  final String place;
+  final String dateStart;
+  final String timeStart;
   final int amountOfChildren;
   final int amountOfAdult;
-  final List<DishModel> dishes;
 }
