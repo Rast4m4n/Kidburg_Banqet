@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 class BanqetModel {
   const BanqetModel({
     required this.nameClient,
@@ -10,8 +12,8 @@ class BanqetModel {
 
   final String nameClient;
   final String place;
-  final String dateStart;
-  final String timeStart;
+  final DateTime dateStart;
+  final TimeOfDay timeStart;
   final int amountOfChildren;
   final int amountOfAdult;
 }

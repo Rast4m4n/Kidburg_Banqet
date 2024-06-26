@@ -84,11 +84,16 @@ class _GridActionFields extends StatelessWidget {
             controller: vm.nameController,
             label: 'Имя заказчика',
           ),
-          const _TextFieldDatePicker(),
+          _TextFieldPicker(
+            name: 'Дата проведения',
+            controller: vm.dateController,
+            onTap: () => vm.showDate(context),
+          ),
           const _PlaceEventDropDownMenu(),
-          CustomTextField(
+          _TextFieldPicker(
+            name: 'Время проведения',
             controller: vm.timeController,
-            label: 'Время начало',
+            onTap: () => vm.showTime(context),
           ),
           CustomTextField(
             controller: vm.childrenController,
@@ -139,18 +144,22 @@ class _PlaceEventDropDownMenu extends StatelessWidget {
   }
 }
 
-class _TextFieldDatePicker extends StatelessWidget {
-  const _TextFieldDatePicker({
+class _TextFieldPicker extends StatelessWidget {
+  const _TextFieldPicker({
     super.key,
+    required this.controller,
+    required this.name,
+    required this.onTap,
   });
-
+  final TextEditingController controller;
+  final String name;
+  final VoidCallback onTap;
   @override
   Widget build(BuildContext context) {
-    final MainBanquetVM vm = Provider.of<MainBanquetVM>(context);
     return CustomTextField(
-      controller: vm.dateController,
-      label: 'Дата проведения',
-      onTap: () => vm.showDate(context),
+      controller: controller,
+      label: name,
+      onTap: onTap,
     );
   }
 }
