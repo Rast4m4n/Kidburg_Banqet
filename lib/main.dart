@@ -29,7 +29,6 @@ class MainApp extends StatelessWidget {
         theme: appTheme.appThemeLight,
         routes: appNavigation.routes(context),
         initialRoute: appNavigation.initialRoute,
-        onGenerateRoute: appNavigation.onGenerateRoute,
       ),
     );
   }
