@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kidburg_banquet/data/repository/excel_repository.dart';
-import 'package:kidburg_banquet/domain/model/banqet_model.dart';
 import 'package:kidburg_banquet/domain/model/dish_model.dart';
 import 'package:kidburg_banquet/domain/model/table_model.dart';
-import 'package:kidburg_banquet/presentation/screens/preorder_form/vm/dish_vm.dart';
+import 'package:kidburg_banquet/presentation/screens/preorder_form/widgets/dish_vm.dart';
 import 'package:kidburg_banquet/presentation/screens/preorder_form/vm/pre_order_vm.dart';
 import 'package:kidburg_banquet/presentation/screens/preorder_form/vm/table_vm.dart';
 import 'package:kidburg_banquet/presentation/screens/preorder_form/widgets/row_dish_widget.dart';
@@ -12,8 +11,7 @@ import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
 import 'package:provider/provider.dart';
 
 class PreOrderFormScreen extends StatefulWidget {
-  const PreOrderFormScreen({super.key, this.banqetModel});
-  final BanqetModel? banqetModel;
+  const PreOrderFormScreen({super.key});
 
   @override
   State<PreOrderFormScreen> createState() => _PreOrderFormScreenState();
@@ -51,7 +49,7 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
           return Scaffold(
             floatingActionButton: FloatingActionButton(
               mini: isVisible,
-              onPressed: () {},
+              onPressed: () => vm.updateTable(context),
               child: const Icon(Icons.save),
             ),
             floatingActionButtonLocation: vm.buttonLocation,
