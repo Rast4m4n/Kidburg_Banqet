@@ -5,6 +5,10 @@ abstract class AppColor {
   static const Color tableForAdult = Color(0xffBCCFFF);
   static const Color textFieldColor = Color(0xffF3F3F3);
   static const Color textFieldInsideColor = Color(0xff898989);
+  static const Color cardPreviewColor = Colors.white;
+  static const Color titleCardPreviewColor = Color(0xffBFAD09);
+  static const Color infoCardPreviewColor = Color(0xff727272);
+  static const Color previewBackgroundColor = Color(0xffE9E9E9);
 }
 
 class AppTheme {
