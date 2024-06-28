@@ -79,7 +79,7 @@ class PreOrderViewModel with ChangeNotifier {
     final args = ModalRoute.of(context)!.settings.arguments as BanqetModel;
     Navigator.pushNamed(
       context,
-      AppRoute.preOrderFormPage,
+      AppRoute.previewBanquetPage,
       arguments: BanqetModel(
         nameClient: args.nameClient,
         place: args.place,
