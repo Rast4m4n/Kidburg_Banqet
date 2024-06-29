@@ -15,7 +15,7 @@ class PreviewBanquerViewModel with ChangeNotifier {
     for (var category in table.categories) {
       dishes.addAll(category.dishes);
     }
-    dishes.removeWhere((dish) => dish.count == null);
+    // dishes.removeWhere((dish) => dish.count == null);
     return dishes;
   }
 }

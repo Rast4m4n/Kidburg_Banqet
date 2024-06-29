@@ -49,7 +49,7 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
           return Scaffold(
             floatingActionButton: FloatingActionButton(
               mini: isVisible,
-              onPressed: () => vm.updateTable(context),
+              onPressed: () => vm.routeToPreviewScreen(context),
               child: const Icon(Icons.save),
             ),
             floatingActionButtonLocation: vm.buttonLocation,
