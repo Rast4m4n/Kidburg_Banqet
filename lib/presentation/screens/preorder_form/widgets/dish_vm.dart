@@ -36,7 +36,7 @@ class DishViewModel with ChangeNotifier {
   void updateCount(String count) {
     dish = dish.copyWith(count: int.parse(count));
     _calculateDish();
-    preOrderViewModel.calculateSumOfProducts();
+    preOrderViewModel.calculateSumOfDishes();
     notifyListeners();
   }
 }

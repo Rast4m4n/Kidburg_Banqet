@@ -24,17 +24,16 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
   void initState() {
     super.initState();
     vm = PreOrderViewModel(
-      excelRepository: ExcelRepository(),
+      scrollVisibilityManager: ScrollVisibilityManagerImpl(),
+      tableManager: TableManagerImpl(ExcelRepository()),
+      productCalculator: ProductCalculator(),
       scrollController: ScrollController(),
     );
-    vm.scrollController.addListener(vm.listenScrollController);
-    vm.isVisible = ValueNotifier<bool>(true);
   }
 
   @override
   void dispose() {
     super.dispose();
-    vm.scrollController.removeListener(vm.listenScrollController);
     vm.scrollController.dispose();
     vm.isVisible.dispose();
   }
@@ -49,7 +48,7 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
           return Scaffold(
             floatingActionButton: FloatingActionButton(
               mini: isVisible,
-              onPressed: () => vm.routeToPreviewScreen(context),
+              onPressed: () => vm.navigateToPreviewScreen(context),
               child: const Icon(Icons.save),
             ),
             floatingActionButtonLocation: vm.buttonLocation,
