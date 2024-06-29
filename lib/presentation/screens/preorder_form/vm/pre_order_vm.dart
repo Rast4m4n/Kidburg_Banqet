@@ -127,9 +127,9 @@ class TableManagerImpl implements TableManager {
     for (var table in tables) {
       for (var category in table.categories) {
         for (var dish in category.dishes) {
-          if (dishes.any((newDish) => newDish.idRow == dish.idRow)) {
+          if (dishes.any((newDish) => newDish.rowIndex == dish.rowIndex)) {
             final updateDish = dishes.singleWhere(
-              (element) => element.idRow == dish.idRow,
+              (element) => element.rowIndex == dish.rowIndex,
             );
             final indexTable = tables.indexOf(table);
             final indexCategory = table.categories.indexOf(category);

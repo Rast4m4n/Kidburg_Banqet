@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:kidburg_banquet/core/permission_app.dart';
 import 'package:kidburg_banquet/presentation/navigation/app_route.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   final AppTheme appTheme = AppTheme();
   final AppNavigation appNavigator = AppNavigation();
+  final PermissionApp permission = PermissionApp();
+  await permission.requestPermission();
 
   runApp(MainApp(
     appTheme: appTheme,
