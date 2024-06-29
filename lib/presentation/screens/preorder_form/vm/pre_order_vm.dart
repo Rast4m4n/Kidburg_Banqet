@@ -9,32 +9,92 @@ import 'package:kidburg_banquet/presentation/navigation/app_route.dart';
 
 class PreOrderViewModel with ChangeNotifier {
   PreOrderViewModel({
-    required this.excelRepository,
+    required this.scrollVisibilityManager,
+    required this.tableManager,
+    required this.productCalculator,
     required this.scrollController,
-  });
+  }) {
+    scrollVisibilityManager.listenScrollController(scrollController);
+  }
+
+  final ScrollVisibilityManager scrollVisibilityManager;
+  final TableManager tableManager;
+  final ProductCalculator productCalculator;
+  final ScrollController scrollController;
 
   List<TableModel> tables = [];
-  final ExcelRepository excelRepository;
-
-  final List<DishModel> dishes = [];
+  List<DishModel> dishes = [];
   int _totalSumOfDishes = 0;
-  int get totalSumOfProducts => _totalSumOfDishes;
 
-  final ScrollController scrollController;
-  ValueNotifier<bool> isVisible = ValueNotifier(true);
+  int get totalSumOfProducts => _totalSumOfDishes;
+  ValueNotifier<bool> get isVisible => scrollVisibilityManager.isVisible;
+  FloatingActionButtonLocation get buttonLocation =>
+      scrollVisibilityManager.buttonLocation;
+
+  Future<List<TableModel>> readDataFromExcel() async {
+    tables = await tableManager.readDataFromExcel();
+    return tables;
+  }
+
+  void calculateSumOfDishes() {
+    _totalSumOfDishes = productCalculator.calculateTotalSum(dishes);
+    notifyListeners();
+  }
+
+  void updateTable() {
+    tableManager.updateTables(tables, dishes);
+  }
+
+  void navigateToPreviewScreen(BuildContext context) {
+    updateTable();
+    final updatedTables = tableManager.removeEmptyData(tables);
+    final args = ModalRoute.of(context)!.settings.arguments as BanqetModel;
+    Navigator.pushNamed(
+      context,
+      AppRoute.previewBanquetPage,
+      arguments: BanqetModel(
+        nameClient: args.nameClient,
+        place: args.place,
+        dateStart: args.dateStart,
+        firstTimeServing: args.firstTimeServing,
+        amountOfChildren: args.amountOfChildren,
+        amountOfAdult: args.amountOfAdult,
+        tables: updatedTables,
+      ),
+    );
+  }
+}
+
+abstract class ScrollVisibilityManager {
+  ValueNotifier<bool> get isVisible;
+  FloatingActionButtonLocation get buttonLocation;
+  void listenScrollController(ScrollController scrollController);
+}
+
+class ScrollVisibilityManagerImpl implements ScrollVisibilityManager {
+  @override
+  final ValueNotifier<bool> isVisible = ValueNotifier(true);
+
+  @override
   FloatingActionButtonLocation get buttonLocation => isVisible.value
       ? FloatingActionButtonLocation.miniEndDocked
       : FloatingActionButtonLocation.endFloat;
 
-  void listenScrollController() {
-    switch (scrollController.position.userScrollDirection) {
-      case ScrollDirection.idle:
-        break;
-      case ScrollDirection.forward:
-        _showNavBar();
-      case ScrollDirection.reverse:
-        _hideNavBar();
-    }
+  @override
+  void listenScrollController(ScrollController scrollController) {
+    scrollController.addListener(() {
+      switch (scrollController.position.userScrollDirection) {
+        case ScrollDirection.forward:
+          _showNavBar();
+          break;
+        case ScrollDirection.reverse:
+          _hideNavBar();
+          break;
+        case ScrollDirection.idle:
+        default:
+          break;
+      }
+    });
   }
 
   void _showNavBar() {
@@ -44,22 +104,26 @@ class PreOrderViewModel with ChangeNotifier {
   void _hideNavBar() {
     if (isVisible.value) isVisible.value = false;
   }
+}
 
+abstract class TableManager {
+  Future<List<TableModel>> readDataFromExcel();
+  void updateTables(List<TableModel> tables, List<DishModel> dishes);
+  List<TableModel> removeEmptyData(List<TableModel> tables);
+}
+
+class TableManagerImpl implements TableManager {
+  final ExcelRepository excelRepository;
+
+  TableManagerImpl(this.excelRepository);
+
+  @override
   Future<List<TableModel>> readDataFromExcel() async {
-    tables = await excelRepository.readDataExcel();
-    return tables;
+    return await excelRepository.readDataExcel();
   }
 
-  void calculateSumOfProducts() {
-    _totalSumOfDishes = dishes.fold(
-      0,
-      (previousDish, currentDish) =>
-          previousDish + (int.parse(currentDish.price!) * currentDish.count!),
-    );
-    notifyListeners();
-  }
-
-  void updateTable() {
+  @override
+  void updateTables(List<TableModel> tables, List<DishModel> dishes) {
     for (var table in tables) {
       for (var category in table.categories) {
         for (var dish in category.dishes) {
@@ -78,7 +142,8 @@ class PreOrderViewModel with ChangeNotifier {
     }
   }
 
-  List<TableModel> deleteEmptyData(List<TableModel> tables) {
+  @override
+  List<TableModel> removeEmptyData(List<TableModel> tables) {
     bool hasCount(DishModel dish) {
       return dish.count != null && dish.count! > 0;
     }
@@ -108,23 +173,12 @@ class PreOrderViewModel with ChangeNotifier {
     });
     return copiedTables;
   }
+}
 
-  void routeToPreviewScreen(BuildContext context) {
-    updateTable();
-    final updateTables = deleteEmptyData(tables);
-    final args = ModalRoute.of(context)!.settings.arguments as BanqetModel;
-    Navigator.pushNamed(
-      context,
-      AppRoute.previewBanquetPage,
-      arguments: BanqetModel(
-        nameClient: args.nameClient,
-        place: args.place,
-        dateStart: args.dateStart,
-        firstTimeServing: args.firstTimeServing,
-        amountOfChildren: args.amountOfChildren,
-        amountOfAdult: args.amountOfAdult,
-        tables: updateTables,
-      ),
-    );
+class ProductCalculator {
+  int calculateTotalSum(List<DishModel> dishes) {
+    return dishes.fold(0, (sum, dish) {
+      return sum + (int.tryParse(dish.price ?? '0') ?? 0) * (dish.count ?? 0);
+    });
   }
 }

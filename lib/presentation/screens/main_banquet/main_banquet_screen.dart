@@ -14,18 +14,19 @@ class MainBanquetScreen extends StatefulWidget {
 }
 
 class _MainBanquetScreenState extends State<MainBanquetScreen> {
-  late final MainBanquetVM vm;
+  late final MainBanquetViewModel vm;
 
   @override
   void initState() {
     super.initState();
-    vm = MainBanquetVM(
+    vm = MainBanquetViewModel(
       nameController: TextEditingController(),
-      timeController: TextEditingController(),
-      dateController: TextEditingController(),
       placeEventController: TextEditingController(),
       childrenController: TextEditingController(),
       adultController: TextEditingController(),
+      dateTimeManager: DateTimeImpl(),
+      timeController: TextEditingController(),
+      dateController: TextEditingController(),
     );
   }
 
@@ -70,7 +71,7 @@ class _GridActionFields extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final vm = context.read<MainBanquetVM>();
+    final vm = context.read<MainBanquetViewModel>();
     return SizedBox(
       height: 190,
       child: GridView.count(
@@ -116,7 +117,7 @@ class _PlaceEventDropDownMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final vm = context.read<MainBanquetVM>();
+    final vm = context.read<MainBanquetViewModel>();
     return DropdownMenu(
       expandedInsets: const EdgeInsets.all(0),
       inputDecorationTheme: const InputDecorationTheme(
