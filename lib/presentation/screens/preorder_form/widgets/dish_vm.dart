@@ -15,7 +15,7 @@ class DishViewModel with ChangeNotifier {
 
   void _calculateDish() {
     bool dishExists = preOrderViewModel.dishes
-        .any((existingDish) => existingDish.idRow == dish.idRow);
+        .any((existingDish) => existingDish.rowIndex == dish.rowIndex);
 
     if (dishExists) {
       _updateExistingDish();
@@ -26,7 +26,7 @@ class DishViewModel with ChangeNotifier {
 
   void _updateExistingDish() {
     preOrderViewModel.dishes
-        .removeWhere((existingDish) => existingDish.idRow == dish.idRow);
+        .removeWhere((existingDish) => existingDish.rowIndex == dish.rowIndex);
 
     if (dish.count != null && dish.count! > 0) {
       preOrderViewModel.dishes.add(dish);

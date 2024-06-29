@@ -24,12 +24,6 @@ class _PreviewBanqetScreenState extends State<PreviewBanqetScreen> {
   }
 
   @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (context) => vm,
@@ -55,7 +49,10 @@ class _PreviewBanqetScreenState extends State<PreviewBanqetScreen> {
               const _ListCardsServingWidget(),
               ElevatedButton(
                 style: Theme.of(context).elevatedButtonTheme.style,
-                onPressed: () {},
+                onPressed: () {
+                  vm.saveBanquetExcelFile();
+                  // vm.showShackBarInfoDirectory(context);
+                },
                 child: const Text('Сохранить'),
               ),
             ],

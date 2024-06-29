@@ -252,7 +252,7 @@ class _DishListWidget extends StatelessWidget {
           return ChangeNotifierProvider(
             create: (context) => DishViewModel(
               dish: DishModel(
-                idRow: product.idRow,
+                rowIndex: product.rowIndex,
                 nameDish: product.nameDish,
                 weight: product.weight,
                 price: product.price,
