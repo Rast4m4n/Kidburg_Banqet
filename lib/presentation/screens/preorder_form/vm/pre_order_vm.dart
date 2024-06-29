@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:kidburg_banquet/data/repository/excel_repository.dart';
 import 'package:kidburg_banquet/domain/model/banqet_model.dart';
+import 'package:kidburg_banquet/domain/model/category_model.dart';
 import 'package:kidburg_banquet/domain/model/dish_model.dart';
 import 'package:kidburg_banquet/domain/model/table_model.dart';
 import 'package:kidburg_banquet/presentation/navigation/app_route.dart';
@@ -58,12 +59,11 @@ class PreOrderViewModel with ChangeNotifier {
     notifyListeners();
   }
 
-  void updateTable(BuildContext context) {
+  void updateTable() {
     for (var table in tables) {
       for (var category in table.categories) {
         for (var dish in category.dishes) {
           if (dishes.any((newDish) => newDish.idRow == dish.idRow)) {
-            (dishes[0].count);
             final updateDish = dishes.singleWhere(
               (element) => element.idRow == dish.idRow,
             );
@@ -76,6 +76,42 @@ class PreOrderViewModel with ChangeNotifier {
         }
       }
     }
+  }
+
+  List<TableModel> deleteEmptyData(List<TableModel> tables) {
+    bool hasCount(DishModel dish) {
+      return dish.count != null && dish.count! > 0;
+    }
+
+    List<TableModel> copiedTables = List.from(
+      tables.map(
+        (table) => TableModel(
+          name: table.name,
+          categories: List.from(
+            table.categories.map(
+              (category) => CategoryModel(
+                name: category.name,
+                dishes: List.from(category.dishes),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    copiedTables.removeWhere((table) {
+      table.categories.removeWhere((category) {
+        category.dishes.removeWhere((dish) => !hasCount(dish));
+        return category.dishes.isEmpty;
+      });
+      return table.categories.isEmpty;
+    });
+    return copiedTables;
+  }
+
+  void routeToPreviewScreen(BuildContext context) {
+    updateTable();
+    final updateTables = deleteEmptyData(tables);
     final args = ModalRoute.of(context)!.settings.arguments as BanqetModel;
     Navigator.pushNamed(
       context,
@@ -87,7 +123,7 @@ class PreOrderViewModel with ChangeNotifier {
         firstTimeServing: args.firstTimeServing,
         amountOfChildren: args.amountOfChildren,
         amountOfAdult: args.amountOfAdult,
-        tables: tables,
+        tables: updateTables,
       ),
     );
   }

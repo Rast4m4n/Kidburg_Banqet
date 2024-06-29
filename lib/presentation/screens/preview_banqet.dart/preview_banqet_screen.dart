@@ -17,15 +17,16 @@ class _PreviewBanqetScreenState extends State<PreviewBanqetScreen> {
   late final PreviewBanquerViewModel vm;
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final args = ModalRoute.of(context)!.settings.arguments as BanqetModel;
     vm = PreviewBanquerViewModel(banqetModel: args);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
   }
 
   @override
@@ -42,14 +43,21 @@ class _PreviewBanqetScreenState extends State<PreviewBanqetScreen> {
           child: ListView(
             shrinkWrap: true,
             children: [
-              Text(
-                'Кидбург банкеты',
-                style: Theme.of(context).textTheme.displayMedium,
+              Center(
+                child: Text(
+                  'Кидбург банкеты',
+                  style: Theme.of(context).textTheme.displaySmall,
+                ),
               ),
               const SizedBox(height: AppPadding.extra),
               const _EventCardWidget(),
               const SizedBox(height: AppPadding.extra),
               const _ListCardsServingWidget(),
+              ElevatedButton(
+                style: Theme.of(context).elevatedButtonTheme.style,
+                onPressed: () {},
+                child: const Text('Сохранить'),
+              ),
             ],
           ),
         ),
