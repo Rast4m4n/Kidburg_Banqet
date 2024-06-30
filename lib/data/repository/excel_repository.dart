@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:excel/excel.dart';
 import 'package:flutter/services.dart';
+import 'package:kidburg_banquet/data/file_manager/file_manager.dart';
 import 'package:kidburg_banquet/domain/model/banqet_model.dart';
 import 'package:kidburg_banquet/domain/model/category_enum.dart';
 import 'package:kidburg_banquet/domain/model/category_model.dart';
@@ -10,7 +11,7 @@ import 'package:kidburg_banquet/domain/model/table_model.dart';
 import 'package:kidburg_banquet/presentation/utils/date_time_formatter.dart';
 
 class ExcelRepository {
-  Future<Excel> _convertToReadExcelFile() async {
+  Future<Excel> _loadTemplate() async {
     try {
       ByteData data = await rootBundle.load('assets/template_banquet.xlsx');
       var bytes =
@@ -22,9 +23,9 @@ class ExcelRepository {
   }
 
   /// Выводит данные с первого листа excel файла
-  Future<List<List<Data?>>> _convertAndReadFirstListExcelFile() async {
+  Future<List<List<Data?>>> _readFirstSheet() async {
     try {
-      var excel = await _convertToReadExcelFile();
+      var excel = await _loadTemplate();
       var firstTableKey = excel.tables.keys.first;
       if (excel.tables[firstTableKey] != null) {
         return excel.tables[firstTableKey]!.rows;
@@ -37,8 +38,7 @@ class ExcelRepository {
   }
 
   Future<List<TableModel>> readDataExcel() async {
-    final List<List<Data?>> excelData =
-        await _convertAndReadFirstListExcelFile();
+    final List<List<Data?>> excelData = await _readFirstSheet();
 
     String tableNameTmp = '';
     String categoryNameTmp = '';
@@ -126,19 +126,12 @@ class ExcelRepository {
   }
 
   Future<void> writeDataToExcel(BanqetModel banquet) async {
-    final Excel templateExcelFile = await _convertToReadExcelFile();
+    final Excel templateExcelFile = await _loadTemplate();
     Sheet sourceSheet = templateExcelFile.tables.values.first;
 
-    final date =
-        "${banquet.dateStart.day}.${banquet.dateStart.month}.${banquet.dateStart.year}";
-
-    final nameFile = "Банкет $date ${banquet.nameClient} ${banquet.place}.xlsx";
-    Directory directory = Directory('/storage/emulated/0/Download');
-    String filePath = '${directory.path}/$nameFile';
-
-    if (!await Directory(directory.path).exists()) {
-      await Directory(directory.path).create(recursive: true);
-    }
+    final nameFile = FileManager.getFileName(banquet);
+    String filePath = FileManager.filePath(nameFile);
+    await FileManager.existsDirectory();
 
     final secondServingTable =
         DateTimeFormatter.calculateNextServingTime(banquet.firstTimeServing);
@@ -148,7 +141,8 @@ class ExcelRepository {
         final cell = sourceSheet.cell(
           CellIndex.indexByColumnRow(columnIndex: col, rowIndex: row),
         );
-
+        //Если ячейка по индексу находится в одном, из этих значений
+        //то записываем туда данные
         final isNameCustomer = col == 2 && row == 2;
         final isDateStartEvent = col == 7 && row == 2;
         final isTimeStartEvent = col == 7 && row == 3;
@@ -212,6 +206,7 @@ class ExcelRepository {
                       : const IntCellValue(0);
                   sourceSheet.setRowHeight(cell.rowIndex, 40);
                 }
+                //Запись формулы подсчёта в крайнюю колонку строки блюда
                 if (col == 8) {
                   try {
                     cell.setFormula(
@@ -227,12 +222,17 @@ class ExcelRepository {
       }
     }
 
+    _saveBanquetExcelFile(filePath, templateExcelFile);
+  }
+
+  void _saveBanquetExcelFile(String filePath, Excel excelFile) {
     try {
       final file = File(filePath);
       if (!file.existsSync()) {
         file.createSync(recursive: true);
       }
-      var fileBytes = templateExcelFile.save(fileName: nameFile);
+      var fileBytes = excelFile.encode();
+
       file.writeAsBytesSync(fileBytes!);
     } catch (e) {
       throw "Ошибка сохранения файла: $e";

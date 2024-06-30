@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 
 abstract class AppColor {
   static const Color tableForKids = Color(0xffAAE8A0);
@@ -35,6 +36,22 @@ class AppTheme {
             borderRadius: BorderRadius.all(
               Radius.circular(8),
             ),
+          ),
+        ),
+      ),
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all(
+          AppColor.cardPreviewColor,
+        ),
+        padding: const MaterialStatePropertyAll(
+          EdgeInsets.all(AppPadding.extra),
+        ),
+        splashFactory: InkRipple.splashFactory,
+        shape: MaterialStateProperty.all(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
           ),
         ),
       ),
