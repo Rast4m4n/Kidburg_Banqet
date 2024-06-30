@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kidburg_banquet/domain/model/banqet_model.dart';
 import 'package:kidburg_banquet/presentation/navigation/app_route.dart';
+import 'package:kidburg_banquet/presentation/utils/date_time_formatter.dart';
 
 class MainBanquetViewModel extends ChangeNotifier {
   MainBanquetViewModel({
@@ -40,6 +41,9 @@ class MainBanquetViewModel extends ChangeNotifier {
         place: placeEventController.text,
         dateStart: dateTimeManager.selectedDate!,
         firstTimeServing: dateTimeManager.selectedTime!,
+        secondTimeServing: DateTimeFormatter.calculateNextServingTime(
+          dateTimeManager.selectedTime!,
+        ),
         amountOfChildren: int.parse(childrenController.text),
         amountOfAdult: int.parse(adultController.text),
       ),

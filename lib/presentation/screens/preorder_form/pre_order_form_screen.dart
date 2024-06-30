@@ -8,6 +8,7 @@ import 'package:kidburg_banquet/presentation/screens/preorder_form/vm/table_vm.d
 import 'package:kidburg_banquet/presentation/screens/preorder_form/widgets/row_dish_widget.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
+import 'package:kidburg_banquet/presentation/utils/date_time_formatter.dart';
 import 'package:provider/provider.dart';
 
 class PreOrderFormScreen extends StatefulWidget {
@@ -136,7 +137,9 @@ class _TableListWidget extends StatelessWidget {
             return Column(
               children: [
                 ChangeNotifierProvider(
-                  create: (context) => TableViewModel(tableModel: table),
+                  create: (context) => TableViewModel(
+                    tableModel: table,
+                  ),
                   child:
                       _TableWidget(indexTimeServing: tableData.indexOf(table)),
                 ),
@@ -290,7 +293,7 @@ class _TitleTableWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "${vm.tableModel.name} ${vm.addTimeServing(context, indexTimeServing)}",
+              "${vm.tableModel.name} ${DateTimeFormatter.addTimeServing(context, indexTimeServing)}",
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
