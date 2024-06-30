@@ -49,6 +49,7 @@ class PreOrderViewModel with ChangeNotifier {
     updateTable();
     final updatedTables = tableManager.removeEmptyData(tables);
     final args = ModalRoute.of(context)!.settings.arguments as BanqetModel;
+
     Navigator.pushNamed(
       context,
       AppRoute.previewBanquetPage,
@@ -57,6 +58,7 @@ class PreOrderViewModel with ChangeNotifier {
         place: args.place,
         dateStart: args.dateStart,
         firstTimeServing: args.firstTimeServing,
+        secondTimeServing: args.secondTimeServing,
         amountOfChildren: args.amountOfChildren,
         amountOfAdult: args.amountOfAdult,
         tables: updatedTables,

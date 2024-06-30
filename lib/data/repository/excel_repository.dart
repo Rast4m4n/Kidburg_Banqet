@@ -2,25 +2,38 @@ import 'dart:io';
 
 import 'package:excel/excel.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import 'package:kidburg_banquet/domain/model/banqet_model.dart';
 import 'package:kidburg_banquet/domain/model/category_enum.dart';
 import 'package:kidburg_banquet/domain/model/category_model.dart';
 import 'package:kidburg_banquet/domain/model/dish_model.dart';
 import 'package:kidburg_banquet/domain/model/table_model.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:kidburg_banquet/presentation/utils/date_time_formatter.dart';
 
 class ExcelRepository {
   Future<Excel> _convertToReadExcelFile() async {
-    ByteData data = await rootBundle.load('assets/template_banquet.xlsx');
-    var bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
-    return Excel.decodeBytes(bytes);
+    try {
+      ByteData data = await rootBundle.load('assets/template_banquet.xlsx');
+      var bytes =
+          data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+      return Excel.decodeBytes(bytes);
+    } catch (e) {
+      throw "Ошибка загрузки или декодирования файла: $e";
+    }
   }
 
   /// Выводит данные с первого листа excel файла
   Future<List<List<Data?>>> _convertAndReadFirstListExcelFile() async {
-    var excel = await _convertToReadExcelFile();
-    return excel.tables[excel.tables.keys.first]!.rows;
+    try {
+      var excel = await _convertToReadExcelFile();
+      var firstTableKey = excel.tables.keys.first;
+      if (excel.tables[firstTableKey] != null) {
+        return excel.tables[firstTableKey]!.rows;
+      } else {
+        throw "Ошибка: Таблица не найдена.";
+      }
+    } catch (e) {
+      throw "Ошибка чтения данных из файла: $e";
+    }
   }
 
   Future<List<TableModel>> readDataExcel() async {
@@ -125,35 +138,87 @@ class ExcelRepository {
 
     if (!await Directory(directory.path).exists()) {
       await Directory(directory.path).create(recursive: true);
-    } else {
-      print('Дериктория найдена: ${directory.path}');
     }
 
-    // записываем новые данные в destinationSheet
+    final secondServingTable =
+        DateTimeFormatter.calculateNextServingTime(banquet.firstTimeServing);
+    // записываем новые данные в sourceSheet
     for (int row = 0; row < sourceSheet.maxRows; row++) {
       for (int col = 0; col < sourceSheet.maxColumns; col++) {
         final cell = sourceSheet.cell(
           CellIndex.indexByColumnRow(columnIndex: col, rowIndex: row),
         );
+
+        final isNameCustomer = col == 2 && row == 2;
+        final isDateStartEvent = col == 7 && row == 2;
+        final isTimeStartEvent = col == 7 && row == 3;
+        final isPlaceEvent = col == 7 && row == 4;
+        final isAmountOfChildrer = col == 8 && row == 6;
+        final isAmountOfAdult = col == 8 && row == 7;
+
+        if (isNameCustomer) {
+          cell.value = TextCellValue(banquet.nameClient);
+        }
+
+        if (isDateStartEvent) {
+          cell.value =
+              TextCellValue(DateTimeFormatter.formatDMM(banquet.dateStart));
+        }
+
+        if (isTimeStartEvent) {
+          cell.value = TextCellValue(
+            DateTimeFormatter.convertToUTC24StringFormat(
+                banquet.firstTimeServing),
+          );
+        }
+
+        if (isPlaceEvent) {
+          cell.value = TextCellValue(banquet.place);
+        }
+
+        if (isAmountOfChildrer) {
+          cell.value = IntCellValue(banquet.amountOfChildren);
+        }
+
+        if (isAmountOfAdult) {
+          cell.value = IntCellValue(banquet.amountOfAdult);
+        }
+
         for (TableModel table in banquet.tables!) {
-          //ошибка: даже если в приложении нет взрослого или детского стола
-          //условие всё равно будет выполняться и будет заменятся значение
-          //в ячейке, необходимо исправить!!!
-          if (cell.value.toString() == "СТОЛ ДЛЯ ВЗРОСЛЫХ") {
-            sourceSheet.cell(cell.cellIndex).value = TextCellValue(table.name);
+          //Запись вида стола и времени подачи
+          final equalityNameTable = table.name == cell.value.toString();
+          if (equalityNameTable &&
+              cell.value.toString() == "СТОЛ ДЛЯ ВЗРОСЛЫХ") {
+            cell.value = TextCellValue(
+                '${table.name} НА ${DateTimeFormatter.convertToUTC24StringFormat(banquet.firstTimeServing)}');
+            sourceSheet.setRowHeight(cell.rowIndex, 50);
             continue;
-          } else if (cell.value.toString() == "ДЕТСКИЙ СТОЛ") {
-            sourceSheet.cell(cell.cellIndex).value = TextCellValue(table.name);
+          } else if (equalityNameTable &&
+              cell.value.toString() == "ДЕТСКИЙ СТОЛ") {
+            cell.value = TextCellValue(
+              '${table.name} НА ${DateTimeFormatter.convertToUTC24StringFormat(secondServingTable)}',
+            );
+            sourceSheet.setRowHeight(cell.rowIndex, 50);
             continue;
           }
+
+          //Запись значений dish.count в ячейки количества блюд
           for (CategoryModel category in table.categories) {
             for (DishModel dish in category.dishes) {
               if (cell.rowIndex == dish.rowIndex) {
                 if (col == 5) {
-                  // print(dish.toString());
                   sourceSheet.cell(cell.cellIndex).value = dish.count != null
                       ? IntCellValue(dish.count!)
                       : const IntCellValue(0);
+                  sourceSheet.setRowHeight(cell.rowIndex, 40);
+                }
+                if (col == 8) {
+                  try {
+                    cell.setFormula(
+                        'SUM(G${cell.rowIndex + 1}*F${cell.rowIndex + 1})');
+                  } catch (e) {
+                    print('Ошибка установки формулы: $e');
+                  }
                 }
               }
             }
@@ -163,13 +228,14 @@ class ExcelRepository {
     }
 
     try {
-      File(filePath)
-        ..createSync(recursive: true)
-        ..writeAsBytesSync(
-          templateExcelFile.save()!,
-        );
+      final file = File(filePath);
+      if (!file.existsSync()) {
+        file.createSync(recursive: true);
+      }
+      var fileBytes = templateExcelFile.save(fileName: nameFile);
+      file.writeAsBytesSync(fileBytes!);
     } catch (e) {
-      print('Ошибка сохранения файла: $e');
+      throw "Ошибка сохранения файла: $e";
     }
   }
 }

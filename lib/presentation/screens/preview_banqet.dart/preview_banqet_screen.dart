@@ -49,8 +49,8 @@ class _PreviewBanqetScreenState extends State<PreviewBanqetScreen> {
               const _ListCardsServingWidget(),
               ElevatedButton(
                 style: Theme.of(context).elevatedButtonTheme.style,
-                onPressed: () {
-                  vm.saveBanquetExcelFile();
+                onPressed: () async {
+                  await vm.saveBanquetExcelFile();
                   // vm.showShackBarInfoDirectory(context);
                 },
                 child: const Text('Сохранить'),
