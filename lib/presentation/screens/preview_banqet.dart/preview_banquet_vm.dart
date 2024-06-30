@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kidburg_banquet/data/file_manager/file_manager.dart';
 import 'package:kidburg_banquet/data/repository/excel_repository.dart';
 import 'package:kidburg_banquet/domain/model/banqet_model.dart';
 import 'package:kidburg_banquet/domain/model/dish_model.dart';
@@ -19,8 +20,19 @@ class PreviewBanquerViewModel with ChangeNotifier {
     return dishes;
   }
 
-  Future<void> saveBanquetExcelFile() async {
+  Future<void> saveBanquetExcelFile(BuildContext context) async {
     final repo = ExcelRepository();
     await repo.writeDataToExcel(banqetModel);
+    if (context.mounted) _showSnackBar(context);
+  }
+
+  void _showSnackBar(BuildContext context) {
+    final pathSavedFile = FileManager.filePath(
+      FileManager.getFileName(banqetModel),
+    );
+    final snackBar = SnackBar(
+      content: Text('Файл сохранён по директории: $pathSavedFile'),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

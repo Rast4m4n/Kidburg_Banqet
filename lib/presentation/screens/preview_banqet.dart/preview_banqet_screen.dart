@@ -4,6 +4,7 @@ import 'package:kidburg_banquet/domain/model/table_model.dart';
 import 'package:kidburg_banquet/presentation/screens/preview_banqet.dart/preview_banquet_vm.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
+import 'package:kidburg_banquet/presentation/utils/date_time_formatter.dart';
 import 'package:provider/provider.dart';
 
 class PreviewBanqetScreen extends StatefulWidget {
@@ -50,10 +51,15 @@ class _PreviewBanqetScreenState extends State<PreviewBanqetScreen> {
               ElevatedButton(
                 style: Theme.of(context).elevatedButtonTheme.style,
                 onPressed: () async {
-                  await vm.saveBanquetExcelFile();
-                  // vm.showShackBarInfoDirectory(context);
+                  await vm.saveBanquetExcelFile(context);
                 },
-                child: const Text('Сохранить'),
+                child: const Text(
+                  'Сохранить',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: AppColor.infoCardPreviewColor,
+                  ),
+                ),
               ),
             ],
           ),
@@ -84,78 +90,35 @@ class _EventCardWidget extends StatelessWidget {
             ),
             child: Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'МЕРОПРИЯТИЕ',
-                      style:
-                          Theme.of(context).textTheme.headlineLarge?.copyWith(
-                                color: AppColor.titleCardPreviewColor,
-                                fontSize: 24,
-                              ),
-                    ),
-                  ],
+                Center(
+                  child: Text(
+                    'МЕРОПРИЯТИЕ',
+                    style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                          color: AppColor.titleCardPreviewColor,
+                          fontSize: 24,
+                        ),
+                  ),
                 ),
                 const SizedBox(height: AppPadding.low),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Имя: ${vm.banqetModel.nameClient}',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: AppColor.titleCardPreviewColor,
-                            fontSize: 16,
-                          ),
-                    ),
-                    Text(
-                      'Дата: ${vm.banqetModel.dateStart.day}.${vm.banqetModel.dateStart.month}.${vm.banqetModel.dateStart.year}',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: AppColor.titleCardPreviewColor,
-                            fontSize: 16,
-                          ),
-                    ),
-                  ],
+                _RowInfoWidget(
+                  text: 'Заказчик: ${vm.banqetModel.nameClient}',
+                  twoText:
+                      "Дата: ${DateTimeFormatter.convertToDDMMYYY(vm.banqetModel.dateStart)}",
+                  fontSize: 16,
+                  isTitle: true,
                 ),
                 const SizedBox(height: AppPadding.low),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Домик: ${vm.banqetModel.place}',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: AppColor.infoCardPreviewColor,
-                            fontSize: 14,
-                          ),
-                    ),
-                    Text(
+                _RowInfoWidget(
+                  text: 'Домик: ${vm.banqetModel.place}',
+                  twoText:
                       'Время: ${vm.banqetModel.firstTimeServing.format(context)}',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: AppColor.infoCardPreviewColor,
-                            fontSize: 14,
-                          ),
-                    ),
-                  ],
+                  fontSize: 14,
                 ),
                 const SizedBox(height: AppPadding.low),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Детей: ${vm.banqetModel.amountOfChildren}',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: AppColor.infoCardPreviewColor,
-                            fontSize: 14,
-                          ),
-                    ),
-                    Text(
-                      'Взрослых: ${vm.banqetModel.amountOfAdult}',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                            color: AppColor.infoCardPreviewColor,
-                            fontSize: 14,
-                          ),
-                    ),
-                  ],
+                _RowInfoWidget(
+                  text: 'Детей: ${vm.banqetModel.amountOfChildren}',
+                  twoText: 'Взрослых: ${vm.banqetModel.amountOfAdult}',
+                  fontSize: 14,
                 ),
               ],
             ),
@@ -216,60 +179,35 @@ class _ServingDishesCardWidget extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          table.name,
-                          style: Theme.of(context)
-                              .textTheme
-                              .headlineLarge
-                              ?.copyWith(
-                                color: AppColor.titleCardPreviewColor,
-                                fontSize: 24,
-                              ),
-                        ),
-                      ],
+                    Center(
+                      child: Text(
+                        table.name,
+                        style:
+                            Theme.of(context).textTheme.headlineLarge?.copyWith(
+                                  color: AppColor.titleCardPreviewColor,
+                                  fontSize: 24,
+                                ),
+                      ),
                     ),
                     const SizedBox(height: AppPadding.low),
-                    ...dishes.map(
-                      (dish) {
+                    ListView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: dishes.length,
+                      itemBuilder: (context, index) {
                         return Column(
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                ConstrainedBox(
-                                  constraints:
-                                      const BoxConstraints(maxWidth: 150),
-                                  child: Text(
-                                    dish.nameDish!,
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge
-                                        ?.copyWith(
-                                          color: AppColor.infoCardPreviewColor,
-                                          fontSize: 14,
-                                        ),
-                                  ),
-                                ),
-                                Text(
-                                  '${dish.count}шт',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .bodyLarge
-                                      ?.copyWith(
-                                        color: AppColor.infoCardPreviewColor,
-                                        fontSize: 14,
-                                      ),
-                                ),
-                              ],
+                            _RowInfoWidget(
+                              text: dishes[index].nameDish!,
+                              twoText: "${dishes[index].count}шт",
+                              fontSize: 14,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                             ),
                             const Divider(),
                           ],
                         );
                       },
-                    ).toList(),
+                    ),
                   ],
                 ),
               ),
@@ -277,6 +215,52 @@ class _ServingDishesCardWidget extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _RowInfoWidget extends StatelessWidget {
+  const _RowInfoWidget({
+    super.key,
+    required this.text,
+    required this.twoText,
+    required this.fontSize,
+    this.isTitle = false,
+    this.crossAxisAlignment = CrossAxisAlignment.start,
+  });
+  final String text;
+  final String twoText;
+  final double fontSize;
+  final bool isTitle;
+  final CrossAxisAlignment crossAxisAlignment;
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: crossAxisAlignment,
+      children: [
+        ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 150),
+          child: Text(
+            text,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: isTitle
+                      ? AppColor.titleCardPreviewColor
+                      : AppColor.infoCardPreviewColor,
+                  fontSize: fontSize,
+                ),
+          ),
+        ),
+        Text(
+          twoText,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: isTitle
+                    ? AppColor.titleCardPreviewColor
+                    : AppColor.infoCardPreviewColor,
+                fontSize: fontSize,
+              ),
+        ),
+      ],
     );
   }
 }

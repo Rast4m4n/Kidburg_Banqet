@@ -51,9 +51,16 @@ class _MainBanquetScreenState extends State<MainBanquetScreen> {
               const SizedBox(height: AppPadding.low),
               SizedBox(
                 width: MediaQuery.of(context).size.width,
-                child: FilledButton(
+                child: ElevatedButton(
+                  style: Theme.of(context).elevatedButtonTheme.style,
                   onPressed: () => vm.routingToPreOrder(context),
-                  child: const Text('Далее'),
+                  child: const Text(
+                    'Далее',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: AppColor.infoCardPreviewColor,
+                    ),
+                  ),
                 ),
               ),
             ],
