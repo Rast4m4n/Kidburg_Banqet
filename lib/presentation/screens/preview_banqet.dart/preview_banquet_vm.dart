@@ -22,7 +22,7 @@ class PreviewBanquerViewModel with ChangeNotifier {
 
   Future<void> saveBanquetExcelFile(BuildContext context) async {
     final repo = ExcelRepository();
-    await repo.writeDataToExcel(banqetModel);
+    await repo.writeNewExcelFile(banqetModel);
     if (context.mounted) _showSnackBar(context);
   }
 

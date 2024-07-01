@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:excel/excel.dart';
 import 'package:flutter/services.dart';
+import 'package:kidburg_banquet/data/excel_builder/excel_builder.dart';
 import 'package:kidburg_banquet/data/file_manager/file_manager.dart';
 import 'package:kidburg_banquet/domain/model/banqet_model.dart';
 import 'package:kidburg_banquet/domain/model/category_enum.dart';
@@ -125,9 +126,9 @@ class ExcelRepository {
     return tableModel;
   }
 
-  Future<void> writeDataToExcel(BanqetModel banquet) async {
+  Future<void> writeExcelBasedTemplate(BanqetModel banquet) async {
     final Excel templateExcelFile = await _loadTemplate();
-    Sheet sourceSheet = templateExcelFile.tables.values.first;
+    Sheet sheet = templateExcelFile.tables.values.first;
 
     final nameFile = FileManager.getFileName(banquet);
     String filePath = FileManager.filePath(nameFile);
@@ -136,9 +137,9 @@ class ExcelRepository {
     final secondServingTable =
         DateTimeFormatter.calculateNextServingTime(banquet.firstTimeServing);
     // записываем новые данные в sourceSheet
-    for (int row = 0; row < sourceSheet.maxRows; row++) {
-      for (int col = 0; col < sourceSheet.maxColumns; col++) {
-        final cell = sourceSheet.cell(
+    for (int row = 0; row < sheet.maxRows; row++) {
+      for (int col = 0; col < sheet.maxColumns; col++) {
+        final cell = sheet.cell(
           CellIndex.indexByColumnRow(columnIndex: col, rowIndex: row),
         );
         //Если ячейка по индексу находится в одном, из этих значений
@@ -185,14 +186,14 @@ class ExcelRepository {
               cell.value.toString() == "СТОЛ ДЛЯ ВЗРОСЛЫХ") {
             cell.value = TextCellValue(
                 '${table.name} НА ${DateTimeFormatter.convertToUTC24StringFormat(banquet.firstTimeServing)}');
-            sourceSheet.setRowHeight(cell.rowIndex, 50);
+            sheet.setRowHeight(cell.rowIndex, 50);
             continue;
           } else if (equalityNameTable &&
               cell.value.toString() == "ДЕТСКИЙ СТОЛ") {
             cell.value = TextCellValue(
               '${table.name} НА ${DateTimeFormatter.convertToUTC24StringFormat(secondServingTable)}',
             );
-            sourceSheet.setRowHeight(cell.rowIndex, 50);
+            sheet.setRowHeight(cell.rowIndex, 50);
             continue;
           }
 
@@ -201,10 +202,10 @@ class ExcelRepository {
             for (DishModel dish in category.dishes) {
               if (cell.rowIndex == dish.rowIndex) {
                 if (col == 5) {
-                  sourceSheet.cell(cell.cellIndex).value = dish.count != null
+                  sheet.cell(cell.cellIndex).value = dish.count != null
                       ? IntCellValue(dish.count!)
                       : const IntCellValue(0);
-                  sourceSheet.setRowHeight(cell.rowIndex, 40);
+                  sheet.setRowHeight(cell.rowIndex, 40);
                 }
                 //Запись формулы подсчёта в крайнюю колонку строки блюда
                 if (col == 8) {
@@ -225,13 +226,27 @@ class ExcelRepository {
     _saveBanquetExcelFile(filePath, templateExcelFile);
   }
 
+  Future<void> writeNewExcelFile(BanqetModel banquet) async {
+    final Excel excel = Excel.createExcel();
+    Sheet sheet = excel.tables.values.first;
+
+    final nameFile = FileManager.getFileName(banquet);
+    String filePath = FileManager.filePath(nameFile);
+    await FileManager.existsDirectory();
+
+    final ExcelBuilder excelBuilder = ExcelBuilder(sheet: sheet);
+    excelBuilder.writeNewExcelFile(banquet);
+
+    _saveBanquetExcelFile(filePath, excel);
+  }
+
   void _saveBanquetExcelFile(String filePath, Excel excelFile) {
     try {
       final file = File(filePath);
       if (!file.existsSync()) {
         file.createSync(recursive: true);
       }
-      var fileBytes = excelFile.encode();
+      var fileBytes = excelFile.save();
 
       file.writeAsBytesSync(fileBytes!);
     } catch (e) {
