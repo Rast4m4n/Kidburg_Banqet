@@ -1,4 +1,5 @@
 import 'package:excel/excel.dart';
+import 'package:intl/intl.dart';
 import 'package:kidburg_banquet/domain/model/banqet_model.dart';
 import 'package:kidburg_banquet/domain/model/category_model.dart';
 import 'package:kidburg_banquet/domain/model/dish_model.dart';
@@ -20,7 +21,9 @@ class ExcelBuilder {
     sheet.setColumnWidth(6, 10);
     _titleColumnCell(rowIndex);
     rowIndex += 1;
+
     int lastIndex = _listDishesAndServing(banquet, rowIndex);
+    print(lastIndex);
     _leftHeaderInfo(sheet, banquet, lastIndex);
     _headerSizedBoxCell(sheet);
     _rightHeaderInfo(sheet, banquet);
@@ -57,8 +60,9 @@ class ExcelBuilder {
       'Контактный тел.': '',
       // lastIndexRow это самое последнее добавленное блюдо в файл
       // Он необходим для подсчёта суммы всех блюд
-      "Сумма заказа": 'SUM(F14:F$lastIndexRow)',
+      "Сумма заказа": 'SUM(F11:F$lastIndexRow)',
     };
+    print(lastIndexRow);
     for (var el in headerInfo.entries) {
       sheet.cell(CellIndex.indexByString("A$rowIndex")).value =
           TextCellValue(el.key);
@@ -121,7 +125,7 @@ class ExcelBuilder {
     );
     final Map<String, dynamic> headerInfo = {
       'Заказ №': '',
-      'Заказчик': DateTimeFormatter.convertToDDMMYYY(banquet.dateStart),
+      'Заказчик': DateFormat('d MMMM').format(banquet.dateStart),
       'Время проведения': DateTimeFormatter.convertToUTC24StringFormat(
           banquet.firstTimeServing),
       'Место проведения': banquet.place,
@@ -348,7 +352,7 @@ class ExcelBuilder {
       fontSize: 12,
       fontFamily: 'Ebrima',
       numberFormat: NumFormat.defaultNumeric,
-      // NumFormat.custom(formatCode: '#,##0 ₽'),
+      // NumFormat.custom(formatCode: r'$#,##0'),
       verticalAlign: VerticalAlign.Center,
       horizontalAlign: HorizontalAlign.Center,
       bottomBorder: border,

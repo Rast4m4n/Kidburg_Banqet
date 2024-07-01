@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:kidburg_banquet/domain/model/banqet_model.dart';
 import 'package:kidburg_banquet/domain/model/table_model.dart';
 import 'package:kidburg_banquet/presentation/screens/preview_banqet.dart/preview_banquet_vm.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
-import 'package:kidburg_banquet/presentation/utils/date_time_formatter.dart';
 import 'package:provider/provider.dart';
 
 class PreviewBanqetScreen extends StatefulWidget {
@@ -103,7 +103,7 @@ class _EventCardWidget extends StatelessWidget {
                 _RowInfoWidget(
                   text: 'Заказчик: ${vm.banqetModel.nameClient}',
                   twoText:
-                      "Дата: ${DateTimeFormatter.convertToDDMMYYY(vm.banqetModel.dateStart)}",
+                      "Дата: ${DateFormat('dd.MM.yy').format(vm.banqetModel.dateStart)}",
                   fontSize: 16,
                   isTitle: true,
                 ),

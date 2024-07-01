@@ -39,14 +39,4 @@ abstract class DateTimeFormatter {
     );
     return DateFormat.Hm().format(localDateTime);
   }
-
-  static String formatDMM(DateTime dateTime) {
-    String stringDateTime =
-        "${dateTime.day} ${DateFormat.MMM().format(dateTime)}";
-    return stringDateTime;
-  }
-
-  static String convertToDDMMYYY(DateTime date) {
-    return "${date.day}.${date.month}.${date.year}";
-  }
 }

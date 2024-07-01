@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:kidburg_banquet/domain/model/banqet_model.dart';
 import 'package:kidburg_banquet/presentation/navigation/app_route.dart';
 import 'package:kidburg_banquet/presentation/utils/date_time_formatter.dart';
@@ -71,11 +72,13 @@ class DateTimeImpl implements DateTimeManager {
   TimeOfDay? selectedTime;
 
   @override
-  String get formatterDate =>
-      "${selectedDate!.day}.${selectedDate!.month}.${selectedDate!.year}";
+  String get formatterDate => DateFormat('dd.MM.yy').format(selectedDate!);
 
   @override
-  String get formatterTime => "${selectedTime!.hour}:${selectedTime!.minute}";
+  String get formatterTime => DateFormat('hh:mm').format(
+        DateTime.now()
+            .copyWith(hour: selectedTime!.hour, minute: selectedTime!.minute),
+      );
 
   @override
   Widget hour24FormatBuilder(BuildContext context, Widget? child) {
