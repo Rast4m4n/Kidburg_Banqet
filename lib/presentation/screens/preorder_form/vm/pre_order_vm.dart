@@ -62,6 +62,12 @@ class PreOrderViewModel with ChangeNotifier {
         amountOfChildren: args.amountOfChildren,
         amountOfAdult: args.amountOfAdult,
         tables: updatedTables,
+        prepayment: args.prepayment,
+        phoneNumberOfClient: args.phoneNumberOfClient,
+        phoneNumberOfManager: args.phoneNumberOfManager,
+        cake: args.cake,
+        remark: args.remark,
+        nameOfManager: args.nameOfManager,
       ),
     );
   }

@@ -13,6 +13,12 @@ class MainBanquetViewModel extends ChangeNotifier {
     required this.dateTimeManager,
     required this.dateController,
     required this.timeController,
+    required this.nameOfManagerController,
+    required this.phoneNumberOfManagerController,
+    required this.phoneNumberOfClientController,
+    required this.prepaymentController,
+    required this.cakeController,
+    required this.remarkController,
   });
   final DateTimeManager dateTimeManager;
   final TextEditingController dateController;
@@ -21,6 +27,12 @@ class MainBanquetViewModel extends ChangeNotifier {
   final TextEditingController placeEventController;
   final TextEditingController childrenController;
   final TextEditingController adultController;
+  final TextEditingController nameOfManagerController;
+  final TextEditingController phoneNumberOfManagerController;
+  final TextEditingController phoneNumberOfClientController;
+  final TextEditingController prepaymentController;
+  final TextEditingController cakeController;
+  final TextEditingController remarkController;
   String formatterDate() => dateTimeManager.formatterDate;
   String formatterTime() => dateTimeManager.formatterTime;
 
@@ -38,15 +50,21 @@ class MainBanquetViewModel extends ChangeNotifier {
     Navigator.of(context).pushNamed(
       AppRoute.preOrderFormPage,
       arguments: BanqetModel(
+        nameOfManager: nameOfManagerController.text,
+        phoneNumberOfManager: phoneNumberOfManagerController.text,
         nameClient: nameController.text,
+        phoneNumberOfClient: phoneNumberOfClientController.text,
+        prepayment: int.tryParse(prepaymentController.text),
+        cake: cakeController.text,
+        remark: remarkController.text,
         place: placeEventController.text,
         dateStart: dateTimeManager.selectedDate!,
         firstTimeServing: dateTimeManager.selectedTime!,
         secondTimeServing: DateTimeFormatter.calculateNextServingTime(
           dateTimeManager.selectedTime!,
         ),
-        amountOfChildren: int.parse(childrenController.text),
-        amountOfAdult: int.parse(adultController.text),
+        amountOfChildren: int.tryParse(childrenController.text),
+        amountOfAdult: int.tryParse(adultController.text),
       ),
     );
   }

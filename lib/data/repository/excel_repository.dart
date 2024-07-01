@@ -164,8 +164,7 @@ class ExcelRepository {
 
         if (isTimeStartEvent) {
           cell.value = TextCellValue(
-            DateTimeFormatter.convertToUTC24StringFormat(
-                banquet.firstTimeServing),
+            DateTimeFormatter.convertToHHMMString(banquet.firstTimeServing),
           );
         }
 
@@ -174,11 +173,11 @@ class ExcelRepository {
         }
 
         if (isAmountOfChildrer) {
-          cell.value = IntCellValue(banquet.amountOfChildren);
+          cell.value = IntCellValue(banquet.amountOfChildren ?? 8);
         }
 
         if (isAmountOfAdult) {
-          cell.value = IntCellValue(banquet.amountOfAdult);
+          cell.value = IntCellValue(banquet.amountOfAdult ?? 8);
         }
 
         for (TableModel table in banquet.tables!) {
@@ -187,13 +186,13 @@ class ExcelRepository {
           if (equalityNameTable &&
               cell.value.toString() == "СТОЛ ДЛЯ ВЗРОСЛЫХ") {
             cell.value = TextCellValue(
-                '${table.name} НА ${DateTimeFormatter.convertToUTC24StringFormat(banquet.firstTimeServing)}');
+                '${table.name} НА ${DateTimeFormatter.convertToHHMMString(banquet.firstTimeServing)}');
             sheet.setRowHeight(cell.rowIndex, 50);
             continue;
           } else if (equalityNameTable &&
               cell.value.toString() == "ДЕТСКИЙ СТОЛ") {
             cell.value = TextCellValue(
-              '${table.name} НА ${DateTimeFormatter.convertToUTC24StringFormat(secondServingTable)}',
+              '${table.name} НА ${DateTimeFormatter.convertToHHMMString(secondServingTable)}',
             );
             sheet.setRowHeight(cell.rowIndex, 50);
             continue;

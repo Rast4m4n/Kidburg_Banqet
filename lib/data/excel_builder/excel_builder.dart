@@ -19,11 +19,11 @@ class ExcelBuilder {
     sheet.setColumnWidth(4, 11);
     sheet.setColumnWidth(5, 10);
     sheet.setColumnWidth(6, 10);
+    sheet.setRowHeight(7, 30);
     _titleColumnCell(rowIndex);
     rowIndex += 1;
 
     int lastIndex = _listDishesAndServing(banquet, rowIndex);
-    print(lastIndex);
     _leftHeaderInfo(sheet, banquet, lastIndex);
     _headerSizedBoxCell(sheet);
     _rightHeaderInfo(sheet, banquet);
@@ -52,15 +52,15 @@ class ExcelBuilder {
       rightBorder: border,
       topBorder: border,
     );
-    final Map<String, String> headerInfo = {
+    final Map<String, dynamic> headerInfo = {
       'Мероприятие': 'День рождение',
       'Заказчик': banquet.nameClient,
-      'Телефон': '',
-      'Менеджер': '',
-      'Контактный тел.': '',
+      'Телефон': banquet.phoneNumberOfClient ?? '',
+      'Менеджер': banquet.nameOfManager ?? '',
+      'Контактный тел.': banquet.phoneNumberOfManager ?? '',
       // lastIndexRow это самое последнее добавленное блюдо в файл
       // Он необходим для подсчёта суммы всех блюд
-      "Сумма заказа": 'SUM(F11:F$lastIndexRow)',
+      "Сумма заказа": 'SUM(F11:F$lastIndexRow)-F5',
     };
     print(lastIndexRow);
     for (var el in headerInfo.entries) {
@@ -123,15 +123,16 @@ class ExcelBuilder {
       rightBorder: border,
       topBorder: border,
     );
+    final prePayment = banquet.prepayment ?? 0;
     final Map<String, dynamic> headerInfo = {
       'Заказ №': '',
       'Заказчик': DateFormat('d MMMM').format(banquet.dateStart),
-      'Время проведения': DateTimeFormatter.convertToUTC24StringFormat(
-          banquet.firstTimeServing),
+      'Время проведения':
+          DateTimeFormatter.convertToHHMMString(banquet.firstTimeServing),
       'Место проведения': banquet.place,
-      'Предоплата': '',
-      'Кол-во детей': banquet.amountOfChildren,
-      'Кол-во взрослых': banquet.amountOfAdult,
+      'Предоплата': prePayment,
+      'Кол-во детей': banquet.amountOfChildren ?? 1,
+      'Кол-во взрослых': banquet.amountOfAdult ?? 1,
     };
     for (var el in headerInfo.entries) {
       sheet.cell(CellIndex.indexByString("D$rowIndex")).value =
@@ -216,15 +217,17 @@ class ExcelBuilder {
       topBorder: border,
       bold: true,
     );
+    final firstServing =
+        DateTimeFormatter.convertToHHMMString(banquet.firstTimeServing);
     final secondServing =
         DateTimeFormatter.calculateNextServingTime(banquet.firstTimeServing);
     if (table.name == 'СТОЛ ДЛЯ ВЗРОСЛЫХ') {
       sheet.cell(CellIndex.indexByString('A$rowIndex')).value = TextCellValue(
-        "${table.name} ${DateTimeFormatter.convertToUTC24StringFormat(banquet.firstTimeServing)}",
+        "${table.name} $firstServing",
       );
     } else {
       sheet.cell(CellIndex.indexByString('A$rowIndex')).value = TextCellValue(
-          "${table.name} ${DateTimeFormatter.convertToUTC24StringFormat(secondServing)}");
+          "${table.name}${DateTimeFormatter.convertToHHMMString(secondServing)}");
     }
 
     sheet.merge(
@@ -391,7 +394,7 @@ class ExcelBuilder {
       borderStyle: BorderStyle.Thin,
     );
     sheet.cell(CellIndex.indexByString('C$rowIndex')).value =
-        TextCellValue("${dish.weight!}г");
+        TextCellValue(dish.weight!);
     sheet.cell(CellIndex.indexByString("C$rowIndex")).cellStyle = CellStyle(
       fontSize: 12,
       fontFamily: 'Ebrima',
@@ -453,7 +456,8 @@ class ExcelBuilder {
       borderColorHex: '#000000',
       borderStyle: BorderStyle.Thin,
     );
-
+    final double rowHeight = banquet.remark!.length >= 16 ? 30 : 15;
+    sheet.setRowHeight(rowIndex - 1, rowHeight);
     final cellStyle = CellStyle(
       fontFamily: 'Corbel',
       fontSize: 12,
@@ -476,7 +480,7 @@ class ExcelBuilder {
     sheet.setMergedCellStyle(CellIndex.indexByString('A$rowIndex'), cellStyle);
 
     sheet.cell(CellIndex.indexByString('F$rowIndex')).value =
-        const TextCellValue('');
+        TextCellValue(banquet.remark ?? ' ');
     sheet.merge(
       CellIndex.indexByString('F$rowIndex'),
       CellIndex.indexByString('G$rowIndex'),
@@ -489,7 +493,8 @@ class ExcelBuilder {
       borderColorHex: '#000000',
       borderStyle: BorderStyle.Thin,
     );
-
+    final double rowHeight = banquet.remark!.length >= 16 ? 30 : 15;
+    sheet.setRowHeight(rowIndex - 1, rowHeight);
     final cellStyle = CellStyle(
       fontFamily: 'Corbel',
       fontSize: 12,
@@ -512,7 +517,7 @@ class ExcelBuilder {
     sheet.setMergedCellStyle(CellIndex.indexByString('A$rowIndex'), cellStyle);
 
     sheet.cell(CellIndex.indexByString('F$rowIndex')).value =
-        const TextCellValue('');
+        TextCellValue(banquet.cake ?? ' ');
     sheet.merge(
       CellIndex.indexByString('F$rowIndex'),
       CellIndex.indexByString('G$rowIndex'),

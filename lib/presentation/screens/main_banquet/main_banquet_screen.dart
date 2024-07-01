@@ -27,12 +27,19 @@ class _MainBanquetScreenState extends State<MainBanquetScreen> {
       dateTimeManager: DateTimeImpl(),
       timeController: TextEditingController(),
       dateController: TextEditingController(),
+      nameOfManagerController: TextEditingController(),
+      phoneNumberOfManagerController: TextEditingController(),
+      phoneNumberOfClientController: TextEditingController(),
+      prepaymentController: TextEditingController(),
+      cakeController: TextEditingController(),
+      remarkController: TextEditingController(),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Text(
           'Кидбург банкеты',
@@ -79,40 +86,62 @@ class _GridActionFields extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final vm = context.read<MainBanquetViewModel>();
-    return SizedBox(
-      height: 190,
-      child: GridView.count(
-        crossAxisCount: 2,
-        crossAxisSpacing: AppPadding.medium,
-        childAspectRatio: 3.4,
-        mainAxisSpacing: AppPadding.low,
-        primary: false,
-        children: [
-          CustomTextField(
-            controller: vm.nameController,
-            label: 'Имя заказчика',
-          ),
-          _TextFieldPicker(
-            name: 'Дата проведения',
-            controller: vm.dateController,
-            onTap: () => vm.showDate(context),
-          ),
-          const _PlaceEventDropDownMenu(),
-          _TextFieldPicker(
-            name: 'Время проведения',
-            controller: vm.timeController,
-            onTap: () => vm.showTime(context),
-          ),
-          CustomTextField(
-            controller: vm.childrenController,
-            label: 'Дети',
-          ),
-          CustomTextField(
-            controller: vm.adultController,
-            label: 'Взрослые',
-          ),
-        ],
-      ),
+    return GridView.count(
+      crossAxisCount: 2,
+      crossAxisSpacing: AppPadding.medium,
+      childAspectRatio: 3.4,
+      mainAxisSpacing: AppPadding.low,
+      primary: false,
+      shrinkWrap: true,
+      children: [
+        CustomTextField(
+          controller: vm.nameOfManagerController,
+          label: 'Имя менеджера',
+        ),
+        CustomTextField(
+          controller: vm.phoneNumberOfManagerController,
+          label: 'Номер менеджера',
+        ),
+        CustomTextField(
+          controller: vm.nameController,
+          label: 'Имя заказчика',
+        ),
+        CustomTextField(
+          controller: vm.phoneNumberOfClientController,
+          label: 'Номер заказчика',
+        ),
+        _TextFieldPicker(
+          name: 'Дата проведения',
+          controller: vm.dateController,
+          onTap: () => vm.showDate(context),
+        ),
+        _TextFieldPicker(
+          name: 'Время проведения',
+          controller: vm.timeController,
+          onTap: () => vm.showTime(context),
+        ),
+        const _PlaceEventDropDownMenu(),
+        CustomTextField(
+          controller: vm.prepaymentController,
+          label: 'Предоплата',
+        ),
+        CustomTextField(
+          controller: vm.childrenController,
+          label: 'Дети',
+        ),
+        CustomTextField(
+          controller: vm.adultController,
+          label: 'Взрослые',
+        ),
+        CustomTextField(
+          controller: vm.cakeController,
+          label: 'Название торта',
+        ),
+        CustomTextField(
+          controller: vm.remarkController,
+          label: 'Примечание',
+        ),
+      ],
     );
   }
 }

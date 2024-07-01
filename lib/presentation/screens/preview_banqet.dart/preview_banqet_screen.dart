@@ -116,8 +116,8 @@ class _EventCardWidget extends StatelessWidget {
                 ),
                 const SizedBox(height: AppPadding.low),
                 _RowInfoWidget(
-                  text: 'Детей: ${vm.banqetModel.amountOfChildren}',
-                  twoText: 'Взрослых: ${vm.banqetModel.amountOfAdult}',
+                  text: 'Детей: ${vm.banqetModel.amountOfChildren ?? ''}',
+                  twoText: 'Взрослых: ${vm.banqetModel.amountOfAdult ?? ''}',
                   fontSize: 14,
                 ),
               ],
