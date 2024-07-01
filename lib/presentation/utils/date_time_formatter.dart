@@ -10,7 +10,7 @@ abstract class DateTimeFormatter {
     final args = ModalRoute.of(context)!.settings.arguments as BanqetModel;
     final firstTimeServing = args.firstTimeServing;
     final secondTimeServing = calculateNextServingTime(firstTimeServing);
-    return convertToUTC24StringFormat(
+    return convertToHHMMString(
       indexTimeServing == 0 ? firstTimeServing : secondTimeServing,
     );
   }
@@ -27,7 +27,7 @@ abstract class DateTimeFormatter {
   }
 
   ///Переводит 12 часовой формат AM/PM на 24 формат
-  static String convertToUTC24StringFormat(TimeOfDay timeOfDay) {
+  static String convertToHHMMString(TimeOfDay timeOfDay) {
     final now = DateTime.now();
     final localDateTime = DateTime(
       now.year,

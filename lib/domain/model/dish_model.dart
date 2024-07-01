@@ -33,13 +33,4 @@ class DishModel {
   String toString() {
     return 'DishModel(rowIndex: $rowIndex, nameDish: $nameDish, weight: $weight, count: $count, price: $price)';
   }
-
-  List<dynamic> modelToList() {
-    return [
-      nameDish,
-      weight,
-      count,
-      price,
-    ];
-  }
 }
