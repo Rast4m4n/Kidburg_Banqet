@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:excel/excel.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:kidburg_banquet/data/excel_builder/excel_builder.dart';
 import 'package:kidburg_banquet/data/file_manager/file_manager.dart';
 import 'package:kidburg_banquet/domain/model/banqet_model.dart';
@@ -156,8 +157,9 @@ class ExcelRepository {
         }
 
         if (isDateStartEvent) {
-          cell.value =
-              TextCellValue(DateTimeFormatter.formatDMM(banquet.dateStart));
+          cell.value = TextCellValue(
+            DateFormat('d MMMM').format(banquet.dateStart),
+          );
         }
 
         if (isTimeStartEvent) {

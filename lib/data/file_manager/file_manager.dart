@@ -1,13 +1,13 @@
 import 'dart:io';
 
+import 'package:intl/intl.dart';
 import 'package:kidburg_banquet/domain/model/banqet_model.dart';
-import 'package:kidburg_banquet/presentation/utils/date_time_formatter.dart';
 
 abstract final class FileManager {
   static final Directory directory = Directory('/storage/emulated/0/Download');
 
   static String getFileName(BanqetModel banquet) {
-    final date = DateTimeFormatter.convertToDDMMYYY(banquet.dateStart);
+    final date = DateFormat('d MMMM').format(banquet.dateStart);
     return "Банкет $date ${banquet.nameClient} ${banquet.place}.xlsx";
   }
 
