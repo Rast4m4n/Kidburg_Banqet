@@ -12,12 +12,21 @@ class ExcelBuilder {
 
   Future<void> writeNewExcelFile(BanqetModel banquet) async {
     int rowIndex = 8;
+    sheet.setColumnWidth(0, 19);
+    sheet.setColumnWidth(1, 18);
+    sheet.setColumnWidth(3, 11);
+    sheet.setColumnWidth(4, 11);
+    sheet.setColumnWidth(5, 10);
+    sheet.setColumnWidth(6, 10);
     _titleColumnCell(rowIndex);
     rowIndex += 1;
-    final lastIndex = _listDishesAndServing(banquet, rowIndex);
+    int lastIndex = _listDishesAndServing(banquet, rowIndex);
     _leftHeaderInfo(sheet, banquet, lastIndex);
-    _headerSizedBox(sheet);
+    _headerSizedBoxCell(sheet);
     _rightHeaderInfo(sheet, banquet);
+    _remarkOfbanquetCell(sheet, banquet, lastIndex);
+    lastIndex += 1;
+    _cakeCell(sheet, banquet, lastIndex);
   }
 
   void _leftHeaderInfo(Sheet sheet, BanqetModel banquet, int lastIndexRow) {
@@ -26,10 +35,12 @@ class ExcelBuilder {
       borderColorHex: '#000000',
       borderStyle: BorderStyle.Thin,
     );
-    sheet.setColumnWidth(0, 20);
+
     final cellStyle = CellStyle(
+      fontFamily: 'Corbel',
+      fontSize: 13,
       bold: true,
-      backgroundColorHex: '#F7E88D',
+      backgroundColorHex: '#FFF2CC',
       verticalAlign: VerticalAlign.Center,
       horizontalAlign: HorizontalAlign.Center,
       textWrapping: TextWrapping.Clip,
@@ -44,7 +55,7 @@ class ExcelBuilder {
       'Телефон': '',
       'Менеджер': '',
       'Контактный тел.': '',
-      // lastIndexRow это самое последнее добавленное блюдо в в файл
+      // lastIndexRow это самое последнее добавленное блюдо в файл
       // Он необходим для подсчёта суммы всех блюд
       "Сумма заказа": 'SUM(F14:F$lastIndexRow)',
     };
@@ -57,6 +68,8 @@ class ExcelBuilder {
           CellIndex.indexByString("A$rowIndex"),
           CellIndex.indexByString("A${rowIndex + 1}"),
         );
+        sheet.cell(CellIndex.indexByString("A${rowIndex + 1}")).cellStyle =
+            cellStyle;
       }
       sheet.cell(CellIndex.indexByString("A$rowIndex")).cellStyle =
           cellStyle.copyWith(
@@ -65,15 +78,23 @@ class ExcelBuilder {
 
       if (el.key == 'Сумма заказа') {
         sheet.cell(CellIndex.indexByString("B$rowIndex")).setFormula(el.value);
+
         sheet.merge(
           CellIndex.indexByString("B$rowIndex"),
           CellIndex.indexByString("B${rowIndex + 1}"),
         );
+        sheet.setMergedCellStyle(
+          CellIndex.indexByString('B$rowIndex'),
+          cellStyle.copyWith(
+            fontColorHexVal: '#FF0101',
+            fontSizeVal: 16,
+          ),
+        );
       } else {
         sheet.cell(CellIndex.indexByString("B$rowIndex")).value =
             TextCellValue(el.value);
+        sheet.cell(CellIndex.indexByString("B$rowIndex")).cellStyle = cellStyle;
       }
-      sheet.cell(CellIndex.indexByString("B$rowIndex")).cellStyle = cellStyle;
 
       rowIndex += 1;
     }
@@ -86,8 +107,10 @@ class ExcelBuilder {
       borderStyle: BorderStyle.Thin,
     );
     final cellStyle = CellStyle(
+      fontFamily: 'Corbel',
+      fontSize: 13,
       bold: true,
-      backgroundColorHex: '#F7E88D',
+      backgroundColorHex: '#FFF2CC',
       verticalAlign: VerticalAlign.Center,
       horizontalAlign: HorizontalAlign.Center,
       textWrapping: TextWrapping.WrapText,
@@ -96,15 +119,15 @@ class ExcelBuilder {
       rightBorder: border,
       topBorder: border,
     );
-    final Map<String, String> headerInfo = {
+    final Map<String, dynamic> headerInfo = {
       'Заказ №': '',
       'Заказчик': DateTimeFormatter.convertToDDMMYYY(banquet.dateStart),
       'Время проведения': DateTimeFormatter.convertToUTC24StringFormat(
           banquet.firstTimeServing),
       'Место проведения': banquet.place,
       'Предоплата': '',
-      'Кол-во детей': banquet.amountOfChildren.toString(),
-      'Кол-во взрослых': banquet.amountOfAdult.toString(),
+      'Кол-во детей': banquet.amountOfChildren,
+      'Кол-во взрослых': banquet.amountOfAdult,
     };
     for (var el in headerInfo.entries) {
       sheet.cell(CellIndex.indexByString("D$rowIndex")).value =
@@ -117,10 +140,29 @@ class ExcelBuilder {
           cellStyle.copyWith(
         horizontalAlignVal: HorizontalAlign.Left,
       );
+      sheet.cell(CellIndex.indexByString("E$rowIndex")).cellStyle = cellStyle;
 
-      sheet.cell(CellIndex.indexByString("F$rowIndex")).value =
-          TextCellValue(el.value);
-      sheet.cell(CellIndex.indexByString("F$rowIndex")).cellStyle = cellStyle;
+      if (el.value is int) {
+        sheet.cell(CellIndex.indexByString("F$rowIndex")).value =
+            IntCellValue(el.value);
+      } else {
+        sheet.cell(CellIndex.indexByString("F$rowIndex")).value =
+            TextCellValue(el.value);
+      }
+      sheet.merge(
+        CellIndex.indexByString("F$rowIndex"),
+        CellIndex.indexByString("G$rowIndex"),
+      );
+      if (el.key == 'Предоплата') {
+        sheet.setMergedCellStyle(
+            CellIndex.indexByString('F$rowIndex'),
+            cellStyle.copyWith(
+              fontColorHexVal: '#00B050',
+            ));
+      } else {
+        sheet.setMergedCellStyle(
+            CellIndex.indexByString('F$rowIndex'), cellStyle);
+      }
 
       rowIndex += 1;
     }
@@ -139,7 +181,7 @@ class ExcelBuilder {
           //Вес блюда
           _weightDishCell(sheet, rowIndex, dish);
           //Количество блюд
-          _counDishCell(sheet, rowIndex, dish);
+          _countDishCell(sheet, rowIndex, dish);
           // Цена блюда
           _priceDishCell(sheet, rowIndex, dish);
           // Формула подсчёта суммы
@@ -156,6 +198,20 @@ class ExcelBuilder {
       borderColorHex: '#000000',
       borderStyle: BorderStyle.Thin,
     );
+    sheet.setRowHeight(rowIndex - 1, 30);
+
+    final cellStyle = CellStyle(
+      fontFamily: 'Ebrima',
+      fontSize: 14,
+      horizontalAlign: HorizontalAlign.Center,
+      verticalAlign: VerticalAlign.Center,
+      backgroundColorHex: '#F7E88D',
+      bottomBorder: border,
+      leftBorder: border,
+      rightBorder: border,
+      topBorder: border,
+      bold: true,
+    );
     final secondServing =
         DateTimeFormatter.calculateNextServingTime(banquet.firstTimeServing);
     if (table.name == 'СТОЛ ДЛЯ ВЗРОСЛЫХ') {
@@ -169,19 +225,9 @@ class ExcelBuilder {
 
     sheet.merge(
       CellIndex.indexByString('A$rowIndex'),
-      CellIndex.indexByString('F$rowIndex'),
+      CellIndex.indexByString('G$rowIndex'),
     );
-    sheet.cell(CellIndex.indexByString('A$rowIndex')).cellStyle = CellStyle(
-      fontSize: 18,
-      horizontalAlign: HorizontalAlign.Center,
-      verticalAlign: VerticalAlign.Center,
-      bold: true,
-      backgroundColorHex: '#F7E88D',
-      bottomBorder: border,
-      leftBorder: border,
-      rightBorder: border,
-      topBorder: border,
-    );
+    sheet.setMergedCellStyle(CellIndex.indexByString('A$rowIndex'), cellStyle);
   }
 
   void _categoryNameCell(int rowIndex, CategoryModel category) {
@@ -189,14 +235,9 @@ class ExcelBuilder {
       borderColorHex: '#000000',
       borderStyle: BorderStyle.Thin,
     );
-    sheet.cell(CellIndex.indexByString('A$rowIndex')).value =
-        TextCellValue(category.name);
-
-    sheet.merge(
-      CellIndex.indexByString('A$rowIndex'),
-      CellIndex.indexByString('F$rowIndex'),
-    );
-    sheet.cell(CellIndex.indexByString('A$rowIndex')).cellStyle = CellStyle(
+    final cellStyle = CellStyle(
+      fontSize: 14,
+      fontFamily: 'Corbel',
       horizontalAlign: HorizontalAlign.Center,
       verticalAlign: VerticalAlign.Center,
       bold: true,
@@ -206,6 +247,20 @@ class ExcelBuilder {
       rightBorder: border,
       topBorder: border,
     );
+    sheet.cell(CellIndex.indexByString('A$rowIndex')).value =
+        TextCellValue(category.name);
+
+    sheet.merge(
+      CellIndex.indexByString("A$rowIndex"),
+      CellIndex.indexByString("G$rowIndex"),
+    );
+    sheet.cell(CellIndex.indexByString('A$rowIndex')).cellStyle = cellStyle;
+    sheet.cell(CellIndex.indexByString('B$rowIndex')).cellStyle = cellStyle;
+    sheet.cell(CellIndex.indexByString('C$rowIndex')).cellStyle = cellStyle;
+    sheet.cell(CellIndex.indexByString('D$rowIndex')).cellStyle = cellStyle;
+    sheet.cell(CellIndex.indexByString('E$rowIndex')).cellStyle = cellStyle;
+    sheet.cell(CellIndex.indexByString('F$rowIndex')).cellStyle = cellStyle;
+    sheet.cell(CellIndex.indexByString('G$rowIndex')).cellStyle = cellStyle;
   }
 
   void _titleColumnCell(int rowIndex) {
@@ -214,6 +269,8 @@ class ExcelBuilder {
       borderStyle: BorderStyle.Thin,
     );
     final cellStyle = CellStyle(
+      fontSize: 13,
+      fontFamily: 'Corbel',
       verticalAlign: VerticalAlign.Center,
       bold: true,
       horizontalAlign: HorizontalAlign.Center,
@@ -233,6 +290,7 @@ class ExcelBuilder {
       CellIndex.indexByString('A$rowIndex'),
       CellIndex.indexByString('B$rowIndex'),
     );
+    sheet.setMergedCellStyle(CellIndex.indexByString('A$rowIndex'), cellStyle);
 
     sheet.cell(CellIndex.indexByString('C$rowIndex')).value =
         const TextCellValue('Вес');
@@ -245,7 +303,11 @@ class ExcelBuilder {
     sheet.cell(CellIndex.indexByString('E$rowIndex')).cellStyle = cellStyle;
     sheet.cell(CellIndex.indexByString('F$rowIndex')).value =
         const TextCellValue('Сумма');
-    sheet.cell(CellIndex.indexByString('F$rowIndex')).cellStyle = cellStyle;
+    sheet.merge(
+      CellIndex.indexByString("F$rowIndex"),
+      CellIndex.indexByString("G$rowIndex"),
+    );
+    sheet.setMergedCellStyle(CellIndex.indexByString('F$rowIndex'), cellStyle);
   }
 
   void _formulaSumCell(Sheet sheet, int rowIndex) {
@@ -253,10 +315,9 @@ class ExcelBuilder {
       borderColorHex: '#000000',
       borderStyle: BorderStyle.Thin,
     );
-    sheet.cell(CellIndex.indexByString('F$rowIndex')).setFormula(
-          'SUM(D$rowIndex*E$rowIndex)',
-        );
-    sheet.cell(CellIndex.indexByString('F$rowIndex')).cellStyle = CellStyle(
+    final cellStyle = CellStyle(
+      fontSize: 12,
+      fontFamily: 'Ebrima',
       verticalAlign: VerticalAlign.Center,
       horizontalAlign: HorizontalAlign.Center,
       bottomBorder: border,
@@ -264,6 +325,14 @@ class ExcelBuilder {
       rightBorder: border,
       topBorder: border,
     );
+    sheet.cell(CellIndex.indexByString('F$rowIndex')).setFormula(
+          'SUM(D$rowIndex*E$rowIndex)',
+        );
+    sheet.merge(
+      CellIndex.indexByString("F$rowIndex"),
+      CellIndex.indexByString("G$rowIndex"),
+    );
+    sheet.setMergedCellStyle(CellIndex.indexByString('F$rowIndex'), cellStyle);
   }
 
   void _priceDishCell(Sheet sheet, int rowIndex, DishModel dish) {
@@ -273,8 +342,11 @@ class ExcelBuilder {
     );
     sheet.cell(CellIndex.indexByString('E$rowIndex')).value =
         IntCellValue(int.parse(dish.price!));
+    // NumFormat.custom(formatCode: '# ##0,00 ₽').read(dish.price!);
 
     sheet.cell(CellIndex.indexByString('E$rowIndex')).cellStyle = CellStyle(
+      fontSize: 12,
+      fontFamily: 'Ebrima',
       numberFormat: NumFormat.defaultNumeric,
       // NumFormat.custom(formatCode: '#,##0 ₽'),
       verticalAlign: VerticalAlign.Center,
@@ -289,7 +361,7 @@ class ExcelBuilder {
     );
   }
 
-  void _counDishCell(Sheet sheet, int rowIndex, DishModel dish) {
+  void _countDishCell(Sheet sheet, int rowIndex, DishModel dish) {
     final border = Border(
       borderColorHex: '#FF0000',
       borderStyle: BorderStyle.Thin,
@@ -297,6 +369,8 @@ class ExcelBuilder {
     sheet.cell(CellIndex.indexByString('D$rowIndex')).value =
         IntCellValue(dish.count!);
     sheet.cell(CellIndex.indexByString('D$rowIndex')).cellStyle = CellStyle(
+      fontSize: 12,
+      fontFamily: 'Ebrima',
       numberFormat: NumFormat.defaultNumeric,
       verticalAlign: VerticalAlign.Center,
       horizontalAlign: HorizontalAlign.Center,
@@ -315,6 +389,8 @@ class ExcelBuilder {
     sheet.cell(CellIndex.indexByString('C$rowIndex')).value =
         TextCellValue("${dish.weight!}г");
     sheet.cell(CellIndex.indexByString("C$rowIndex")).cellStyle = CellStyle(
+      fontSize: 12,
+      fontFamily: 'Ebrima',
       verticalAlign: VerticalAlign.Center,
       horizontalAlign: HorizontalAlign.Center,
       bottomBorder: border,
@@ -332,22 +408,29 @@ class ExcelBuilder {
       borderColorHex: '#000000',
       borderStyle: BorderStyle.Thin,
     );
-    sheet.cell(CellIndex.indexByString('A$rowIndex')).value =
-        TextCellValue(dish.nameDish!);
-    sheet.cell(CellIndex.indexByString('A$rowIndex')).cellStyle = CellStyle(
+    final cellStyle = CellStyle(
+      fontSize: 12,
+      fontFamily: 'Ebrima',
       textWrapping: TextWrapping.WrapText,
       bottomBorder: border,
       leftBorder: border,
       rightBorder: border,
       topBorder: border,
+      verticalAlign: VerticalAlign.Center,
     );
+    sheet.setRowHeight(rowIndex - 1, 30);
+    sheet.cell(CellIndex.indexByString('A$rowIndex')).value =
+        TextCellValue(dish.nameDish!);
     sheet.merge(
       CellIndex.indexByString('A$rowIndex'),
       CellIndex.indexByString('B$rowIndex'),
     );
+    sheet.setMergedCellStyle(CellIndex.indexByString('A$rowIndex'), cellStyle);
+    // sheet.cell(CellIndex.indexByString('A$rowIndex')).cellStyle = cellStyle;
+    // sheet.cell(CellIndex.indexByString('B$rowIndex')).cellStyle = cellStyle;
   }
 
-  void _headerSizedBox(Sheet sheet) {
+  void _headerSizedBoxCell(Sheet sheet) {
     final border = Border(
       borderColorHex: '#000000',
       borderStyle: BorderStyle.Thin,
@@ -359,5 +442,77 @@ class ExcelBuilder {
       rightBorder: border,
       topBorder: border,
     );
+  }
+
+  void _remarkOfbanquetCell(Sheet sheet, BanqetModel banquet, int rowIndex) {
+    final border = Border(
+      borderColorHex: '#000000',
+      borderStyle: BorderStyle.Thin,
+    );
+
+    final cellStyle = CellStyle(
+      fontFamily: 'Corbel',
+      fontSize: 12,
+      textWrapping: TextWrapping.WrapText,
+      horizontalAlign: HorizontalAlign.Center,
+      verticalAlign: VerticalAlign.Center,
+      backgroundColorHex: '#F7E88D',
+      bottomBorder: border,
+      leftBorder: border,
+      rightBorder: border,
+      topBorder: border,
+      bold: true,
+    );
+    sheet.cell(CellIndex.indexByString('A$rowIndex')).value =
+        const TextCellValue('Примечание');
+    sheet.merge(
+      CellIndex.indexByString('A$rowIndex'),
+      CellIndex.indexByString('E$rowIndex'),
+    );
+    sheet.setMergedCellStyle(CellIndex.indexByString('A$rowIndex'), cellStyle);
+
+    sheet.cell(CellIndex.indexByString('F$rowIndex')).value =
+        const TextCellValue('');
+    sheet.merge(
+      CellIndex.indexByString('F$rowIndex'),
+      CellIndex.indexByString('G$rowIndex'),
+    );
+    sheet.setMergedCellStyle(CellIndex.indexByString('F$rowIndex'), cellStyle);
+  }
+
+  void _cakeCell(Sheet sheet, BanqetModel banquet, int rowIndex) {
+    final border = Border(
+      borderColorHex: '#000000',
+      borderStyle: BorderStyle.Thin,
+    );
+
+    final cellStyle = CellStyle(
+      fontFamily: 'Corbel',
+      fontSize: 12,
+      textWrapping: TextWrapping.WrapText,
+      horizontalAlign: HorizontalAlign.Center,
+      verticalAlign: VerticalAlign.Center,
+      bottomBorder: border,
+      leftBorder: border,
+      rightBorder: border,
+      bold: true,
+      topBorder: border,
+      fontColorHex: '#FF0000',
+    );
+    sheet.cell(CellIndex.indexByString('A$rowIndex')).value =
+        const TextCellValue('Наименование торта');
+    sheet.merge(
+      CellIndex.indexByString('A$rowIndex'),
+      CellIndex.indexByString('E$rowIndex'),
+    );
+    sheet.setMergedCellStyle(CellIndex.indexByString('A$rowIndex'), cellStyle);
+
+    sheet.cell(CellIndex.indexByString('F$rowIndex')).value =
+        const TextCellValue('');
+    sheet.merge(
+      CellIndex.indexByString('F$rowIndex'),
+      CellIndex.indexByString('G$rowIndex'),
+    );
+    sheet.setMergedCellStyle(CellIndex.indexByString('F$rowIndex'), cellStyle);
   }
 }
