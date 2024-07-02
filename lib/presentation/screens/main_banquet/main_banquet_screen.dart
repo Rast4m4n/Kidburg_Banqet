@@ -85,7 +85,7 @@ class _GridActionFields extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final vm = context.read<MainBanquetViewModel>();
+    final vm = context.watch<MainBanquetViewModel>();
     return GridView.count(
       crossAxisCount: 2,
       crossAxisSpacing: AppPadding.medium,
@@ -110,13 +110,13 @@ class _GridActionFields extends StatelessWidget {
           controller: vm.phoneNumberOfClientController,
           label: 'Номер заказчика',
         ),
-        _TextFieldPicker(
-          name: 'Дата проведения',
+        CustomTextField(
+          label: 'Дата проведения',
           controller: vm.dateController,
           onTap: () => vm.showDate(context),
         ),
-        _TextFieldPicker(
-          name: 'Время проведения',
+        CustomTextField(
+          label: 'Время проведения',
           controller: vm.timeController,
           onTap: () => vm.showTime(context),
         ),
@@ -149,12 +149,15 @@ class _GridActionFields extends StatelessWidget {
 class _PlaceEventDropDownMenu extends StatelessWidget {
   const _PlaceEventDropDownMenu({
     super.key,
+    this.errorString,
   });
 
+  final String? errorString;
   @override
   Widget build(BuildContext context) {
     final vm = context.read<MainBanquetViewModel>();
     return DropdownMenu(
+      errorText: errorString,
       expandedInsets: const EdgeInsets.all(0),
       inputDecorationTheme: const InputDecorationTheme(
         fillColor: AppColor.textFieldColor,
@@ -177,26 +180,6 @@ class _PlaceEventDropDownMenu extends StatelessWidget {
           );
         },
       ).toList(),
-    );
-  }
-}
-
-class _TextFieldPicker extends StatelessWidget {
-  const _TextFieldPicker({
-    super.key,
-    required this.controller,
-    required this.name,
-    required this.onTap,
-  });
-  final TextEditingController controller;
-  final String name;
-  final VoidCallback onTap;
-  @override
-  Widget build(BuildContext context) {
-    return CustomTextField(
-      controller: controller,
-      label: name,
-      onTap: onTap,
     );
   }
 }
