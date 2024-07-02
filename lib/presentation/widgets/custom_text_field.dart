@@ -5,8 +5,6 @@ import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
 class CustomTextField extends StatelessWidget {
   const CustomTextField({
     super.key,
-    // required this.maxWidth,
-    // required this.maxHeight,
     required this.label,
     this.controller,
     this.onTap,
@@ -16,10 +14,9 @@ class CustomTextField extends StatelessWidget {
     this.maxLines,
     this.minLines,
     this.floatingLabelAlignment,
+    this.errorString,
   });
 
-  // final double maxWidth;
-  // final double maxHeight;
   final TextEditingController? controller;
   final String label;
   final VoidCallback? onTap;
@@ -29,6 +26,7 @@ class CustomTextField extends StatelessWidget {
   final int? maxLines;
   final int? minLines;
   final FloatingLabelAlignment? floatingLabelAlignment;
+  final String? errorString;
   @override
   Widget build(BuildContext context) {
     final InputDecorationTheme textFieldTheme =
@@ -43,6 +41,7 @@ class CustomTextField extends StatelessWidget {
       onChanged: onChanged,
       controller: controller,
       decoration: InputDecoration(
+        errorText: errorString,
         floatingLabelAlignment: floatingLabelAlignment,
         suffixIcon: suffixIcon,
         labelText: label,
