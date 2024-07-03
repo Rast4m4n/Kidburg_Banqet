@@ -31,30 +31,33 @@ class CustomTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     final InputDecorationTheme textFieldTheme =
         Theme.of(context).inputDecorationTheme;
-    return TextField(
-      maxLines: maxLines,
-      minLines: minLines,
-      expands: true,
-      onTap: onTap,
-      textAlign: textAlign ?? TextAlign.start,
-      readOnly: onTap != null ? true : false,
-      onChanged: onChanged,
-      controller: controller,
-      decoration: InputDecoration(
-        errorText: errorString,
-        floatingLabelAlignment: floatingLabelAlignment,
-        suffixIcon: suffixIcon,
-        labelText: label,
-        labelStyle: textFieldTheme.labelStyle,
-        contentPadding: const EdgeInsets.only(
-          left: AppPadding.low,
-          bottom: AppPadding.low,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxHeight: 60),
+      child: TextField(
+        maxLines: maxLines,
+        minLines: minLines,
+        expands: true,
+        onTap: onTap,
+        textAlign: textAlign ?? TextAlign.start,
+        readOnly: onTap != null ? true : false,
+        onChanged: onChanged,
+        controller: controller,
+        decoration: InputDecoration(
+          errorText: errorString,
+          floatingLabelAlignment: floatingLabelAlignment,
+          suffixIcon: suffixIcon,
+          labelText: label,
+          labelStyle: textFieldTheme.labelStyle,
+          contentPadding: const EdgeInsets.only(
+            left: AppPadding.low,
+            bottom: AppPadding.low,
+          ),
+          enabledBorder: textFieldTheme.border,
+          focusedBorder: textFieldTheme.focusedBorder,
+          filled: true,
+          fillColor: AppColor.textFieldColor,
+          border: InputBorder.none,
         ),
-        enabledBorder: textFieldTheme.border,
-        focusedBorder: textFieldTheme.focusedBorder,
-        filled: true,
-        fillColor: AppColor.textFieldColor,
-        border: InputBorder.none,
       ),
     );
   }

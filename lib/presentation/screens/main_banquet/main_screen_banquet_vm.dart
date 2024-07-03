@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kidburg_banquet/domain/model/banqet_model.dart';
+import 'package:kidburg_banquet/domain/model/establishments_enum.dart';
+import 'package:kidburg_banquet/domain/model/manager_model.dart';
+import 'package:kidburg_banquet/domain/model/place_event_enum.dart';
 import 'package:kidburg_banquet/presentation/navigation/app_route.dart';
 import 'package:kidburg_banquet/presentation/utils/date_time_formatter.dart';
 
@@ -33,6 +36,8 @@ class MainBanquetViewModel extends ChangeNotifier {
   final TextEditingController prepaymentController;
   final TextEditingController cakeController;
   final TextEditingController remarkController;
+  List<dynamic> dropDownMenuEntries = [];
+
   String formatterDate() => dateTimeManager.formatterDate;
   String formatterTime() => dateTimeManager.formatterTime;
 
@@ -46,12 +51,22 @@ class MainBanquetViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void initDropDownEntriesPlacesEvent(BuildContext context) {
+    final args = ModalRoute.of(context)!.settings.arguments as ManagerModel;
+    if (args.establishmentEnum == EstablishmentsEnum.cdm) {
+      dropDownMenuEntries = PlaceEventCDMEnum.values;
+    } else if (args.establishmentEnum == EstablishmentsEnum.riviera) {
+      dropDownMenuEntries = PlaceEventRivieraEnum.values;
+    }
+  }
+
   void routingToPreOrder(BuildContext context) {
+    final args = ModalRoute.of(context)!.settings.arguments as ManagerModel;
     Navigator.of(context).pushNamed(
       AppRoute.preOrderFormPage,
       arguments: BanqetModel(
-        nameOfManager: nameOfManagerController.text,
-        phoneNumberOfManager: phoneNumberOfManagerController.text,
+        nameOfManager: args.name,
+        phoneNumberOfManager: args.phoneNumber,
         nameClient: nameController.text,
         phoneNumberOfClient: phoneNumberOfClientController.text,
         prepayment: int.tryParse(prepaymentController.text),
@@ -74,9 +89,13 @@ abstract class DateTimeManager {
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
   Future<void> showDate(
-      BuildContext context, TextEditingController dateController);
+    BuildContext context,
+    TextEditingController dateController,
+  );
   Future<void> showTime(
-      BuildContext context, TextEditingController timeController);
+    BuildContext context,
+    TextEditingController timeController,
+  );
   Widget hour24FormatBuilder(BuildContext context, Widget? child);
   String get formatterDate;
   String get formatterTime;

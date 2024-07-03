@@ -1,43 +1,32 @@
 import 'package:flutter/material.dart';
-import 'package:kidburg_banquet/domain/model/place_event_enum.dart';
 import 'package:kidburg_banquet/presentation/screens/main_banquet/main_screen_banquet_vm.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
 import 'package:kidburg_banquet/presentation/widgets/custom_text_field.dart';
 import 'package:provider/provider.dart';
 
-class MainBanquetScreen extends StatefulWidget {
-  const MainBanquetScreen({super.key});
+class MainBanquetScreen extends StatelessWidget {
+  MainBanquetScreen({super.key});
 
-  @override
-  State<MainBanquetScreen> createState() => _MainBanquetScreenState();
-}
-
-class _MainBanquetScreenState extends State<MainBanquetScreen> {
-  late final MainBanquetViewModel vm;
-
-  @override
-  void initState() {
-    super.initState();
-    vm = MainBanquetViewModel(
-      nameController: TextEditingController(),
-      placeEventController: TextEditingController(),
-      childrenController: TextEditingController(),
-      adultController: TextEditingController(),
-      dateTimeManager: DateTimeImpl(),
-      timeController: TextEditingController(),
-      dateController: TextEditingController(),
-      nameOfManagerController: TextEditingController(),
-      phoneNumberOfManagerController: TextEditingController(),
-      phoneNumberOfClientController: TextEditingController(),
-      prepaymentController: TextEditingController(),
-      cakeController: TextEditingController(),
-      remarkController: TextEditingController(),
-    );
-  }
+  final MainBanquetViewModel vm = MainBanquetViewModel(
+    nameController: TextEditingController(),
+    placeEventController: TextEditingController(),
+    childrenController: TextEditingController(),
+    adultController: TextEditingController(),
+    dateTimeManager: DateTimeImpl(),
+    timeController: TextEditingController(),
+    dateController: TextEditingController(),
+    nameOfManagerController: TextEditingController(),
+    phoneNumberOfManagerController: TextEditingController(),
+    phoneNumberOfClientController: TextEditingController(),
+    prepaymentController: TextEditingController(),
+    cakeController: TextEditingController(),
+    remarkController: TextEditingController(),
+  );
 
   @override
   Widget build(BuildContext context) {
+    vm.initDropDownEntriesPlacesEvent(context);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -95,14 +84,6 @@ class _GridActionFields extends StatelessWidget {
       shrinkWrap: true,
       children: [
         CustomTextField(
-          controller: vm.nameOfManagerController,
-          label: 'Имя менеджера',
-        ),
-        CustomTextField(
-          controller: vm.phoneNumberOfManagerController,
-          label: 'Номер менеджера',
-        ),
-        CustomTextField(
           controller: vm.nameController,
           label: 'Имя заказчика',
         ),
@@ -149,15 +130,13 @@ class _GridActionFields extends StatelessWidget {
 class _PlaceEventDropDownMenu extends StatelessWidget {
   const _PlaceEventDropDownMenu({
     super.key,
-    this.errorString,
   });
 
-  final String? errorString;
   @override
   Widget build(BuildContext context) {
     final vm = context.read<MainBanquetViewModel>();
+
     return DropdownMenu(
-      errorText: errorString,
       expandedInsets: const EdgeInsets.all(0),
       inputDecorationTheme: const InputDecorationTheme(
         fillColor: AppColor.textFieldColor,
@@ -171,10 +150,9 @@ class _PlaceEventDropDownMenu extends StatelessWidget {
         style: Theme.of(context).inputDecorationTheme.labelStyle,
       ),
       controller: vm.placeEventController,
-      dropdownMenuEntries:
-          PlaceEventEnum.values.map<DropdownMenuEntry<PlaceEventEnum>>(
-        (PlaceEventEnum place) {
-          return DropdownMenuEntry<PlaceEventEnum>(
+      dropdownMenuEntries: vm.dropDownMenuEntries.map<DropdownMenuEntry>(
+        (place) {
+          return DropdownMenuEntry(
             value: place,
             label: place.name,
           );
