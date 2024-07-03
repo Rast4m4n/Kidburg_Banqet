@@ -17,9 +17,8 @@ class ExcelBuilder {
     sheet.setColumnWidth(1, 18);
     sheet.setColumnWidth(3, 11);
     sheet.setColumnWidth(4, 11);
-    sheet.setColumnWidth(5, 10);
+    sheet.setColumnWidth(5, 13);
     sheet.setColumnWidth(6, 10);
-    sheet.setRowHeight(7, 30);
     _titleColumnCell(rowIndex);
     rowIndex += 1;
 
@@ -227,7 +226,7 @@ class ExcelBuilder {
       );
     } else {
       sheet.cell(CellIndex.indexByString('A$rowIndex')).value = TextCellValue(
-          "${table.name}${DateTimeFormatter.convertToHHMMString(secondServing)}");
+          "${table.name} ${DateTimeFormatter.convertToHHMMString(secondServing)}");
     }
 
     sheet.merge(
