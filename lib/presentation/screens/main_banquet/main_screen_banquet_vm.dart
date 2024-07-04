@@ -92,7 +92,6 @@ abstract class DateTimeManager {
     BuildContext context,
     TextEditingController timeController,
   );
-  Widget hour24FormatBuilder(BuildContext context, Widget? child);
   String get formatterDate;
   String get formatterTime;
 }
@@ -108,21 +107,12 @@ class DateTimeImpl implements DateTimeManager {
   String get formatterDate => DateFormat('dd.MM.yy').format(selectedDate!);
 
   @override
-  String get formatterTime => DateFormat('hh:mm').format(
-        DateTime.now()
-            .copyWith(hour: selectedTime!.hour, minute: selectedTime!.minute),
+  String get formatterTime => DateFormat('HH:mm').format(
+        DateTime.now().copyWith(
+          hour: selectedTime!.hour,
+          minute: selectedTime!.minute,
+        ),
       );
-
-  @override
-  Widget hour24FormatBuilder(BuildContext context, Widget? child) {
-    final mediaQueryData = MediaQuery.of(context);
-    return MediaQuery(
-      data: mediaQueryData.alwaysUse24HourFormat
-          ? mediaQueryData
-          : mediaQueryData.copyWith(alwaysUse24HourFormat: true),
-      child: child!,
-    );
-  }
 
   @override
   Future<void> showDate(
@@ -144,7 +134,6 @@ class DateTimeImpl implements DateTimeManager {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: const TimeOfDay(hour: 10, minute: 50),
-      builder: hour24FormatBuilder,
     );
     if (picked != null && picked != selectedTime) {
       selectedTime = picked;
