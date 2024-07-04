@@ -16,8 +16,6 @@ class MainBanquetViewModel extends ChangeNotifier {
     required this.dateTimeManager,
     required this.dateController,
     required this.timeController,
-    required this.nameOfManagerController,
-    required this.phoneNumberOfManagerController,
     required this.phoneNumberOfClientController,
     required this.prepaymentController,
     required this.cakeController,
@@ -30,8 +28,6 @@ class MainBanquetViewModel extends ChangeNotifier {
   final TextEditingController placeEventController;
   final TextEditingController childrenController;
   final TextEditingController adultController;
-  final TextEditingController nameOfManagerController;
-  final TextEditingController phoneNumberOfManagerController;
   final TextEditingController phoneNumberOfClientController;
   final TextEditingController prepaymentController;
   final TextEditingController cakeController;

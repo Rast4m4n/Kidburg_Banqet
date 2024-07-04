@@ -16,8 +16,6 @@ class MainBanquetScreen extends StatelessWidget {
     dateTimeManager: DateTimeImpl(),
     timeController: TextEditingController(),
     dateController: TextEditingController(),
-    nameOfManagerController: TextEditingController(),
-    phoneNumberOfManagerController: TextEditingController(),
     phoneNumberOfClientController: TextEditingController(),
     prepaymentController: TextEditingController(),
     cakeController: TextEditingController(),
