@@ -47,7 +47,9 @@ class MainBanquetScreen extends StatelessWidget {
                 width: MediaQuery.of(context).size.width,
                 child: ElevatedButton(
                   style: Theme.of(context).elevatedButtonTheme.style,
-                  onPressed: () => vm.routingToPreOrder(context),
+                  onPressed: () {
+                    vm.routingToPreOrder(context);
+                  },
                   child: const Text(
                     'Далее',
                     style: TextStyle(
@@ -84,6 +86,7 @@ class _GridActionFields extends StatelessWidget {
         CustomTextField(
           controller: vm.nameController,
           label: 'Имя заказчика',
+          errorText: vm.errorName,
         ),
         CustomTextField(
           controller: vm.phoneNumberOfClientController,
@@ -93,11 +96,13 @@ class _GridActionFields extends StatelessWidget {
           label: 'Дата проведения',
           controller: vm.dateController,
           onTap: () => vm.showDate(context),
+          errorText: vm.errorDate,
         ),
         CustomTextField(
           label: 'Время проведения',
           controller: vm.timeController,
           onTap: () => vm.showTime(context),
+          errorText: vm.errorTime,
         ),
         const _PlaceEventDropDownMenu(),
         CustomTextField(
@@ -132,21 +137,29 @@ class _PlaceEventDropDownMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final vm = context.read<MainBanquetViewModel>();
+    final vm = context.watch<MainBanquetViewModel>();
 
     return DropdownMenu(
       expandedInsets: const EdgeInsets.all(0),
-      inputDecorationTheme: const InputDecorationTheme(
+      inputDecorationTheme: InputDecorationTheme(
+        floatingLabelBehavior: vm.errorPlace != null
+            ? FloatingLabelBehavior.always
+            : FloatingLabelBehavior.auto,
+        hintStyle: TextStyle(
+          color: Colors.red[200],
+          fontSize: 12,
+        ),
         fillColor: AppColor.textFieldColor,
         filled: true,
         isCollapsed: true,
-        contentPadding: EdgeInsets.all(AppPadding.low),
-        constraints: BoxConstraints(maxHeight: 48),
+        contentPadding: const EdgeInsets.all(AppPadding.low),
+        constraints: const BoxConstraints(maxHeight: 48),
       ),
       label: Text(
         'Место проведения',
         style: Theme.of(context).inputDecorationTheme.labelStyle,
       ),
+      hintText: vm.errorPlace,
       controller: vm.placeEventController,
       dropdownMenuEntries: vm.dropDownMenuEntries.map<DropdownMenuEntry>(
         (place) {

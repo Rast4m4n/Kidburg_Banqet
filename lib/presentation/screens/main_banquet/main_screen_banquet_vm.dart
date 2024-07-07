@@ -37,6 +37,57 @@ class MainBanquetViewModel extends ChangeNotifier {
   String formatterDate() => dateTimeManager.formatterDate;
   String formatterTime() => dateTimeManager.formatterTime;
 
+  String? errorName;
+  String? errorDate;
+  String? errorTime;
+  String? errorPlace;
+  void isValidateName() {
+    if (nameController.text.isEmpty) {
+      errorName = 'Обязательное поле';
+      notifyListeners();
+    } else {
+      errorName = null;
+      notifyListeners();
+    }
+  }
+
+  void isValidateDate() {
+    if (dateController.text.isEmpty) {
+      errorDate = 'Обязательное поле';
+      notifyListeners();
+    } else {
+      errorDate = null;
+      notifyListeners();
+    }
+  }
+
+  void isValidateTime() {
+    if (timeController.text.isEmpty) {
+      errorTime = 'Обязательное поле';
+      notifyListeners();
+    } else {
+      errorTime = null;
+      notifyListeners();
+    }
+  }
+
+  void isValidatePlace() {
+    if (placeEventController.text.isEmpty) {
+      errorPlace = 'Обязательное поле';
+      notifyListeners();
+    } else {
+      errorPlace = null;
+      notifyListeners();
+    }
+  }
+
+  void isValidateForms() {
+    isValidateTime();
+    isValidateDate();
+    isValidateName();
+    isValidatePlace();
+  }
+
   Future<void> showDate(BuildContext context) async {
     dateTimeManager.showDate(context, dateController);
     notifyListeners();
@@ -57,27 +108,33 @@ class MainBanquetViewModel extends ChangeNotifier {
   }
 
   void routingToPreOrder(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as ManagerModel;
-    Navigator.of(context).pushNamed(
-      AppRoute.preOrderFormPage,
-      arguments: BanqetModel(
-        nameOfManager: args.name,
-        phoneNumberOfManager: args.phoneNumber,
-        nameClient: nameController.text,
-        phoneNumberOfClient: phoneNumberOfClientController.text,
-        prepayment: int.tryParse(prepaymentController.text),
-        cake: cakeController.text,
-        remark: remarkController.text,
-        place: placeEventController.text,
-        dateStart: dateTimeManager.selectedDate!,
-        firstTimeServing: dateTimeManager.selectedTime!,
-        secondTimeServing: DateTimeFormatter.calculateNextServingTime(
-          dateTimeManager.selectedTime!,
+    isValidateForms();
+    if (errorName == null &&
+        errorDate == null &&
+        errorTime == null &&
+        errorPlace == null) {
+      final args = ModalRoute.of(context)!.settings.arguments as ManagerModel;
+      Navigator.of(context).pushNamed(
+        AppRoute.preOrderFormPage,
+        arguments: BanqetModel(
+          nameOfManager: args.name,
+          phoneNumberOfManager: args.phoneNumber,
+          nameClient: nameController.text,
+          phoneNumberOfClient: phoneNumberOfClientController.text,
+          prepayment: int.tryParse(prepaymentController.text),
+          cake: cakeController.text,
+          remark: remarkController.text,
+          place: placeEventController.text,
+          dateStart: dateTimeManager.selectedDate!,
+          firstTimeServing: dateTimeManager.selectedTime!,
+          secondTimeServing: DateTimeFormatter.calculateNextServingTime(
+            dateTimeManager.selectedTime!,
+          ),
+          amountOfChildren: int.tryParse(childrenController.text),
+          amountOfAdult: int.tryParse(adultController.text),
         ),
-        amountOfChildren: int.tryParse(childrenController.text),
-        amountOfAdult: int.tryParse(adultController.text),
-      ),
-    );
+      );
+    }
   }
 }
 
