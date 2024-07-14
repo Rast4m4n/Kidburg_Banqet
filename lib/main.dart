@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kidburg_banquet/core/permission_app.dart';
+import 'package:kidburg_banquet/data/repository/shared_preferences_repository.dart';
 import 'package:kidburg_banquet/generated/l10n.dart';
 import 'package:kidburg_banquet/presentation/navigation/app_route.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
@@ -7,8 +8,12 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferencesRepository.instance;
+  // (await SharedPreferencesRepository.instance.pref).clear();
   final AppTheme appTheme = AppTheme();
   final AppNavigation appNavigator = AppNavigation();
+
+  appNavigator.isAuth();
   final PermissionApp permission = PermissionApp();
   await permission.requestPermission();
 

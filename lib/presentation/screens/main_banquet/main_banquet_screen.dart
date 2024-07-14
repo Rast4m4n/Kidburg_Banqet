@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kidburg_banquet/presentation/navigation/app_route.dart';
 import 'package:kidburg_banquet/presentation/screens/main_banquet/main_screen_banquet_vm.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
@@ -24,44 +25,66 @@ class MainBanquetScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    vm.initDropDownEntriesPlacesEvent(context);
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: Text(
-          'Кидбург банкеты',
-          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
+        automaticallyImplyLeading: false,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Кидбург банкеты',
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            IconButton(
+              onPressed: () => Navigator.of(context).pushNamed(
+                AppRoute.selectionKidburgPage,
               ),
+              icon: const Icon(Icons.account_circle_outlined),
+            ),
+          ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(AppPadding.low),
-        child: ChangeNotifierProvider(
-          create: (context) => vm,
-          child: Column(
-            children: [
-              const _GridActionFields(),
-              const SizedBox(height: AppPadding.low),
-              SizedBox(
-                width: MediaQuery.of(context).size.width,
-                child: ElevatedButton(
-                  style: Theme.of(context).elevatedButtonTheme.style,
-                  onPressed: () {
-                    vm.routingToPreOrder(context);
-                  },
-                  child: const Text(
-                    'Далее',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: AppColor.infoCardPreviewColor,
+      body: FutureBuilder(
+        future: vm.initDropDownEntriesPlacesEvent(),
+        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else {
+            return Padding(
+              padding: const EdgeInsets.all(AppPadding.low),
+              child: ChangeNotifierProvider(
+                create: (context) => vm,
+                child: Column(
+                  children: [
+                    const _GridActionFields(),
+                    const SizedBox(height: AppPadding.low),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      child: ElevatedButton(
+                        style: Theme.of(context).elevatedButtonTheme.style,
+                        onPressed: () {
+                          vm.routingToPreOrder(context);
+                        },
+                        child: const Text(
+                          'Далее',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: AppColor.infoCardPreviewColor,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
+            );
+          }
+        },
       ),
     );
   }
@@ -138,7 +161,6 @@ class _PlaceEventDropDownMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<MainBanquetViewModel>();
-
     return DropdownMenu(
       expandedInsets: const EdgeInsets.all(0),
       inputDecorationTheme: InputDecorationTheme(

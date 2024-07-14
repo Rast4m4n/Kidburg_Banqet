@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:kidburg_banquet/data/repository/shared_preferences_repository.dart';
 import 'package:kidburg_banquet/domain/model/banqet_model.dart';
 import 'package:kidburg_banquet/domain/model/establishments_enum.dart';
 import 'package:kidburg_banquet/domain/model/manager_model.dart';
@@ -98,11 +99,12 @@ class MainBanquetViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void initDropDownEntriesPlacesEvent(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as ManagerModel;
-    if (args.establishmentEnum == EstablishmentsEnum.cdm) {
+  Future<void> initDropDownEntriesPlacesEvent() async {
+    final managerModel =
+        (await SharedPreferencesRepository.instance.loadManagerInfo())!;
+    if (managerModel.establishmentEnum == EstablishmentsEnum.cdm) {
       dropDownMenuEntries = PlaceEventCDMEnum.values;
-    } else if (args.establishmentEnum == EstablishmentsEnum.riviera) {
+    } else if (managerModel.establishmentEnum == EstablishmentsEnum.riviera) {
       dropDownMenuEntries = PlaceEventRivieraEnum.values;
     }
   }
