@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:excel/excel.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:kidburg_banquet/data/excel_builder/excel_builder.dart';
+import 'package:kidburg_banquet/controller/excel_builder_controller.dart';
 import 'package:kidburg_banquet/data/file_manager/file_manager.dart';
 import 'package:kidburg_banquet/domain/model/banqet_model.dart';
 import 'package:kidburg_banquet/domain/model/category_enum.dart';
@@ -235,7 +235,8 @@ class ExcelRepository {
     String filePath = FileManager.filePath(nameFile);
     await FileManager.existsDirectory();
 
-    final ExcelBuilder excelBuilder = ExcelBuilder(sheet: sheet);
+    final ExcelBuilderController excelBuilder =
+        ExcelBuilderController(sheet: sheet);
     excelBuilder.writeNewExcelFile(banquet);
 
     _saveBanquetExcelFile(filePath, excel);

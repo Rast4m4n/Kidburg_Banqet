@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kidburg_banquet/domain/model/establishments_enum.dart';
-import 'package:kidburg_banquet/presentation/screens/selection_kidburg/selection_kidbur_vm.dart';
+import 'package:kidburg_banquet/presentation/screens/selection_kidburg/selection_kidburg_vm.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
 import 'package:kidburg_banquet/presentation/widgets/custom_text_field.dart';
@@ -8,11 +8,8 @@ import 'package:provider/provider.dart';
 
 class SelectionKidburScreen extends StatelessWidget {
   SelectionKidburScreen({super.key});
-  final vm = SelectionKidburgViewModel(
-    nameController: TextEditingController(),
-    phoneNumberOfManagerController: TextEditingController(),
-    establishmentController: TextEditingController(),
-  );
+
+  final vm = SelectionKidburgViewModel();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,41 +21,53 @@ class SelectionKidburScreen extends StatelessWidget {
               ),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(AppPadding.low),
-        child: ChangeNotifierProvider<SelectionKidburgViewModel>(
-          create: (context) => vm,
-          child: Column(
-            children: [
-              CustomTextField(
-                controller: vm.nameController,
-                label: 'Имя менеджера',
-              ),
-              const SizedBox(height: AppPadding.low),
-              CustomTextField(
-                controller: vm.phoneNumberOfManagerController,
-                label: 'Номер менеджера',
-              ),
-              const SizedBox(height: AppPadding.low),
-              const _EstablishmentsDropDownMenu(),
-              const SizedBox(height: AppPadding.low),
-              SizedBox(
-                width: MediaQuery.of(context).size.width,
-                child: ElevatedButton(
-                  style: Theme.of(context).elevatedButtonTheme.style,
-                  onPressed: () => vm.enterToHeaderFormScreen(context),
-                  child: const Text(
-                    'Далее',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: AppColor.infoCardPreviewColor,
+      body: FutureBuilder(
+        future: vm.loadCurrentManager(),
+        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else {
+            return Padding(
+              padding: const EdgeInsets.all(AppPadding.low),
+              child: ChangeNotifierProvider<SelectionKidburgViewModel>(
+                create: (context) => vm,
+                child: Column(
+                  children: [
+                    CustomTextField(
+                      controller: vm.nameController,
+                      label: 'Имя менеджера',
                     ),
-                  ),
+                    const SizedBox(height: AppPadding.low),
+                    CustomTextField(
+                      controller: vm.phoneNumberOfManagerController,
+                      label: 'Номер менеджера',
+                    ),
+                    const SizedBox(height: AppPadding.low),
+                    const _EstablishmentsDropDownMenu(),
+                    const SizedBox(height: AppPadding.low),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width,
+                      child: ElevatedButton(
+                        style: Theme.of(context).elevatedButtonTheme.style,
+                        onPressed: () async =>
+                            vm.enterToHeaderFormScreen(context),
+                        child: const Text(
+                          'Далее',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: AppColor.infoCardPreviewColor,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
+            );
+          }
+        },
       ),
     );
   }

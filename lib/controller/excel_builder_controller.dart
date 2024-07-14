@@ -6,8 +6,8 @@ import 'package:kidburg_banquet/domain/model/dish_model.dart';
 import 'package:kidburg_banquet/domain/model/table_model.dart';
 import 'package:kidburg_banquet/presentation/utils/date_time_formatter.dart';
 
-class ExcelBuilder {
-  ExcelBuilder({required this.sheet});
+class ExcelBuilderController {
+  ExcelBuilderController({required this.sheet});
 
   final Sheet sheet;
 
