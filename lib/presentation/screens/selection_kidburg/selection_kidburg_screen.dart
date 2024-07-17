@@ -15,7 +15,7 @@ class SelectionKidburScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Кидбург банкеты',
+          'КидБург банкеты',
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
