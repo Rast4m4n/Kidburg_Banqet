@@ -33,7 +33,7 @@ class MainBanquetScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Кидбург банкеты',
+              'КидБург банкеты',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -104,6 +104,7 @@ class _GridActionFields extends StatelessWidget {
       childAspectRatio: 3.4,
       mainAxisSpacing: AppPadding.low,
       primary: false,
+      physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       children: [
         CustomTextField(

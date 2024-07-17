@@ -15,6 +15,7 @@ class CustomTextField extends StatelessWidget {
     this.minLines,
     this.floatingLabelAlignment,
     this.errorText,
+    // this.maxLength,
   });
 
   final TextEditingController? controller;
@@ -27,6 +28,7 @@ class CustomTextField extends StatelessWidget {
   final int? minLines;
   final FloatingLabelAlignment? floatingLabelAlignment;
   final String? errorText;
+  // final int? maxLength;
   @override
   Widget build(BuildContext context) {
     final InputDecorationTheme textFieldTheme =
@@ -42,6 +44,7 @@ class CustomTextField extends StatelessWidget {
         readOnly: onTap != null ? true : false,
         onChanged: onChanged,
         controller: controller,
+        // maxLength: maxLength,
         decoration: InputDecoration(
           floatingLabelAlignment: floatingLabelAlignment,
           suffixIcon: suffixIcon,

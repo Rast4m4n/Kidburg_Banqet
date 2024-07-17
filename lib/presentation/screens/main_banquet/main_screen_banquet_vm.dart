@@ -3,7 +3,6 @@ import 'package:intl/intl.dart';
 import 'package:kidburg_banquet/data/repository/shared_preferences_repository.dart';
 import 'package:kidburg_banquet/domain/model/banqet_model.dart';
 import 'package:kidburg_banquet/domain/model/establishments_enum.dart';
-import 'package:kidburg_banquet/domain/model/manager_model.dart';
 import 'package:kidburg_banquet/domain/model/place_event_enum.dart';
 import 'package:kidburg_banquet/presentation/navigation/app_route.dart';
 import 'package:kidburg_banquet/presentation/utils/date_time_formatter.dart';
@@ -109,33 +108,36 @@ class MainBanquetViewModel extends ChangeNotifier {
     }
   }
 
-  void routingToPreOrder(BuildContext context) {
+  void routingToPreOrder(BuildContext context) async {
     isValidateForms();
     if (errorName == null &&
         errorDate == null &&
         errorTime == null &&
         errorPlace == null) {
-      final args = ModalRoute.of(context)!.settings.arguments as ManagerModel;
-      Navigator.of(context).pushNamed(
-        AppRoute.preOrderFormPage,
-        arguments: BanqetModel(
-          nameOfManager: args.name,
-          phoneNumberOfManager: args.phoneNumber,
-          nameClient: nameController.text,
-          phoneNumberOfClient: phoneNumberOfClientController.text,
-          prepayment: int.tryParse(prepaymentController.text),
-          cake: cakeController.text,
-          remark: remarkController.text,
-          place: placeEventController.text,
-          dateStart: dateTimeManager.selectedDate!,
-          firstTimeServing: dateTimeManager.selectedTime!,
-          secondTimeServing: DateTimeFormatter.calculateNextServingTime(
-            dateTimeManager.selectedTime!,
+      final managerModel =
+          await SharedPreferencesRepository.instance.loadManagerInfo();
+      if (context.mounted) {
+        Navigator.of(context).pushNamed(
+          AppRoute.preOrderFormPage,
+          arguments: BanqetModel(
+            nameOfManager: managerModel?.name,
+            phoneNumberOfManager: managerModel?.phoneNumber,
+            nameClient: nameController.text,
+            phoneNumberOfClient: phoneNumberOfClientController.text,
+            prepayment: int.tryParse(prepaymentController.text),
+            cake: cakeController.text,
+            remark: remarkController.text,
+            place: placeEventController.text,
+            dateStart: dateTimeManager.selectedDate!,
+            firstTimeServing: dateTimeManager.selectedTime!,
+            secondTimeServing: DateTimeFormatter.calculateNextServingTime(
+              dateTimeManager.selectedTime!,
+            ),
+            amountOfChildren: int.tryParse(childrenController.text),
+            amountOfAdult: int.tryParse(adultController.text),
           ),
-          amountOfChildren: int.tryParse(childrenController.text),
-          amountOfAdult: int.tryParse(adultController.text),
-        ),
-      );
+        );
+      }
     }
   }
 }

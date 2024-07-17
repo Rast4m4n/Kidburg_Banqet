@@ -55,7 +55,7 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
             floatingActionButtonLocation: vm.buttonLocation,
             appBar: AppBar(
               title: Text(
-                'Кидбург банкеты',
+                'Оформление банкета',
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),

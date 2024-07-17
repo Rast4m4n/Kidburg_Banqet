@@ -40,7 +40,7 @@ class _PreviewBanqetScreenState extends State<PreviewBanqetScreen> {
             children: [
               Center(
                 child: Text(
-                  'Кидбург банкеты',
+                  'КидБург банкеты',
                   style: Theme.of(context).textTheme.displaySmall,
                 ),
               ),
