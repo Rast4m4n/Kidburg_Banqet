@@ -21,7 +21,6 @@ class SharedPreferencesRepository {
   Future<ManagerModel?> loadManagerInfo() async {
     final json = (await pref).getString(StorageKey.manager);
     if (json == null) {
-      print('хранилище пустое');
       return null;
     } else {
       print(ManagerModel.fromJson(json).toString());

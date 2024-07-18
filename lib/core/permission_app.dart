@@ -1,13 +1,29 @@
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class PermissionApp {
   Future<void> requestPermission() async {
-    var status = await Permission.manageExternalStorage.status;
-    if (!status.isGranted) {
-      await Permission.manageExternalStorage.request();
-      print(status);
-    } else {
-      print("${status}");
+    final androidInfo = await DeviceInfoPlugin().androidInfo;
+    final sdkInt = androidInfo.version.sdkInt;
+    if (Platform.isAndroid) {
+      final statusManageExternalStorage =
+          await Permission.manageExternalStorage.status;
+      final statusStorage = await Permission.storage.status;
+      if (sdkInt <= 29) {
+        if (statusStorage.isDenied) {
+          print(statusStorage);
+          if (await Permission.storage.request().isGranted) {
+          } else {
+            openAppSettings();
+          }
+        }
+      } else {
+        if (statusManageExternalStorage.isDenied) {
+          if (await Permission.manageExternalStorage.request().isGranted) {}
+        }
+      }
     }
   }
 }
