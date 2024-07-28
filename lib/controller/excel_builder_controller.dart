@@ -347,7 +347,7 @@ class ExcelBuilderController {
       borderStyle: BorderStyle.Thin,
     );
     sheet.cell(CellIndex.indexByString('E$rowIndex')).value =
-        IntCellValue(int.parse(dish.price!));
+        IntCellValue(dish.price!);
     // NumFormat.custom(formatCode: '# ##0,00 ₽').read(dish.price!);
 
     sheet.cell(CellIndex.indexByString('E$rowIndex')).cellStyle = CellStyle(

@@ -1,27 +1,32 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:convert';
+
+import 'package:json_annotation/json_annotation.dart';
+
+part 'dish_model.g.dart';
+
+@JsonSerializable()
 class DishModel {
   DishModel({
-    required this.rowIndex,
+    // required this.rowIndex,
     required this.nameDish,
     required this.weight,
     required this.price,
     this.count,
   });
-  final int rowIndex;
+  // final int rowIndex;
   final String? nameDish;
   final String? weight;
   final int? count;
-  final String? price;
+  final int? price;
 
   DishModel copyWith({
-    int? rowIndex,
     String? nameDish,
     String? weight,
     int? count,
-    String? price,
+    int? price,
   }) {
     return DishModel(
-      rowIndex: rowIndex ?? this.rowIndex,
       nameDish: nameDish ?? this.nameDish,
       weight: weight ?? this.weight,
       count: count ?? this.count,
@@ -31,6 +36,19 @@ class DishModel {
 
   @override
   String toString() {
-    return 'DishModel(rowIndex: $rowIndex, nameDish: $nameDish, weight: $weight, count: $count, price: $price)';
+    return 'DishModel(nameDish: $nameDish, weight: $weight, count: $count, price: $price)';
   }
+
+  Map<String, dynamic> toMap() {
+    return _$DishModelToJson(this);
+  }
+
+  factory DishModel.fromMap(Map<String, dynamic> map) {
+    return _$DishModelFromJson(map);
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory DishModel.fromJson(String source) =>
+      DishModel.fromMap(json.decode(source) as Map<String, dynamic>);
 }

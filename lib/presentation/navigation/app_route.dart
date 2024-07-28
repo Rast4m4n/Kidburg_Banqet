@@ -25,7 +25,7 @@ class AppNavigation {
     }
   }
 
-  String get initialRoute => _initialRoute;
+  String get initialRoute => AppRoute.preOrderFormPage;
 
   Map<String, WidgetBuilder> routes(context) => {
         AppRoute.selectionKidburgPage: (context) => SelectionKidburScreen(),
