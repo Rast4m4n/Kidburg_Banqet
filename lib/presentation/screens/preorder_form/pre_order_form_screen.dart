@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:kidburg_banquet/data/repository/google_sheet_data_repository.dart';
 import 'package:kidburg_banquet/domain/model/category_model.dart';
+import 'package:kidburg_banquet/domain/model/dish_model.dart';
+import 'package:kidburg_banquet/presentation/screens/preorder_form/pre_order_form_vm.dart';
+import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
+import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
+import 'package:kidburg_banquet/presentation/widgets/custom_text_field.dart';
+import 'package:provider/provider.dart';
 
 class PreOrderFormScreen extends StatefulWidget {
   const PreOrderFormScreen({super.key});
@@ -10,393 +16,198 @@ class PreOrderFormScreen extends StatefulWidget {
 }
 
 class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
-  late Future<List<CategoryModel>> futureCategories;
-  final googleSheetRepository = GoogleSheetDataRepository();
+  late final PreOrderFormVm vm;
+  late final ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    vm = PreOrderFormVm(
+      googleSheetRepository: GoogleSheetDataRepository(),
+      scrollController: _scrollController,
+      scrollVisibilityManager: ScrollVisibilityManagerImpl(),
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _scrollController.dispose();
+    vm.scrollController.dispose();
+    vm.isVisible.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Dishes'),
-      ),
-      body: FutureBuilder<List<CategoryModel>>(
-        future: googleSheetRepository.fetchDishes(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            print(snapshot.error);
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (snapshot.hasData) {
-            final categories = snapshot.data!;
-            return ListView.builder(
-              itemCount: categories.length,
-              itemBuilder: (context, index) {
-                final category = categories[index];
-                return ExpansionTile(
-                  title: Text(category.name),
-                  children: category.dishes.map((dish) {
-                    print(dish);
-                    return ListTile(
-                      title: Text(dish.nameDish ?? ''),
-                      subtitle:
-                          Text('${dish.weight ?? ''} - ${dish.price ?? ''}'),
-                    );
-                  }).toList(),
-                );
-              },
-            );
-          } else {
-            return Center(child: Text('No data found'));
-          }
+    return ChangeNotifierProvider<PreOrderFormVm>(
+      create: (context) => vm,
+      child: ValueListenableBuilder<bool>(
+        valueListenable: vm.isVisible,
+        builder: (context, isVisible, child) {
+          return Scaffold(
+            floatingActionButton: FloatingActionButton(
+              backgroundColor: AppColor.cardPreviewColor,
+              mini: isVisible,
+              onPressed: () => vm.navigateToPreviewScreen(context),
+              child: const Icon(Icons.save),
+            ),
+            floatingActionButtonLocation: vm.buttonLocation,
+            appBar: AppBar(
+              title: Text(
+                'Оформление банкета',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+            ),
+            body: child!,
+            bottomNavigationBar: _BottomNavigationBar(isVisible: isVisible),
+          );
         },
+        child: FutureBuilder<List<CategoryModel>>(
+          future: vm.fetchDataFromGoogleSheet(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Text('Ошибка: ${snapshot.error}'),
+              );
+            } else if (snapshot.hasData) {
+              final categories = snapshot.data!;
+              return SingleChildScrollView(
+                controller: _scrollController,
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: AppPadding.low),
+                  child: Column(
+                    children: [
+                      ExpansionTile(
+                        initiallyExpanded: true,
+                        collapsedBackgroundColor:
+                            AppColor.previewBackgroundColor,
+                        textColor: AppColor.titleCardPreviewColor,
+                        maintainState: true,
+                        title: const Text(
+                          "Подача на ",
+                          style: TextStyle(
+                            fontSize: 20,
+                          ),
+                        ),
+                        children: [
+                          _ListDishes(categories: categories),
+                        ],
+                      ),
+                      const SizedBox(height: AppPadding.low),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        child: ElevatedButton(
+                          style: Theme.of(context).elevatedButtonTheme.style,
+                          onPressed: () {},
+                          child: const Text(
+                            'Добавить подачу',
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: AppColor.infoCardPreviewColor,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            } else {
+              return const Center(child: Text('No data found'));
+            }
+          },
+        ),
       ),
     );
   }
 }
-// import 'package:flutter/material.dart';
-// import 'package:kidburg_banquet/data/repository/excel_repository.dart';
-// import 'package:kidburg_banquet/domain/model/dish_model.dart';
-// import 'package:kidburg_banquet/domain/model/table_model.dart';
-// import 'package:kidburg_banquet/presentation/screens/preorder_form/widgets/dish_vm.dart';
-// import 'package:kidburg_banquet/presentation/screens/preorder_form/vm/pre_order_vm.dart';
-// import 'package:kidburg_banquet/presentation/screens/preorder_form/vm/table_vm.dart';
-// import 'package:kidburg_banquet/presentation/screens/preorder_form/widgets/row_dish_widget.dart';
-// import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
-// import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
-// import 'package:kidburg_banquet/presentation/utils/date_time_formatter.dart';
-// import 'package:provider/provider.dart';
 
-// class PreOrderFormScreen extends StatefulWidget {
-//   const PreOrderFormScreen({super.key});
+class _BottomNavigationBar extends StatelessWidget {
+  const _BottomNavigationBar({
+    super.key,
+    required this.isVisible,
+  });
 
-//   @override
-//   State<PreOrderFormScreen> createState() => _PreOrderFormScreenState();
-// }
+  final bool isVisible;
 
-// class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
-//   late final PreOrderViewModel vm;
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      height: isVisible ? 60 : 0,
+      child: BottomAppBar(
+        color: AppColor.cardPreviewColor,
+        shape: const CircularNotchedRectangle(),
+        child: Row(
+          children: [
+            Consumer<PreOrderFormVm>(
+              builder: (context, vm, child) {
+                return Text("Сумма: ${vm.getTotalPrice()}");
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
-//   @override
-//   void initState() {
-//     super.initState();
-//     vm = PreOrderViewModel(
-//       scrollVisibilityManager: ScrollVisibilityManagerImpl(),
-//       tableManager: TableManagerImpl(ExcelRepository()),
-//       productCalculator: ProductCalculator(),
-//       scrollController: ScrollController(),
-//     );
-//   }
+class _ListDishes extends StatelessWidget {
+  const _ListDishes({
+    super.key,
+    required this.categories,
+  });
 
-//   @override
-//   void dispose() {
-//     super.dispose();
-//     vm.scrollController.dispose();
-//     vm.isVisible.dispose();
-//   }
+  final List<CategoryModel> categories;
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return ChangeNotifierProvider(
-//       create: (context) => vm,
-//       child: ValueListenableBuilder<bool>(
-//         valueListenable: vm.isVisible,
-//         builder: (BuildContext context, bool isVisible, Widget? child) {
-//           return Scaffold(
-//             floatingActionButton: FloatingActionButton(
-//               mini: isVisible,
-//               onPressed: () => vm.navigateToPreviewScreen(context),
-//               child: const Icon(Icons.save),
-//             ),
-//             floatingActionButtonLocation: vm.buttonLocation,
-//             appBar: AppBar(
-//               title: Text(
-//                 'Оформление банкета',
-//                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-//                       fontWeight: FontWeight.bold,
-//                     ),
-//               ),
-//             ),
-//             body: child!,
-//             bottomNavigationBar: _BottomNavigationBar(isVisible: isVisible),
-//           );
-//         },
-//         child: Padding(
-//           padding: const EdgeInsets.all(AppPadding.low),
-//           child: FutureBuilder(
-//             future: vm.readDataFromExcel(),
-//             builder: (context, snapshot) {
-//               if (snapshot.hasData) {
-//                 final tableData = snapshot.data!;
-//                 return _TableListWidget(
-//                   tableData: tableData,
-//                   controller: vm.scrollController,
-//                 );
-//               } else {
-//                 return const Center(
-//                   child: CircularProgressIndicator(),
-//                 );
-//               }
-//             },
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: categories.map((category) {
+        return ExpansionTile(
+          maintainState: true,
+          title: Text(category.name),
+          children: category.dishes.map((dish) {
+            return DishWidget(
+              dish: dish,
+            );
+          }).toList(),
+        );
+      }).toList(),
+    );
+  }
+}
 
-// class _BottomNavigationBar extends StatelessWidget {
-//   const _BottomNavigationBar({
-//     super.key,
-//     required this.isVisible,
-//   });
-
-//   final bool isVisible;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return AnimatedContainer(
-//       duration: const Duration(milliseconds: 200),
-//       height: isVisible ? 60 : 0,
-//       child: BottomAppBar(
-//         shape: const CircularNotchedRectangle(),
-//         child: Row(
-//           children: [
-//             Consumer<PreOrderViewModel>(
-//               builder: (context, vm, child) {
-//                 return Text("Сумма: ${vm.totalSumOfProducts}");
-//               },
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// class _TableListWidget extends StatelessWidget {
-//   const _TableListWidget({
-//     super.key,
-//     required this.tableData,
-//     required this.controller,
-//   });
-
-//   final List<TableModel> tableData;
-//   final ScrollController controller;
-//   @override
-//   Widget build(BuildContext context) {
-//     return SingleChildScrollView(
-//       controller: controller,
-//       child: Column(
-//         children: tableData.map(
-//           (table) {
-//             return Column(
-//               children: [
-//                 ChangeNotifierProvider(
-//                   create: (context) => TableViewModel(
-//                     tableModel: table,
-//                   ),
-//                   child:
-//                       _TableWidget(indexTimeServing: tableData.indexOf(table)),
-//                 ),
-//               ],
-//             );
-//           },
-//         ).toList(),
-//       ),
-//     );
-//   }
-// }
-
-// class _TableWidget extends StatefulWidget {
-//   const _TableWidget({
-//     super.key,
-//     required this.indexTimeServing,
-//   });
-
-//   final int indexTimeServing;
-//   @override
-//   State<_TableWidget> createState() => _TableWidgetState();
-// }
-
-// class _TableWidgetState extends State<_TableWidget>
-//     with TickerProviderStateMixin {
-//   late final animationController = AnimationController(
-//     duration: const Duration(milliseconds: 200),
-//     vsync: this,
-//   );
-
-//   @override
-//   void dispose() {
-//     super.dispose();
-//     animationController.dispose();
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Consumer<TableViewModel>(
-//       builder: (BuildContext context, TableViewModel vm, Widget? child) {
-//         if (vm.isVisibleTable) {
-//           animationController.forward();
-//         } else {
-//           animationController.reverse();
-//         }
-//         return Column(
-//           children: [
-//             child!,
-//             AnimatedBuilder(
-//               animation: animationController,
-//               builder: (context, child) {
-//                 return SizeTransition(
-//                   sizeFactor: CurvedAnimation(
-//                     parent: animationController,
-//                     curve: Curves.linear,
-//                   ),
-//                   child: child,
-//                 );
-//               },
-//               child: const _CategoryListWidget(),
-//             ),
-//           ],
-//         );
-//       },
-//       child: Column(
-//         children: [
-//           _TitleTableWidget(indexTimeServing: widget.indexTimeServing),
-//           const SizedBox(height: AppPadding.low),
-//         ],
-//       ),
-//     );
-//   }
-// }
-
-// class _CategoryListWidget extends StatelessWidget {
-//   const _CategoryListWidget({
-//     super.key,
-//   });
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final vm = context.read<TableViewModel>();
-
-//     return Column(
-//       children: vm.tableModel.categories.map(
-//         (category) {
-//           final products = category.dishes;
-//           return Column(
-//             children: [
-//               _CategoryNameWidget(name: category.name),
-//               _DishListWidget(products: products),
-//             ],
-//           );
-//         },
-//       ).toList(),
-//     );
-//   }
-// }
-
-// class _DishListWidget extends StatelessWidget {
-//   const _DishListWidget({
-//     super.key,
-//     required this.products,
-//   });
-
-//   final List<DishModel> products;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Column(
-//       children: products.map(
-//         (product) {
-//           return ChangeNotifierProvider(
-//             create: (context) => DishViewModel(
-//               dish: DishModel(
-//                 rowIndex: product.rowIndex,
-//                 nameDish: product.nameDish,
-//                 weight: product.weight,
-//                 price: product.price,
-//               ),
-//               preOrderViewModel: context.read<PreOrderViewModel>(),
-//             ),
-//             child: const RowDish(),
-//           );
-//         },
-//       ).toList(),
-//     );
-//   }
-// }
-
-// class _TitleTableWidget extends StatelessWidget {
-//   const _TitleTableWidget({
-//     super.key,
-//     required this.indexTimeServing,
-//   });
-
-//   final int indexTimeServing;
-//   @override
-//   Widget build(BuildContext context) {
-//     final vm = context.watch<TableViewModel>();
-//     return DecoratedBox(
-//       decoration: const BoxDecoration(
-//         color: AppColor.tableForAdult,
-//         borderRadius: BorderRadius.all(
-//           Radius.circular(8),
-//         ),
-//       ),
-//       child: Padding(
-//         padding: const EdgeInsets.all(AppPadding.low),
-//         child: Row(
-//           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//           children: [
-//             Text(
-//               "${vm.tableModel.name} ${DateTimeFormatter.addTimeServing(context, indexTimeServing)}",
-//               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-//                     fontWeight: FontWeight.bold,
-//                   ),
-//             ),
-//             IconButton(
-//               onPressed: vm.expandTable,
-//               icon: vm.isVisibleTable
-//                   ? const Icon(Icons.arrow_drop_down_sharp)
-//                   : const Icon(Icons.arrow_drop_up_sharp),
-//             )
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-// class _CategoryNameWidget extends StatelessWidget {
-//   const _CategoryNameWidget({
-//     super.key,
-//     required this.name,
-//   });
-
-//   final String name;
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return DecoratedBox(
-//       decoration: const BoxDecoration(
-//         color: Colors.blueGrey,
-//         borderRadius: BorderRadius.all(
-//           Radius.circular(8),
-//         ),
-//       ),
-//       child: Padding(
-//         padding: const EdgeInsets.all(AppPadding.low),
-//         child: Row(
-//           children: [
-//             Text(
-//               name,
-//               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-//                     fontWeight: FontWeight.bold,
-//                   ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
+class DishWidget extends StatelessWidget {
+  const DishWidget({
+    required this.dish,
+    super.key,
+  });
+  final DishModel dish;
+  @override
+  Widget build(BuildContext context) {
+    final vm = Provider.of<PreOrderFormVm>(context);
+    return ListTile(
+      title: Text(dish.nameDish ?? ''),
+      subtitle: Text('${dish.weight ?? ''}  ${dish.price ?? ''}₽'),
+      trailing: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 70),
+        child: CustomTextField(
+          label: 'Кол-во',
+          onChanged: (value) {
+            int? count = int.tryParse(value);
+            vm.updateDishCount(dish, count ?? 0);
+          },
+        ),
+      ),
+    );
+  }
+}

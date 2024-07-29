@@ -5,7 +5,7 @@ import 'package:kidburg_banquet/domain/model/dish_model.dart';
 import 'package:http/http.dart' as http;
 
 class GoogleSheetDataRepository {
-  Future<List<CategoryModel>> fetchDishes() async {
+  Future<List<CategoryModel>> fetchCategoriesAndDishes() async {
     final response = await http.get(
       Uri.parse(
         'https://script.google.com/macros/s/AKfycbwRfXear5quPtotp9Ty81As8tzN2hHmQfq5lpCOLfrFRHp1DLpia2sDw35UmsO1It7M6w/exec',
@@ -15,11 +15,13 @@ class GoogleSheetDataRepository {
     if (response.statusCode == 200) {
       List<dynamic> data = jsonDecode(response.body);
       Map<String, List<DishModel>> categorizedDishes = {};
+
       for (var item in data) {
         String category = item['Категория'];
         DishModel dish = DishModel(
           nameDish: item['Название'],
           weight: item['Вес'],
+          count: 0,
           price: item['Цена'],
         );
 
