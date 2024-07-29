@@ -11,7 +11,7 @@ DishModel _$DishModelFromJson(Map<String, dynamic> json) => DishModel(
       nameDish: json['nameDish'] as String?,
       weight: json['weight'] as String?,
       price: json['price'] as int?,
-      count: (json['count'] as num?)?.toInt(),
+      count: json['count'] as int,
     );
 
 Map<String, dynamic> _$DishModelToJson(DishModel instance) => <String, dynamic>{
