@@ -8,6 +8,7 @@ part of 'dish_model.dart';
 
 DishModel _$DishModelFromJson(Map<String, dynamic> json) => DishModel(
       // rowIndex: (json['rowIndex'] as num).toInt(),
+      id: json['id'] as String,
       nameDish: json['nameDish'] as String?,
       weight: json['weight'] as String?,
       price: json['price'] as int?,
@@ -16,6 +17,7 @@ DishModel _$DishModelFromJson(Map<String, dynamic> json) => DishModel(
 
 Map<String, dynamic> _$DishModelToJson(DishModel instance) => <String, dynamic>{
       // 'rowIndex': instance.rowIndex,
+      'id': instance.id,
       'nameDish': instance.nameDish,
       'weight': instance.weight,
       'count': instance.count,
