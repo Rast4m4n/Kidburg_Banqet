@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kidburg_banquet/data/repository/google_sheet_data_repository.dart';
 import 'package:kidburg_banquet/domain/model/category_model.dart';
 import 'package:kidburg_banquet/domain/model/dish_model.dart';
+import 'package:kidburg_banquet/domain/model/table_model.dart';
 import 'package:kidburg_banquet/presentation/screens/preorder_form/pre_order_form_vm.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
@@ -65,7 +66,7 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
             bottomNavigationBar: _BottomNavigationBar(isVisible: isVisible),
           );
         },
-        child: FutureBuilder<List<CategoryModel>>(
+        child: FutureBuilder<List<TableModel>>(
           future: vm.fetchDataFromGoogleSheet(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -77,47 +78,13 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
                 child: Text('Ошибка: ${snapshot.error}'),
               );
             } else if (snapshot.hasData) {
-              final categories = snapshot.data!;
+              final tables = snapshot.data!;
               return SingleChildScrollView(
                 controller: _scrollController,
                 child: Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: AppPadding.low),
-                  child: Column(
-                    children: [
-                      ExpansionTile(
-                        initiallyExpanded: true,
-                        collapsedBackgroundColor:
-                            AppColor.previewBackgroundColor,
-                        textColor: AppColor.titleCardPreviewColor,
-                        maintainState: true,
-                        title: const Text(
-                          "Подача на ",
-                          style: TextStyle(
-                            fontSize: 20,
-                          ),
-                        ),
-                        children: [
-                          _ListDishes(categories: categories),
-                        ],
-                      ),
-                      const SizedBox(height: AppPadding.low),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width,
-                        child: ElevatedButton(
-                          style: Theme.of(context).elevatedButtonTheme.style,
-                          onPressed: () {},
-                          child: const Text(
-                            'Добавить подачу',
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: AppColor.infoCardPreviewColor,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                  child: _ServingsDishes(tables: tables),
                 ),
               );
             } else {
@@ -126,6 +93,59 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
           },
         ),
       ),
+    );
+  }
+}
+
+class _ServingsDishes extends StatelessWidget {
+  const _ServingsDishes({
+    super.key,
+    required this.tables,
+  });
+
+  final List<TableModel> tables;
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<PreOrderFormVm>(
+      builder: (context, vm, child) {
+        return Column(
+          children: [
+            ...tables.map((table) {
+              return ExpansionTile(
+                initiallyExpanded: false,
+                collapsedBackgroundColor: AppColor.previewBackgroundColor,
+                textColor: AppColor.titleCardPreviewColor,
+                maintainState: true,
+                title: Text(
+                  table.name,
+                  style: const TextStyle(
+                    fontSize: 20,
+                  ),
+                ),
+                children: [
+                  _ListDishes(categories: table.categories),
+                ],
+              );
+            }).toList(),
+            const SizedBox(height: AppPadding.low),
+            SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: ElevatedButton(
+                style: Theme.of(context).elevatedButtonTheme.style,
+                onPressed: () => vm.addNewServing(),
+                child: const Text(
+                  'Добавить подачу',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: AppColor.infoCardPreviewColor,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

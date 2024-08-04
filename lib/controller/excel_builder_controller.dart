@@ -61,7 +61,6 @@ class ExcelBuilderController {
       // Он необходим для подсчёта суммы всех блюд
       "Сумма заказа": 'SUM(F11:F$lastIndexRow)-F5',
     };
-    print(lastIndexRow);
     for (var el in headerInfo.entries) {
       sheet.cell(CellIndex.indexByString("A$rowIndex")).value =
           TextCellValue(el.key);
@@ -373,7 +372,7 @@ class ExcelBuilderController {
       borderStyle: BorderStyle.Thin,
     );
     sheet.cell(CellIndex.indexByString('D$rowIndex')).value =
-        IntCellValue(dish.count!);
+        IntCellValue(dish.count);
     sheet.cell(CellIndex.indexByString('D$rowIndex')).cellStyle = CellStyle(
       fontSize: 12,
       fontFamily: 'Ebrima',
