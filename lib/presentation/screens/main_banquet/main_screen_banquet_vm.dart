@@ -5,7 +5,6 @@ import 'package:kidburg_banquet/domain/model/banqet_model.dart';
 import 'package:kidburg_banquet/domain/model/establishments_enum.dart';
 import 'package:kidburg_banquet/domain/model/place_event_enum.dart';
 import 'package:kidburg_banquet/presentation/navigation/app_route.dart';
-import 'package:kidburg_banquet/presentation/utils/date_time_formatter.dart';
 
 class MainBanquetViewModel extends ChangeNotifier {
   MainBanquetViewModel({
@@ -128,10 +127,7 @@ class MainBanquetViewModel extends ChangeNotifier {
             remark: remarkController.text,
             place: placeEventController.text,
             dateStart: dateTimeManager.selectedDate!,
-            firstTimeServing: dateTimeManager.selectedTime!,
-            secondTimeServing: DateTimeFormatter.calculateNextServingTime(
-              dateTimeManager.selectedTime!,
-            ),
+            timeStart: dateTimeManager.selectedTime!,
             amountOfChildren: int.tryParse(childrenController.text),
             amountOfAdult: int.tryParse(adultController.text),
           ),

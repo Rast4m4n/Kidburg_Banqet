@@ -110,8 +110,7 @@ class _EventCardWidget extends StatelessWidget {
                 const SizedBox(height: AppPadding.low),
                 _RowInfoWidget(
                   text: 'Домик: ${vm.banqetModel.place}',
-                  twoText:
-                      'Время: ${vm.banqetModel.firstTimeServing.format(context)}',
+                  twoText: 'Время: ${vm.banqetModel.timeStart.format(context)}',
                   fontSize: 14,
                 ),
                 const SizedBox(height: AppPadding.low),

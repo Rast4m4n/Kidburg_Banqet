@@ -1,28 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import 'package:intl/intl.dart';
 import 'package:kidburg_banquet/data/repository/google_sheet_data_repository.dart';
+import 'package:kidburg_banquet/domain/model/banqet_model.dart';
 import 'package:kidburg_banquet/domain/model/category_model.dart';
 import 'package:kidburg_banquet/domain/model/dish_model.dart';
 import 'package:kidburg_banquet/domain/model/table_model.dart';
+import 'package:kidburg_banquet/presentation/navigation/app_route.dart';
 import 'package:uuid/uuid.dart';
 
 class PreOrderFormVm with ChangeNotifier {
   PreOrderFormVm({
     required this.googleSheetRepository,
-    required this.scrollVisibilityManager,
-    required this.scrollController,
-  }) {
-    scrollVisibilityManager.listenScrollController(scrollController);
-  }
-
-  final ScrollVisibilityManager scrollVisibilityManager;
-  final ScrollController scrollController;
-
-  ValueNotifier<bool> get isVisible => scrollVisibilityManager.isVisible;
-  FloatingActionButtonLocation get buttonLocation =>
-      scrollVisibilityManager.buttonLocation;
+  });
 
   final GoogleSheetDataRepository googleSheetRepository;
+
+  late final BanqetModel? banquetModel;
 
   final List<TableModel> _tables = [];
   List<TableModel> get tables => _tables;
@@ -30,17 +23,28 @@ class PreOrderFormVm with ChangeNotifier {
   List<CategoryModel> _originalCategories = [];
 
   Future<List<TableModel>> fetchDataFromGoogleSheet() async {
-    _originalCategories =
-        await googleSheetRepository.fetchCategoriesAndDishes();
     if (_tables.isEmpty) {
+      _originalCategories =
+          await googleSheetRepository.fetchCategoriesAndDishes();
+      String formatterTime = _timeFormat(banquetModel!.timeStart);
       _tables.add(
         TableModel(
-          name: 'Подача на',
+          name: 'Подача на $formatterTime',
           categories: _cloneCategories(_originalCategories),
+          timeServing: banquetModel!.timeStart,
         ),
       );
     }
     return _tables;
+  }
+
+  String _timeFormat(TimeOfDay timeofDay) {
+    return DateFormat('HH:mm').format(
+      DateTime.now().copyWith(
+        hour: timeofDay.hour,
+        minute: timeofDay.minute,
+      ),
+    );
   }
 
   // Клонирование списка категорий и блюд
@@ -56,9 +60,17 @@ class PreOrderFormVm with ChangeNotifier {
   }
 
   // Добавление новой подачи блюд для стола
-  void addNewServing() {
+  Future<void> addNewServing(BuildContext context) async {
     List<CategoryModel> newCategories = _cloneCategories(_originalCategories);
-    final newServing = TableModel(name: 'Подача на', categories: newCategories);
+    final timePicked = await showTimePicker(
+      context: context,
+      initialTime: banquetModel!.timeStart,
+    );
+    final newServing = TableModel(
+      name: 'Подача на ${_timeFormat(timePicked!)}',
+      categories: newCategories,
+      timeServing: timePicked,
+    );
     _tables.add(newServing);
     notifyListeners();
   }
@@ -94,46 +106,61 @@ class PreOrderFormVm with ChangeNotifier {
     return totalPrice;
   }
 
-  void navigateToPreviewScreen(context) {}
-}
-
-abstract class ScrollVisibilityManager {
-  ValueNotifier<bool> get isVisible;
-  FloatingActionButtonLocation get buttonLocation;
-  void listenScrollController(ScrollController scrollController);
-}
-
-class ScrollVisibilityManagerImpl implements ScrollVisibilityManager {
-  @override
-  final ValueNotifier<bool> isVisible = ValueNotifier(true);
-
-  @override
-  FloatingActionButtonLocation get buttonLocation => isVisible.value
-      ? FloatingActionButtonLocation.miniEndDocked
-      : FloatingActionButtonLocation.endFloat;
-
-  @override
-  void listenScrollController(ScrollController scrollController) {
-    scrollController.addListener(() {
-      switch (scrollController.position.userScrollDirection) {
-        case ScrollDirection.forward:
-          _showNavBar();
-          break;
-        case ScrollDirection.reverse:
-          _hideNavBar();
-          break;
-        case ScrollDirection.idle:
-        default:
-          break;
+  Future<void> changeTime(BuildContext context, TableModel currentTable) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: banquetModel!.timeStart,
+    );
+    for (var table in _tables) {
+      if (table.timeServing == currentTable.timeServing) {
+        final indexTable = _tables.indexOf(table);
+        _tables[indexTable] = table.copyWith(
+          name: 'Подача на ${_timeFormat(picked!)}',
+          timeServing: picked,
+        );
       }
+    }
+    notifyListeners();
+  }
+
+  List<TableModel> deleteEmptyData(List<TableModel> tables) {
+    bool hasCount(DishModel dish) {
+      return dish.count > 0;
+    }
+
+    // Копирую элементы существующих столов
+    // чтобы сохранять изменения в списке
+    List<TableModel> copiedTables = List.from(
+      tables.map(
+        (table) => TableModel(
+          name: table.name,
+          categories: List.from(
+            table.categories.map(
+              (category) => CategoryModel(
+                name: category.name,
+                dishes: List.from(category.dishes),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    copiedTables.removeWhere((table) {
+      table.categories.removeWhere((category) {
+        category.dishes.removeWhere((dish) => !hasCount(dish));
+        return category.dishes.isEmpty;
+      });
+      return table.categories.isEmpty;
     });
+    return copiedTables;
   }
 
-  void _showNavBar() {
-    if (!isVisible.value) isVisible.value = true;
-  }
-
-  void _hideNavBar() {
-    if (isVisible.value) isVisible.value = false;
+  void navigateToPreviewScreen(context) {
+    final tables = deleteEmptyData(_tables);
+    Navigator.of(context).pushNamed(
+      AppRoute.previewBanquetPage,
+      arguments: banquetModel!.copyWith(tables: tables),
+    );
   }
 }
