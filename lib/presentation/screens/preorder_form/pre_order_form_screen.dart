@@ -24,7 +24,9 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
   void initState() {
     super.initState();
     vm = PreOrderFormVm(
-      googleSheetRepository: GoogleSheetDataRepository(),
+      googleSheetRepository: GoogleSheetDataRepository(
+        apiRepository: GoogleSheetApiRepository(),
+      ),
     );
   }
 
