@@ -13,7 +13,7 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
   flutter_localizations:
     sdk: flutter
-  intl: ^0.18.1
+  intl: ^0.19.0
   build_runner: ^2.4.9
   json_annotation: ^4.9.0
   json_serializable: ^6.8.0
@@ -22,14 +22,14 @@ dependencies:
   permission_handler: ^11.3.1
   provider: ^6.1.1
   shared_preferences: ^2.2.3
-  device_info_plus: ^9.1.2
+  device_info_plus: ^10.1.2
   http: ^1.2.0
   uuid: ^4.4.2
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^2.0.0
+  flutter_lints: ^4.0.0
 
 flutter:
   uses-material-design: true
@@ -43,3 +43,9 @@ flutter_launcher_icons:
   android: "launcher_icon"
   image_path: "assets/kidburg_launch_icon.png"
   min_sdk_android: 21
+
+# После обновление на новую версию флаттер
+# без этого колхоза выходит ошибка и не
+# запускается приложение на эмуляторе
+dependency_overrides:
+  archive: ^3.6.1
