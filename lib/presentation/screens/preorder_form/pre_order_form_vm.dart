@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kidburg_banquet/data/repository/google_sheet_data_repository.dart';
@@ -22,19 +24,25 @@ class PreOrderFormVm with ChangeNotifier {
 
   List<CategoryModel> _originalCategories = [];
 
-  Future<List<TableModel>> fetchDataFromGoogleSheet() async {
+  Future<List<TableModel>> getTableData() async {
     if (_tables.isEmpty) {
-      _originalCategories =
-          await googleSheetRepository.fetchCategoriesAndDishes();
-      String formatterTime = _timeFormat(banquetModel!.timeStart);
-      _tables.add(
-        TableModel(
-          name: 'Подача на $formatterTime',
-          categories: _cloneCategories(_originalCategories),
-          timeServing: banquetModel!.timeStart,
-        ),
-      );
+      return await _fetchDataFromGoogleSheet();
+    } else {
+      return _tables;
     }
+  }
+
+  Future<List<TableModel>> _fetchDataFromGoogleSheet() async {
+    _originalCategories =
+        await googleSheetRepository.fetchCategoriesAndDishes();
+    String formatterTime = _timeFormat(banquetModel!.timeStart);
+    _tables.add(
+      TableModel(
+        name: 'Подача на $formatterTime',
+        categories: _cloneCategories(_originalCategories),
+        timeServing: banquetModel!.timeStart,
+      ),
+    );
     return _tables;
   }
 
@@ -75,22 +83,20 @@ class PreOrderFormVm with ChangeNotifier {
     _tables.add(newServing);
   }
 
-  // Обновление количества блюд конкретного блюда
-  void updateDishCount(DishModel currentDish, int newCount) {
+  // Обновление количества конкретного блюда
+  void updateDishCount({
+    required int tableIndex,
+    required int categoryIndex,
+    required DishModel currentDish,
+    required int newCount,
+  }) {
     if (newCount < 0) return;
-    for (var table in _tables) {
-      for (var category in table.categories) {
-        for (var dish in category.dishes) {
-          if (currentDish.id == dish.id) {
-            final indexTable = _tables.indexOf(table);
-            final indexCategory = table.categories.indexOf(category);
-            final indexDish = category.dishes.indexOf(dish);
-            _tables[indexTable].categories[indexCategory].dishes[indexDish] =
-                dish.copyWith(count: newCount);
-          }
-        }
-      }
-    }
+    final indexDish = _tables[tableIndex]
+        .categories[categoryIndex]
+        .dishes
+        .indexOf(currentDish);
+    _tables[tableIndex].categories[categoryIndex].dishes[indexDish] =
+        currentDish.copyWith(count: newCount);
     notifyListeners();
   }
 
@@ -124,7 +130,12 @@ class PreOrderFormVm with ChangeNotifier {
     notifyListeners();
   }
 
-  List<TableModel> deleteEmptyData(List<TableModel> tables) {
+  void swipeToDeleteData(int tableIndex) {
+    _tables.removeAt(tableIndex);
+    notifyListeners();
+  }
+
+  List<TableModel> clearEmptyData(List<TableModel> tables) {
     bool hasCount(DishModel dish) {
       return dish.count > 0;
     }
@@ -158,7 +169,7 @@ class PreOrderFormVm with ChangeNotifier {
   }
 
   void navigateToPreviewScreen(context) {
-    final tables = deleteEmptyData(_tables);
+    final tables = clearEmptyData(_tables);
     Navigator.of(context).pushNamed(
       AppRoute.previewBanquetPage,
       arguments: banquetModel!.copyWith(tables: tables),

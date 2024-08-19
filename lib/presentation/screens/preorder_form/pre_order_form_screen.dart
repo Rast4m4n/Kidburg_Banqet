@@ -59,7 +59,7 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
           ),
         ),
         body: FutureBuilder<List<TableModel>>(
-          future: vm.fetchDataFromGoogleSheet(),
+          future: vm.getTableData(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(
@@ -104,29 +104,46 @@ class _ServingsDishes extends StatelessWidget {
         return Column(
           children: [
             ...tables.map((table) {
-              return ExpansionTile(
-                initiallyExpanded: false,
-                collapsedBackgroundColor: AppColor.previewBackgroundColor,
-                textColor: AppColor.titleCardPreviewColor,
-                maintainState: true,
-                leading: InkWell(
-                  child: const Icon(
-                    Icons.access_time,
-                    color: Colors.black,
-                  ),
-                  onTap: () => vm.changeTime(context, table),
-                ),
-                title: Text(
-                  table.name,
-                  style: const TextStyle(
-                    fontSize: 20,
+              return Dismissible(
+                key: ValueKey(table.hashCode),
+                background: Container(
+                  color: Colors.red[200],
+                  child: Center(
+                    child: Text(
+                      'Подача удалена',
+                      style: Theme.of(context).textTheme.bodyLarge,
+                    ),
                   ),
                 ),
-                children: [
-                  _ListDishes(categories: table.categories),
-                ],
+                onDismissed: (direction) =>
+                    vm.swipeToDeleteData(tables.indexOf(table)),
+                child: ExpansionTile(
+                  initiallyExpanded: false,
+                  collapsedBackgroundColor: AppColor.previewBackgroundColor,
+                  textColor: AppColor.titleCardPreviewColor,
+                  maintainState: true,
+                  leading: InkWell(
+                    child: const Icon(
+                      Icons.access_time,
+                      color: Colors.black,
+                    ),
+                    onTap: () => vm.changeTime(context, table),
+                  ),
+                  title: Text(
+                    table.name,
+                    style: const TextStyle(
+                      fontSize: 20,
+                    ),
+                  ),
+                  children: [
+                    _ListDishes(
+                      categories: table.categories,
+                      tableIndex: tables.indexOf(table),
+                    ),
+                  ],
+                ),
               );
-            }).toList(),
+            }),
             const SizedBox(height: AppPadding.low),
             SizedBox(
               width: MediaQuery.of(context).size.width,
@@ -180,8 +197,10 @@ class _ListDishes extends StatelessWidget {
   const _ListDishes({
     super.key,
     required this.categories,
+    required this.tableIndex,
   });
 
+  final int tableIndex;
   final List<CategoryModel> categories;
 
   @override
@@ -194,6 +213,8 @@ class _ListDishes extends StatelessWidget {
           children: category.dishes.map((dish) {
             return DishWidget(
               dish: dish,
+              tableIndex: tableIndex,
+              categoryIndex: categories.indexOf(category),
             );
           }).toList(),
         );
@@ -205,9 +226,13 @@ class _ListDishes extends StatelessWidget {
 class DishWidget extends StatelessWidget {
   const DishWidget({
     required this.dish,
+    required this.tableIndex,
+    required this.categoryIndex,
     super.key,
   });
   final DishModel dish;
+  final int tableIndex;
+  final int categoryIndex;
   @override
   Widget build(BuildContext context) {
     final vm = Provider.of<PreOrderFormVm>(context);
@@ -220,7 +245,12 @@ class DishWidget extends StatelessWidget {
           label: 'Кол-во',
           onChanged: (value) {
             int? count = int.tryParse(value);
-            vm.updateDishCount(dish, count ?? 0);
+            vm.updateDishCount(
+              tableIndex: tableIndex,
+              categoryIndex: categoryIndex,
+              currentDish: dish,
+              newCount: count ?? 0,
+            );
           },
         ),
       ),
