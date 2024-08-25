@@ -5,6 +5,7 @@ import 'package:kidburg_banquet/domain/model/table_model.dart';
 import 'package:kidburg_banquet/presentation/screens/preview_banqet.dart/preview_banquet_vm.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
+import 'package:kidburg_banquet/presentation/widgets/custom_drawer.dart';
 import 'package:provider/provider.dart';
 
 class PreviewBanqetScreen extends StatefulWidget {
@@ -29,6 +30,7 @@ class _PreviewBanqetScreenState extends State<PreviewBanqetScreen> {
     return ChangeNotifierProvider(
       create: (context) => vm,
       child: Scaffold(
+        endDrawer: const CustomDrawer(),
         appBar: AppBar(
           forceMaterialTransparency: true,
         ),

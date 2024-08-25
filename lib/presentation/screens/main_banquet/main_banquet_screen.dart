@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:kidburg_banquet/presentation/navigation/app_route.dart';
 import 'package:kidburg_banquet/presentation/screens/main_banquet/main_screen_banquet_vm.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
+import 'package:kidburg_banquet/presentation/widgets/custom_drawer.dart';
 import 'package:kidburg_banquet/presentation/widgets/custom_text_field.dart';
 import 'package:provider/provider.dart';
 
-class MainBanquetScreen extends StatelessWidget {
-  MainBanquetScreen({super.key});
+class MainBanquetScreen extends StatefulWidget {
+  const MainBanquetScreen({super.key});
 
+  @override
+  State<MainBanquetScreen> createState() => _MainBanquetScreenState();
+}
+
+class _MainBanquetScreenState extends State<MainBanquetScreen> {
   final MainBanquetViewModel vm = MainBanquetViewModel(
     nameController: TextEditingController(),
     placeEventController: TextEditingController(),
@@ -24,41 +29,41 @@ class MainBanquetScreen extends StatelessWidget {
   );
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
+      endDrawer: const CustomDrawer(),
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'КидБург банкеты',
+              'Банкеты',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
             ),
-            IconButton(
-              onPressed: () => Navigator.of(context).pushNamed(
-                AppRoute.selectionKidburgPage,
-              ),
-              icon: const Icon(Icons.account_circle_outlined),
-            ),
           ],
         ),
       ),
-      body: FutureBuilder(
-        future: vm.initDropDownEntriesPlacesEvent(),
-        builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          } else {
-            return Padding(
-              padding: const EdgeInsets.all(AppPadding.low),
-              child: ChangeNotifierProvider(
-                create: (context) => vm,
+      body: ChangeNotifierProvider(
+        create: (context) => vm,
+        child: FutureBuilder(
+          future: vm.initDropDownEntriesPlacesEvent(),
+          builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else {
+              return Padding(
+                padding: const EdgeInsets.all(AppPadding.low),
                 child: Column(
                   children: [
                     const _GridActionFields(),
@@ -81,10 +86,10 @@ class MainBanquetScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),
-            );
-          }
-        },
+              );
+            }
+          },
+        ),
       ),
     );
   }
