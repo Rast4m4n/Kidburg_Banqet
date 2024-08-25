@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kidburg_banquet/presentation/widgets/custom_drawer.dart';
 
-class ListBanquetsScreen extends StatelessWidget {
-  const ListBanquetsScreen({super.key});
+class StatisticsScreen extends StatelessWidget {
+  const StatisticsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +13,7 @@ class ListBanquetsScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Список банкетов',
+              'Статистика',
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),

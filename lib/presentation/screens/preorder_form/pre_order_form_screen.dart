@@ -7,6 +7,7 @@ import 'package:kidburg_banquet/domain/model/table_model.dart';
 import 'package:kidburg_banquet/presentation/screens/preorder_form/pre_order_form_vm.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
+import 'package:kidburg_banquet/presentation/widgets/custom_drawer.dart';
 import 'package:kidburg_banquet/presentation/widgets/custom_text_field.dart';
 import 'package:provider/provider.dart';
 
@@ -42,20 +43,20 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
     return ChangeNotifierProvider<PreOrderFormVm>(
       create: (context) => vm,
       child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: AppColor.cardPreviewColor,
-          mini: true,
-          onPressed: () => vm.navigateToPreviewScreen(context),
-          child: const Icon(Icons.save),
-        ),
-        floatingActionButtonLocation:
-            FloatingActionButtonLocation.miniEndDocked,
+        floatingActionButton: const _FloatingButton(),
+        floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
+        endDrawer: const CustomDrawer(),
         appBar: AppBar(
-          title: Text(
-            'Оформление банкета',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Оформление',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+            ],
           ),
         ),
         body: FutureBuilder<List<TableModel>>(
@@ -83,8 +84,34 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
             }
           },
         ),
-        bottomNavigationBar: const _BottomNavigationBar(),
       ),
+    );
+  }
+}
+
+class _FloatingButton extends StatelessWidget {
+  const _FloatingButton({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<PreOrderFormVm>(
+      builder: (context, vm, child) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text("Сумма: ${vm.getTotalPrice()}",
+                style: Theme.of(context).textTheme.bodyLarge),
+            FloatingActionButton(
+              backgroundColor: AppColor.cardPreviewColor,
+              onPressed: () => vm.navigateToPreviewScreen(context),
+              mini: true,
+              child: const Icon(Icons.save),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -162,33 +189,6 @@ class _ServingsDishes extends StatelessWidget {
           ],
         );
       },
-    );
-  }
-}
-
-class _BottomNavigationBar extends StatelessWidget {
-  const _BottomNavigationBar({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      height: 60,
-      child: BottomAppBar(
-        color: AppColor.cardPreviewColor,
-        shape: const CircularNotchedRectangle(),
-        child: Row(
-          children: [
-            Consumer<PreOrderFormVm>(
-              builder: (context, vm, child) {
-                return Text("Сумма: ${vm.getTotalPrice()}");
-              },
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
