@@ -29,6 +29,7 @@ class PreviewBanquerViewModel with ChangeNotifier {
   void _showSnackBar(BuildContext context) {
     final pathSavedFile = FileManager.filePath(
       FileManager.getFileName(banqetModel),
+      banqetModel,
     );
     final snackBar = SnackBar(
       content: Text('Файл сохранён по директории: $pathSavedFile'),
