@@ -7,19 +7,19 @@ abstract final class FileManager {
   static Directory directory =
       Directory('/storage/emulated/0/Download/Банкеты');
 
-  static Directory _createDirectoryByDate(BanqetModel banquet) {
+  static Directory _createDirectoryByDate(BanquetModel banquet) {
     final monthOfBanquet = DateFormat('MMMM').format(banquet.dateStart);
     directory = Directory(
         '/storage/emulated/0/Download/Банкеты/${banquet.dateStart.year}/$monthOfBanquet');
     return directory;
   }
 
-  static String getFileName(BanqetModel banquet) {
+  static String getFileName(BanquetModel banquet) {
     final date = DateFormat('d MMMM').format(banquet.dateStart);
     return "Банкет $date ${banquet.nameClient} ${banquet.place}.xlsx";
   }
 
-  static String filePath(String nameFile, BanqetModel banquet) {
+  static String filePath(String nameFile, BanquetModel banquet) {
     return "${_createDirectoryByDate(banquet).path}/$nameFile";
   }
 

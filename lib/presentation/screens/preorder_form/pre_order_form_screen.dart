@@ -33,7 +33,7 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args = ModalRoute.of(context)!.settings.arguments as BanqetModel;
+    final args = ModalRoute.of(context)!.settings.arguments as BanquetModel;
     vm.banquetModel = args;
   }
 

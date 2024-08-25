@@ -20,7 +20,7 @@ class _PreviewBanqetScreenState extends State<PreviewBanqetScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args = ModalRoute.of(context)!.settings.arguments as BanqetModel;
+    final args = ModalRoute.of(context)!.settings.arguments as BanquetModel;
     vm = PreviewBanquerViewModel(banqetModel: args);
   }
 

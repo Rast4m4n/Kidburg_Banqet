@@ -6,7 +6,7 @@ import 'package:kidburg_banquet/data/file_manager/file_manager.dart';
 import 'package:kidburg_banquet/domain/model/banqet_model.dart';
 
 class ExcelRepository {
-  Future<void> writeNewExcelFile(BanqetModel banquet) async {
+  Future<void> writeNewExcelFile(BanquetModel banquet) async {
     final Excel excel = Excel.createExcel();
     Sheet sheet = excel.tables.values.first;
 
