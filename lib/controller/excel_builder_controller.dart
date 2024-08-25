@@ -11,7 +11,7 @@ class ExcelBuilderController {
 
   final Sheet sheet;
 
-  Future<void> writeNewExcelFile(BanqetModel banquet) async {
+  Future<void> writeNewExcelFile(BanquetModel banquet) async {
     int rowIndex = 8;
     sheet.setColumnWidth(0, 19);
     sheet.setColumnWidth(1, 18);
@@ -31,7 +31,7 @@ class ExcelBuilderController {
     _cakeCell(sheet, banquet, lastIndex);
   }
 
-  void _leftHeaderInfo(Sheet sheet, BanqetModel banquet, int lastIndexRow) {
+  void _leftHeaderInfo(Sheet sheet, BanquetModel banquet, int lastIndexRow) {
     int rowIndex = 1;
     final border = Border(
       borderColorHex: ExcelColor.fromHexString('#000000'),
@@ -102,7 +102,7 @@ class ExcelBuilderController {
     }
   }
 
-  void _rightHeaderInfo(Sheet sheet, BanqetModel banquet) {
+  void _rightHeaderInfo(Sheet sheet, BanquetModel banquet) {
     int rowIndex = 1;
     final border = Border(
       borderColorHex: ExcelColor.fromHexString('#000000'),
@@ -171,7 +171,7 @@ class ExcelBuilderController {
     }
   }
 
-  int _listDishesAndServing(BanqetModel banquet, int rowIndex) {
+  int _listDishesAndServing(BanquetModel banquet, int rowIndex) {
     for (var table in banquet.tables!) {
       _tableNameCell(table, rowIndex, banquet);
       rowIndex += 1;
@@ -196,7 +196,7 @@ class ExcelBuilderController {
     return rowIndex;
   }
 
-  void _tableNameCell(TableModel table, int rowIndex, BanqetModel banquet) {
+  void _tableNameCell(TableModel table, int rowIndex, BanquetModel banquet) {
     final border = Border(
       borderColorHex: ExcelColor.fromHexString('#000000'),
       borderStyle: BorderStyle.Thin,
@@ -441,7 +441,7 @@ class ExcelBuilderController {
     );
   }
 
-  void _remarkOfbanquetCell(Sheet sheet, BanqetModel banquet, int rowIndex) {
+  void _remarkOfbanquetCell(Sheet sheet, BanquetModel banquet, int rowIndex) {
     final border = Border(
       borderColorHex: ExcelColor.fromHexString('#000000'),
       borderStyle: BorderStyle.Thin,
@@ -478,7 +478,7 @@ class ExcelBuilderController {
     sheet.setMergedCellStyle(CellIndex.indexByString('F$rowIndex'), cellStyle);
   }
 
-  void _cakeCell(Sheet sheet, BanqetModel banquet, int rowIndex) {
+  void _cakeCell(Sheet sheet, BanquetModel banquet, int rowIndex) {
     final border = Border(
       borderColorHex: ExcelColor.fromHexString('#000000'),
       borderStyle: BorderStyle.Thin,

@@ -118,7 +118,7 @@ class MainBanquetViewModel extends ChangeNotifier {
       if (context.mounted) {
         Navigator.of(context).pushNamed(
           AppRoute.preOrderFormPage,
-          arguments: BanqetModel(
+          arguments: BanquetModel(
             managerModel: managerModel!,
             nameClient: nameController.text,
             phoneNumberOfClient: phoneNumberOfClientController.text,

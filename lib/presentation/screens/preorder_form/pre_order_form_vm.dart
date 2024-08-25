@@ -17,7 +17,7 @@ class PreOrderFormVm with ChangeNotifier {
 
   final GoogleSheetDataRepository googleSheetRepository;
 
-  late BanqetModel? banquetModel;
+  late BanquetModel? banquetModel;
 
   final List<TableModel> _tables = [];
   List<TableModel> get tables => _tables;
