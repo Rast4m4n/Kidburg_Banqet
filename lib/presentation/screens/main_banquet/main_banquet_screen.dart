@@ -103,6 +103,7 @@ class _GridActionFields extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final vm = context.watch<MainBanquetViewModel>();
+
     return GridView.count(
       crossAxisCount: 2,
       crossAxisSpacing: AppPadding.medium,
