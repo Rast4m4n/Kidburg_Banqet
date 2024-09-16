@@ -4,12 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kidburg_banquet/data/file_manager/file_manager.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ListBanquetVM with ChangeNotifier {
   final Directory directory = FileManager.directory;
 
   Future<void> openFile(FileSystemEntity file) async {
     await OpenFilex.open(file.path);
+  }
+
+  Future<void> shareFile(FileSystemEntity file) async {
+    // Текст отсылается только в телеграм, но не в востапп
+    await Share.shareXFiles(
+      [XFile(file.path)],
+      text:
+          'Это ваш бланк предзаказа по меню, проверьте, всё ли верно по времени подачи и позициям из меню',
+    );
   }
 
   Future<void> deleteFile(FileSystemEntity file) async {
