@@ -13,7 +13,6 @@ class PermissionApp {
       final statusStorage = await Permission.storage.status;
       if (sdkInt <= 29) {
         if (statusStorage.isDenied) {
-          print(statusStorage);
           if (await Permission.storage.request().isGranted) {
           } else {
             openAppSettings();

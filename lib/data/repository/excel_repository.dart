@@ -34,35 +34,4 @@ class ExcelRepository {
       throw "Ошибка сохранения файла: $e";
     }
   }
-
-  // Future<BanquetModel> editExcelFile(String filePath) async {
-  //   final bytes = File(filePath).readAsBytesSync();
-  //   final excel = Excel.decodeBytes(bytes);
-  //   final sheet = excel.tables.values.first;
-  //   DateTime parsedTime = DateFormat("HH:mm")
-  //       .parse(sheet.cell(CellIndex.indexByString('F3')).value.toString());
-  //   DateTime parsedDate = DateFormat("MMMMd")
-  //       .parse(sheet.cell(CellIndex.indexByString('F2')).value.toString());
-  //   DateTime date = DateTime(
-  //     DateTime.now().year,
-  //     parsedDate.month,
-  //     parsedDate.day,
-  //   );
-  //   final banquet = BanquetModel(
-  //     nameClient: sheet.cell(CellIndex.indexByString('B2')).value.toString(),
-  //     place: sheet.cell(CellIndex.indexByString('F4')).value.toString(),
-  //     dateStart: date,
-  //     timeStart: TimeOfDay(hour: parsedTime.hour, minute: parsedTime.minute),
-  //     amountOfChildren:
-  //         int.parse(sheet.cell(CellIndex.indexByString('F6')).value.toString()),
-  //     amountOfAdult:
-  //         int.parse(sheet.cell(CellIndex.indexByString('F7')).value.toString()),
-  //     managerModel: ManagerModel(
-  //       name: sheet.cell(CellIndex.indexByString('B4')).value.toString(),
-  //       phoneNumber: sheet.cell(CellIndex.indexByString('B5')).value.toString(),
-  //       establishmentEnum: EstablishmentsEnum.cdm,
-  //     ),
-  //   );
-  //   return banquet;
-  // }
 }
