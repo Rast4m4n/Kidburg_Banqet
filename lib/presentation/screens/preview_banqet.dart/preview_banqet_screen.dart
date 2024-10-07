@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kidburg_banquet/domain/model/banqet_model.dart';
 import 'package:kidburg_banquet/domain/model/table_model.dart';
+import 'package:kidburg_banquet/presentation/navigation/app_route.dart';
 import 'package:kidburg_banquet/presentation/screens/preview_banqet.dart/preview_banquet_vm.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
@@ -42,7 +43,7 @@ class _PreviewBanqetScreenState extends State<PreviewBanqetScreen> {
               const _EventCardWidget(),
               const SizedBox(height: AppPadding.extra),
               const _ListCardsServingWidget(),
-              const _SaveButton(),
+              const _ActionButton(),
             ],
           ),
         ),
@@ -51,22 +52,27 @@ class _PreviewBanqetScreenState extends State<PreviewBanqetScreen> {
   }
 }
 
-class _SaveButton extends StatelessWidget {
-  const _SaveButton({
+class _ActionButton extends StatelessWidget {
+  const _ActionButton({
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    final vm = context.read<PreviewBanquerViewModel>();
+    final vm = context.watch<PreviewBanquerViewModel>();
     return ElevatedButton(
       style: Theme.of(context).elevatedButtonTheme.style,
       onPressed: () async {
-        await vm.saveBanquetExcelFile(context);
+        !vm.isSavedBanquet
+            ? await vm.saveBanquetExcelFile(context)
+            : Navigator.of(context).pushNamedAndRemoveUntil(
+                AppRoute.listBanquetPage,
+                (Route<dynamic> route) => false,
+              );
       },
-      child: const Text(
-        'Сохранить',
-        style: TextStyle(
+      child: Text(
+        !vm.isSavedBanquet ? 'Сохранить' : 'Перейти к списку банкетов',
+        style: const TextStyle(
           fontSize: 16,
           color: AppColor.infoCardPreviewColor,
         ),

@@ -101,7 +101,7 @@ class _FloatingButton extends StatelessWidget {
         return Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Text("Сумма: ${vm.getTotalPrice()}",
+            Text("Сумма: ${vm.getTotalSum()}",
                 style: Theme.of(context).textTheme.bodyLarge),
             FloatingActionButton(
               backgroundColor: AppColor.cardPreviewColor,
