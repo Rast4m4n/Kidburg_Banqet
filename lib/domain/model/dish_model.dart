@@ -8,30 +8,27 @@ part 'dish_model.g.dart';
 @JsonSerializable()
 class DishModel {
   DishModel({
-    required this.id,
     required this.nameDish,
     required this.weight,
     required this.price,
     required this.count,
   });
-  final String id;
   final String? nameDish;
   final String? weight;
   final int count;
   final int? price;
 
   DishModel copyWith({
-    String? id,
     String? nameDish,
     String? weight,
     int? count,
+    int? price,
   }) {
     return DishModel(
-      id: id ?? this.id,
       nameDish: nameDish ?? this.nameDish,
       weight: weight ?? this.weight,
       count: count ?? this.count,
-      price: price,
+      price: price ?? this.price,
     );
   }
 

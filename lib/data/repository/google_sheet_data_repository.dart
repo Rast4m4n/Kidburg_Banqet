@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:kidburg_banquet/domain/model/category_model.dart';
 import 'package:kidburg_banquet/domain/model/dish_model.dart';
 import 'package:http/http.dart' as http;
-import 'package:uuid/uuid.dart';
 
 class GoogleSheetDataRepository {
   Future<List<CategoryModel>> fetchCategoriesAndDishes() async {
@@ -20,7 +19,6 @@ class GoogleSheetDataRepository {
       for (var item in data) {
         String category = item['Категория'];
         DishModel dish = DishModel(
-          id: const Uuid().v4(),
           nameDish: item['Название'],
           weight: item['Вес'],
           count: 0,
