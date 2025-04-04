@@ -126,7 +126,7 @@ class ExcelBuilderController {
       'Заказ №': '',
       'Заказчик': DateFormat('d MMMM').format(banquet.dateStart),
       'Время проведения':
-          DateTimeFormatter.convertToHHMMString(banquet.timeStart),
+          DateTimeFormatter.convertToHHMMString(banquet.firstTimeServing),
       'Место проведения': banquet.place,
       'Предоплата': prePayment,
       'Кол-во детей': banquet.amountOfChildren ?? 1,
@@ -215,12 +215,17 @@ class ExcelBuilderController {
       topBorder: border,
       bold: true,
     );
-    final timeStart = DateTimeFormatter.convertToHHMMString(banquet.timeStart);
-
+    final firstServing =
+        DateTimeFormatter.convertToHHMMString(banquet.firstTimeServing);
+    final secondServing =
+        DateTimeFormatter.calculateNextServingTime(banquet.firstTimeServing);
     if (table.name == 'СТОЛ ДЛЯ ВЗРОСЛЫХ') {
       sheet.cell(CellIndex.indexByString('A$rowIndex')).value = TextCellValue(
-        "${table.name} $timeStart",
+        "${table.name} $firstServing",
       );
+    } else {
+      sheet.cell(CellIndex.indexByString('A$rowIndex')).value = TextCellValue(
+          "${table.name} ${DateTimeFormatter.convertToHHMMString(secondServing)}");
     }
 
     sheet.merge(

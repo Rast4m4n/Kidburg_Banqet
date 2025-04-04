@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:kidburg_banquet/data/repository/google_sheet_data_repository.dart';
-import 'package:kidburg_banquet/domain/model/banqet_model.dart';
 import 'package:kidburg_banquet/domain/model/category_model.dart';
 import 'package:kidburg_banquet/domain/model/dish_model.dart';
 import 'package:kidburg_banquet/domain/model/table_model.dart';
@@ -19,44 +18,55 @@ class PreOrderFormScreen extends StatefulWidget {
 
 class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
   late final PreOrderFormVm vm;
+  late final ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController();
     vm = PreOrderFormVm(
       googleSheetRepository: GoogleSheetDataRepository(),
+      scrollController: _scrollController,
+      scrollVisibilityManager: ScrollVisibilityManagerImpl(),
     );
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final args = ModalRoute.of(context)!.settings.arguments as BanqetModel;
-    vm.banquetModel = args;
+  void dispose() {
+    super.dispose();
+    _scrollController.dispose();
+    vm.scrollController.dispose();
+    vm.isVisible.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<PreOrderFormVm>(
       create: (context) => vm,
-      child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: AppColor.cardPreviewColor,
-          mini: true,
-          onPressed: () => vm.navigateToPreviewScreen(context),
-          child: const Icon(Icons.save),
-        ),
-        floatingActionButtonLocation:
-            FloatingActionButtonLocation.miniEndDocked,
-        appBar: AppBar(
-          title: Text(
-            'Оформление банкета',
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
-        ),
-        body: FutureBuilder<List<TableModel>>(
+      child: ValueListenableBuilder<bool>(
+        valueListenable: vm.isVisible,
+        builder: (context, isVisible, child) {
+          return Scaffold(
+            floatingActionButton: FloatingActionButton(
+              backgroundColor: AppColor.cardPreviewColor,
+              mini: isVisible,
+              onPressed: () => vm.navigateToPreviewScreen(context),
+              child: const Icon(Icons.save),
+            ),
+            floatingActionButtonLocation: vm.buttonLocation,
+            appBar: AppBar(
+              title: Text(
+                'Оформление банкета',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+              ),
+            ),
+            body: child!,
+            bottomNavigationBar: _BottomNavigationBar(isVisible: isVisible),
+          );
+        },
+        child: FutureBuilder<List<TableModel>>(
           future: vm.fetchDataFromGoogleSheet(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -70,6 +80,7 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
             } else if (snapshot.hasData) {
               final tables = snapshot.data!;
               return SingleChildScrollView(
+                controller: _scrollController,
                 child: Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: AppPadding.low),
@@ -81,7 +92,6 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
             }
           },
         ),
-        bottomNavigationBar: const _BottomNavigationBar(),
       ),
     );
   }
@@ -107,13 +117,6 @@ class _ServingsDishes extends StatelessWidget {
                 collapsedBackgroundColor: AppColor.previewBackgroundColor,
                 textColor: AppColor.titleCardPreviewColor,
                 maintainState: true,
-                leading: InkWell(
-                  child: const Icon(
-                    Icons.access_time,
-                    color: Colors.black,
-                  ),
-                  onTap: () => vm.changeTime(context, table),
-                ),
                 title: Text(
                   table.name,
                   style: const TextStyle(
@@ -130,7 +133,7 @@ class _ServingsDishes extends StatelessWidget {
               width: MediaQuery.of(context).size.width,
               child: ElevatedButton(
                 style: Theme.of(context).elevatedButtonTheme.style,
-                onPressed: () => vm.addNewServing(context),
+                onPressed: () => vm.addNewServing(),
                 child: const Text(
                   'Добавить подачу',
                   style: TextStyle(
@@ -150,13 +153,16 @@ class _ServingsDishes extends StatelessWidget {
 class _BottomNavigationBar extends StatelessWidget {
   const _BottomNavigationBar({
     super.key,
+    required this.isVisible,
   });
+
+  final bool isVisible;
 
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      height: 60,
+      height: isVisible ? 60 : 0,
       child: BottomAppBar(
         color: AppColor.cardPreviewColor,
         shape: const CircularNotchedRectangle(),

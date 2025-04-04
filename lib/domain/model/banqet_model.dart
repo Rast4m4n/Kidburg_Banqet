@@ -9,10 +9,11 @@ class BanqetModel {
     required this.nameClient,
     required this.place,
     required this.dateStart,
-    required this.timeStart,
+    required this.firstTimeServing,
     required this.amountOfChildren,
     required this.amountOfAdult,
     required this.managerModel,
+    this.secondTimeServing,
     this.tables,
     this.phoneNumberOfClient,
     this.prepayment,
@@ -25,7 +26,8 @@ class BanqetModel {
   final String? phoneNumberOfClient;
   final String place;
   final DateTime dateStart;
-  final TimeOfDay timeStart;
+  final TimeOfDay firstTimeServing;
+  final TimeOfDay? secondTimeServing;
   final List<TableModel>? tables;
   final int? amountOfChildren;
   final int? amountOfAdult;
@@ -40,7 +42,8 @@ class BanqetModel {
     String? phoneNumberOfClient,
     String? place,
     DateTime? dateStart,
-    TimeOfDay? timeStart,
+    TimeOfDay? firstTimeServing,
+    TimeOfDay? secondTimeServing,
     List<TableModel>? tables,
     int? amountOfChildren,
     int? amountOfAdult,
@@ -54,7 +57,8 @@ class BanqetModel {
       phoneNumberOfClient: phoneNumberOfClient ?? this.phoneNumberOfClient,
       place: place ?? this.place,
       dateStart: dateStart ?? this.dateStart,
-      timeStart: timeStart ?? this.timeStart,
+      firstTimeServing: firstTimeServing ?? this.firstTimeServing,
+      secondTimeServing: secondTimeServing ?? this.secondTimeServing,
       tables: tables ?? this.tables,
       amountOfChildren: amountOfChildren ?? this.amountOfChildren,
       amountOfAdult: amountOfAdult ?? this.amountOfAdult,
@@ -66,6 +70,6 @@ class BanqetModel {
 
   @override
   String toString() {
-    return 'BanqetModel(nameOfManager: ${managerModel.name}, numberOfManager: ${managerModel.phoneNumber}, nameClient: $nameClient, numberClient: $phoneNumberOfClient, place: $place, dateStart: $dateStart, firstTimeServing: $timeStart, tables: $tables, amountOfChildren: $amountOfChildren, amountOfAdult: $amountOfAdult, prepayment: $prepayment, cake: $cake, remark: $remark)';
+    return 'BanqetModel(nameOfManager: ${managerModel.name}, numberOfManager: ${managerModel.phoneNumber}, nameClient: $nameClient, numberClient: $phoneNumberOfClient, place: $place, dateStart: $dateStart, firstTimeServing: $firstTimeServing, secondTimeServing: $secondTimeServing, tables: $tables, amountOfChildren: $amountOfChildren, amountOfAdult: $amountOfAdult, prepayment: $prepayment, cake: $cake, remark: $remark)';
   }
 }
