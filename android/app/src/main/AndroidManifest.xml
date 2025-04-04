@@ -7,6 +7,7 @@
     
     <application
         android:label="КидБург Банкеты"
+        android:label="КидБург Банкеты"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon"
         android:requestLegacyExternalStorage="true">
