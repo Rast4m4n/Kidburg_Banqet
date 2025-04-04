@@ -9,7 +9,7 @@ class BanquetModel {
     required this.nameClient,
     required this.place,
     required this.dateStart,
-    required this.timeStart,
+    required this.firstTimeServing,
     required this.amountOfChildren,
     required this.amountOfAdult,
     required this.managerModel,
@@ -22,6 +22,7 @@ class BanquetModel {
 
   final ManagerModel managerModel;
   final String nameClient;
+  final String? phoneNumberOfClient;
   final String? phoneNumberOfClient;
   final String place;
   final DateTime dateStart;
