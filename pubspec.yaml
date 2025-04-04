@@ -25,8 +25,6 @@ dependencies:
   device_info_plus: ^10.1.2
   http: ^1.2.0
   uuid: ^4.4.2
-  file_picker: ^8.1.2
-  flutter_snake_navigationbar: ^0.6.1
 
 dev_dependencies:
   flutter_test:

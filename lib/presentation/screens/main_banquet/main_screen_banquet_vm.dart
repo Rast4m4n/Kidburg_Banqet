@@ -42,7 +42,6 @@ class MainBanquetViewModel extends ChangeNotifier {
   String? errorDate;
   String? errorTime;
   String? errorPlace;
-
   void isValidateName() {
     if (nameController.text.isEmpty) {
       errorName = 'Обязательное поле';
