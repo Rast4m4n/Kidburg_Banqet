@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kidburg_banquet/domain/model/banqet_model.dart';
 import 'package:kidburg_banquet/domain/model/table_model.dart';
+import 'package:kidburg_banquet/presentation/navigation/app_route.dart';
 import 'package:kidburg_banquet/presentation/screens/preview_banqet.dart/preview_banquet_vm.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
+import 'package:kidburg_banquet/presentation/widgets/custom_drawer.dart';
 import 'package:provider/provider.dart';
 
 class PreviewBanqetScreen extends StatefulWidget {
@@ -15,20 +17,13 @@ class PreviewBanqetScreen extends StatefulWidget {
 }
 
 class _PreviewBanqetScreenState extends State<PreviewBanqetScreen> {
-  late final PreviewBanquerViewModel vm;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final args = ModalRoute.of(context)!.settings.arguments as BanquetModel;
-    vm = PreviewBanquerViewModel(banqetModel: args);
-  }
-
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)!.settings.arguments as BanquetModel;
     return ChangeNotifierProvider(
-      create: (context) => vm,
+      create: (context) => PreviewBanquerViewModel(banqetModel: args),
       child: Scaffold(
+        endDrawer: const CustomDrawer(),
         appBar: AppBar(
           forceMaterialTransparency: true,
         ),
@@ -48,21 +43,38 @@ class _PreviewBanqetScreenState extends State<PreviewBanqetScreen> {
               const _EventCardWidget(),
               const SizedBox(height: AppPadding.extra),
               const _ListCardsServingWidget(),
-              ElevatedButton(
-                style: Theme.of(context).elevatedButtonTheme.style,
-                onPressed: () async {
-                  await vm.saveBanquetExcelFile(context);
-                },
-                child: const Text(
-                  'Сохранить',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: AppColor.infoCardPreviewColor,
-                  ),
-                ),
-              ),
+              const _ActionButton(),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ActionButton extends StatelessWidget {
+  const _ActionButton({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final vm = context.watch<PreviewBanquerViewModel>();
+    return ElevatedButton(
+      style: Theme.of(context).elevatedButtonTheme.style,
+      onPressed: () async {
+        !vm.isSavedBanquet
+            ? await vm.saveBanquetExcelFile(context)
+            : Navigator.of(context).pushNamedAndRemoveUntil(
+                AppRoute.listBanquetPage,
+                (Route<dynamic> route) => false,
+              );
+      },
+      child: Text(
+        !vm.isSavedBanquet ? 'Сохранить' : 'Перейти к списку банкетов',
+        style: const TextStyle(
+          fontSize: 16,
+          color: AppColor.infoCardPreviewColor,
         ),
       ),
     );

@@ -100,7 +100,7 @@ class PreOrderFormVm with ChangeNotifier {
     notifyListeners();
   }
 
-  int getTotalPrice() {
+  int getTotalSum() {
     int totalPrice = 0;
     for (var table in _tables) {
       for (var category in table.categories) {
@@ -172,7 +172,8 @@ class PreOrderFormVm with ChangeNotifier {
     final tables = clearEmptyData(_tables);
     Navigator.of(context).pushNamed(
       AppRoute.previewBanquetPage,
-      arguments: banquetModel!.copyWith(tables: tables),
+      arguments:
+          banquetModel!.copyWith(tables: tables, sumOfBanquet: getTotalSum()),
     );
   }
 }
