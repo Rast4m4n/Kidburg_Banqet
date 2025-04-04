@@ -9,7 +9,7 @@ class PreviewBanquerViewModel with ChangeNotifier {
   PreviewBanquerViewModel({
     required this.banqetModel,
   });
-  final BanquetModel banqetModel;
+  final BanqetModel banqetModel;
   bool isExpandedCard = false;
 
   List<DishModel> spreadList(TableModel table) {

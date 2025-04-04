@@ -4,8 +4,8 @@ import 'package:kidburg_banquet/domain/model/manager_model.dart';
 
 import 'package:kidburg_banquet/domain/model/table_model.dart';
 
-class BanquetModel {
-  const BanquetModel({
+class BanqetModel {
+  const BanqetModel({
     required this.nameClient,
     required this.place,
     required this.dateStart,
@@ -34,7 +34,7 @@ class BanquetModel {
   // Примечание к банкету
   final String? remark;
 
-  BanquetModel copyWith({
+  BanqetModel copyWith({
     ManagerModel? managerModel,
     String? nameClient,
     String? phoneNumberOfClient,
@@ -48,7 +48,7 @@ class BanquetModel {
     String? cake,
     String? remark,
   }) {
-    return BanquetModel(
+    return BanqetModel(
       managerModel: managerModel ?? this.managerModel,
       nameClient: nameClient ?? this.nameClient,
       phoneNumberOfClient: phoneNumberOfClient ?? this.phoneNumberOfClient,
