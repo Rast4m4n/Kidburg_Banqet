@@ -11,7 +11,7 @@ class ExcelBuilderController {
 
   final Sheet sheet;
 
-  Future<void> writeNewExcelFile(BanqetModel banquet) async {
+  Future<void> writeNewExcelFile(BanquetModel banquet) async {
     int rowIndex = 8;
     sheet.setColumnWidth(0, 19);
     sheet.setColumnWidth(1, 18);
@@ -31,10 +31,10 @@ class ExcelBuilderController {
     _cakeCell(sheet, banquet, lastIndex);
   }
 
-  void _leftHeaderInfo(Sheet sheet, BanqetModel banquet, int lastIndexRow) {
+  void _leftHeaderInfo(Sheet sheet, BanquetModel banquet, int lastIndexRow) {
     int rowIndex = 1;
     final border = Border(
-      borderColorHex: '#000000',
+      borderColorHex: ExcelColor.fromHexString('#000000'),
       borderStyle: BorderStyle.Thin,
     );
 
@@ -42,7 +42,7 @@ class ExcelBuilderController {
       fontFamily: 'Corbel',
       fontSize: 13,
       bold: true,
-      backgroundColorHex: '#FFF2CC',
+      backgroundColorHex: ExcelColor.fromHexString('#FFF2CC'),
       verticalAlign: VerticalAlign.Center,
       horizontalAlign: HorizontalAlign.Center,
       textWrapping: TextWrapping.Clip,
@@ -55,13 +55,12 @@ class ExcelBuilderController {
       'Мероприятие': 'День рождение',
       'Заказчик': banquet.nameClient,
       'Телефон': banquet.phoneNumberOfClient ?? '',
-      'Менеджер': banquet.nameOfManager ?? '',
-      'Контактный тел.': banquet.phoneNumberOfManager ?? '',
+      'Менеджер': banquet.managerModel.name,
+      'Контактный тел.': banquet.managerModel.phoneNumber,
       // lastIndexRow это самое последнее добавленное блюдо в файл
       // Он необходим для подсчёта суммы всех блюд
       "Сумма заказа": 'SUM(F11:F$lastIndexRow)-F5',
     };
-    print(lastIndexRow);
     for (var el in headerInfo.entries) {
       sheet.cell(CellIndex.indexByString("A$rowIndex")).value =
           TextCellValue(el.key);
@@ -89,7 +88,7 @@ class ExcelBuilderController {
         sheet.setMergedCellStyle(
           CellIndex.indexByString('B$rowIndex'),
           cellStyle.copyWith(
-            fontColorHexVal: '#FF0101',
+            fontColorHexVal: ExcelColor.fromHexString('#FF0101'),
             fontSizeVal: 16,
           ),
         );
@@ -103,17 +102,17 @@ class ExcelBuilderController {
     }
   }
 
-  void _rightHeaderInfo(Sheet sheet, BanqetModel banquet) {
+  void _rightHeaderInfo(Sheet sheet, BanquetModel banquet) {
     int rowIndex = 1;
     final border = Border(
-      borderColorHex: '#000000',
+      borderColorHex: ExcelColor.fromHexString('#000000'),
       borderStyle: BorderStyle.Thin,
     );
     final cellStyle = CellStyle(
       fontFamily: 'Corbel',
       fontSize: 13,
       bold: true,
-      backgroundColorHex: '#FFF2CC',
+      backgroundColorHex: ExcelColor.fromHexString('#FFF2CC'),
       verticalAlign: VerticalAlign.Center,
       horizontalAlign: HorizontalAlign.Center,
       textWrapping: TextWrapping.WrapText,
@@ -127,7 +126,7 @@ class ExcelBuilderController {
       'Заказ №': '',
       'Заказчик': DateFormat('d MMMM').format(banquet.dateStart),
       'Время проведения':
-          DateTimeFormatter.convertToHHMMString(banquet.firstTimeServing),
+          DateTimeFormatter.convertToHHMMString(banquet.timeStart),
       'Место проведения': banquet.place,
       'Предоплата': prePayment,
       'Кол-во детей': banquet.amountOfChildren ?? 1,
@@ -161,7 +160,7 @@ class ExcelBuilderController {
         sheet.setMergedCellStyle(
             CellIndex.indexByString('F$rowIndex'),
             cellStyle.copyWith(
-              fontColorHexVal: '#00B050',
+              fontColorHexVal: ExcelColor.fromHexString('#00B050'),
             ));
       } else {
         sheet.setMergedCellStyle(
@@ -172,7 +171,7 @@ class ExcelBuilderController {
     }
   }
 
-  int _listDishesAndServing(BanqetModel banquet, int rowIndex) {
+  int _listDishesAndServing(BanquetModel banquet, int rowIndex) {
     for (var table in banquet.tables!) {
       _tableNameCell(table, rowIndex, banquet);
       rowIndex += 1;
@@ -197,9 +196,9 @@ class ExcelBuilderController {
     return rowIndex;
   }
 
-  void _tableNameCell(TableModel table, int rowIndex, BanqetModel banquet) {
+  void _tableNameCell(TableModel table, int rowIndex, BanquetModel banquet) {
     final border = Border(
-      borderColorHex: '#000000',
+      borderColorHex: ExcelColor.fromHexString('#000000'),
       borderStyle: BorderStyle.Thin,
     );
     sheet.setRowHeight(rowIndex - 1, 30);
@@ -209,25 +208,17 @@ class ExcelBuilderController {
       fontSize: 14,
       horizontalAlign: HorizontalAlign.Center,
       verticalAlign: VerticalAlign.Center,
-      backgroundColorHex: '#F7E88D',
+      backgroundColorHex: ExcelColor.fromHexString('#F7E88D'),
       bottomBorder: border,
       leftBorder: border,
       rightBorder: border,
       topBorder: border,
       bold: true,
     );
-    final firstServing =
-        DateTimeFormatter.convertToHHMMString(banquet.firstTimeServing);
-    final secondServing =
-        DateTimeFormatter.calculateNextServingTime(banquet.firstTimeServing);
-    if (table.name == 'СТОЛ ДЛЯ ВЗРОСЛЫХ') {
-      sheet.cell(CellIndex.indexByString('A$rowIndex')).value = TextCellValue(
-        "${table.name} $firstServing",
-      );
-    } else {
-      sheet.cell(CellIndex.indexByString('A$rowIndex')).value = TextCellValue(
-          "${table.name} ${DateTimeFormatter.convertToHHMMString(secondServing)}");
-    }
+
+    sheet.cell(CellIndex.indexByString('A$rowIndex')).value = TextCellValue(
+      table.name,
+    );
 
     sheet.merge(
       CellIndex.indexByString('A$rowIndex'),
@@ -238,7 +229,7 @@ class ExcelBuilderController {
 
   void _categoryNameCell(int rowIndex, CategoryModel category) {
     final border = Border(
-      borderColorHex: '#000000',
+      borderColorHex: ExcelColor.fromHexString('#000000'),
       borderStyle: BorderStyle.Thin,
     );
     final cellStyle = CellStyle(
@@ -247,7 +238,7 @@ class ExcelBuilderController {
       horizontalAlign: HorizontalAlign.Center,
       verticalAlign: VerticalAlign.Center,
       bold: true,
-      backgroundColorHex: '#99FFCC',
+      backgroundColorHex: ExcelColor.fromHexString('#99FFCC'),
       bottomBorder: border,
       leftBorder: border,
       rightBorder: border,
@@ -271,7 +262,7 @@ class ExcelBuilderController {
 
   void _titleColumnCell(int rowIndex) {
     final border = Border(
-      borderColorHex: '#000000',
+      borderColorHex: ExcelColor.fromHexString('#000000'),
       borderStyle: BorderStyle.Thin,
     );
     final cellStyle = CellStyle(
@@ -280,7 +271,7 @@ class ExcelBuilderController {
       verticalAlign: VerticalAlign.Center,
       bold: true,
       horizontalAlign: HorizontalAlign.Center,
-      backgroundColorHex: '#F7E88D',
+      backgroundColorHex: ExcelColor.fromHexString('#F7E88D'),
       bottomBorder: border,
       leftBorder: border,
       rightBorder: border,
@@ -318,7 +309,7 @@ class ExcelBuilderController {
 
   void _formulaSumCell(Sheet sheet, int rowIndex) {
     final border = Border(
-      borderColorHex: '#000000',
+      borderColorHex: ExcelColor.fromHexString('#000000'),
       borderStyle: BorderStyle.Thin,
     );
     final cellStyle = CellStyle(
@@ -343,11 +334,11 @@ class ExcelBuilderController {
 
   void _priceDishCell(Sheet sheet, int rowIndex, DishModel dish) {
     final border = Border(
-      borderColorHex: '#000000',
+      borderColorHex: ExcelColor.fromHexString('#000000'),
       borderStyle: BorderStyle.Thin,
     );
     sheet.cell(CellIndex.indexByString('E$rowIndex')).value =
-        IntCellValue(int.parse(dish.price!));
+        IntCellValue(dish.price!);
     // NumFormat.custom(formatCode: '# ##0,00 ₽').read(dish.price!);
 
     sheet.cell(CellIndex.indexByString('E$rowIndex')).cellStyle = CellStyle(
@@ -359,7 +350,7 @@ class ExcelBuilderController {
       horizontalAlign: HorizontalAlign.Center,
       bottomBorder: border,
       leftBorder: Border(
-        borderColorHex: '#FF0000',
+        borderColorHex: ExcelColor.fromHexString('#FF0000'),
         borderStyle: BorderStyle.Thin,
       ),
       rightBorder: border,
@@ -369,11 +360,11 @@ class ExcelBuilderController {
 
   void _countDishCell(Sheet sheet, int rowIndex, DishModel dish) {
     final border = Border(
-      borderColorHex: '#FF0000',
+      borderColorHex: ExcelColor.fromHexString('#FF0000'),
       borderStyle: BorderStyle.Thin,
     );
     sheet.cell(CellIndex.indexByString('D$rowIndex')).value =
-        IntCellValue(dish.count!);
+        IntCellValue(dish.count);
     sheet.cell(CellIndex.indexByString('D$rowIndex')).cellStyle = CellStyle(
       fontSize: 12,
       fontFamily: 'Ebrima',
@@ -389,7 +380,7 @@ class ExcelBuilderController {
 
   void _weightDishCell(Sheet sheet, int rowIndex, DishModel dish) {
     final border = Border(
-      borderColorHex: '#000000',
+      borderColorHex: ExcelColor.fromHexString('#000000'),
       borderStyle: BorderStyle.Thin,
     );
     sheet.cell(CellIndex.indexByString('C$rowIndex')).value =
@@ -402,7 +393,7 @@ class ExcelBuilderController {
       bottomBorder: border,
       leftBorder: border,
       rightBorder: Border(
-        borderColorHex: '#FF0000',
+        borderColorHex: ExcelColor.fromHexString('#FF0000'),
         borderStyle: BorderStyle.Thin,
       ),
       topBorder: border,
@@ -411,7 +402,7 @@ class ExcelBuilderController {
 
   void _nameDishCell(Sheet sheet, int rowIndex, DishModel dish) {
     final border = Border(
-      borderColorHex: '#000000',
+      borderColorHex: ExcelColor.fromHexString('#000000'),
       borderStyle: BorderStyle.Thin,
     );
     final cellStyle = CellStyle(
@@ -438,7 +429,7 @@ class ExcelBuilderController {
 
   void _headerSizedBoxCell(Sheet sheet) {
     final border = Border(
-      borderColorHex: '#000000',
+      borderColorHex: ExcelColor.fromHexString('#000000'),
       borderStyle: BorderStyle.Thin,
     );
     sheet.merge(CellIndex.indexByString("C1"), CellIndex.indexByString("C7"));
@@ -450,9 +441,9 @@ class ExcelBuilderController {
     );
   }
 
-  void _remarkOfbanquetCell(Sheet sheet, BanqetModel banquet, int rowIndex) {
+  void _remarkOfbanquetCell(Sheet sheet, BanquetModel banquet, int rowIndex) {
     final border = Border(
-      borderColorHex: '#000000',
+      borderColorHex: ExcelColor.fromHexString('#000000'),
       borderStyle: BorderStyle.Thin,
     );
     final double rowHeight = banquet.remark!.length >= 16 ? 30 : 15;
@@ -463,7 +454,7 @@ class ExcelBuilderController {
       textWrapping: TextWrapping.WrapText,
       horizontalAlign: HorizontalAlign.Center,
       verticalAlign: VerticalAlign.Center,
-      backgroundColorHex: '#F7E88D',
+      backgroundColorHex: ExcelColor.fromHexString('#F7E88D'),
       bottomBorder: border,
       leftBorder: border,
       rightBorder: border,
@@ -487,9 +478,9 @@ class ExcelBuilderController {
     sheet.setMergedCellStyle(CellIndex.indexByString('F$rowIndex'), cellStyle);
   }
 
-  void _cakeCell(Sheet sheet, BanqetModel banquet, int rowIndex) {
+  void _cakeCell(Sheet sheet, BanquetModel banquet, int rowIndex) {
     final border = Border(
-      borderColorHex: '#000000',
+      borderColorHex: ExcelColor.fromHexString('#000000'),
       borderStyle: BorderStyle.Thin,
     );
     final double rowHeight = banquet.remark!.length >= 16 ? 30 : 15;
@@ -505,7 +496,7 @@ class ExcelBuilderController {
       rightBorder: border,
       bold: true,
       topBorder: border,
-      fontColorHex: '#FF0000',
+      fontColorHex: ExcelColor.fromHexString('#FF0000'),
     );
     sheet.cell(CellIndex.indexByString('A$rowIndex')).value =
         const TextCellValue('Наименование торта');

@@ -9,7 +9,7 @@ class PreviewBanquerViewModel with ChangeNotifier {
   PreviewBanquerViewModel({
     required this.banqetModel,
   });
-  final BanqetModel banqetModel;
+  final BanquetModel banqetModel;
   bool isExpandedCard = false;
 
   List<DishModel> spreadList(TableModel table) {
@@ -29,6 +29,7 @@ class PreviewBanquerViewModel with ChangeNotifier {
   void _showSnackBar(BuildContext context) {
     final pathSavedFile = FileManager.filePath(
       FileManager.getFileName(banqetModel),
+      banqetModel,
     );
     final snackBar = SnackBar(
       content: Text('Файл сохранён по директории: $pathSavedFile'),

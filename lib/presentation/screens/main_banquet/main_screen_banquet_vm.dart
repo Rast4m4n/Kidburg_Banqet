@@ -34,6 +34,8 @@ class MainBanquetViewModel extends ChangeNotifier {
   final TextEditingController remarkController;
   List<dynamic> dropDownMenuEntries = [];
 
+  final _managerModel = SharedPreferencesRepository.instance.loadManagerInfo();
+
   String formatterDate() => dateTimeManager.formatterDate;
   String formatterTime() => dateTimeManager.formatterTime;
 
@@ -99,8 +101,7 @@ class MainBanquetViewModel extends ChangeNotifier {
   }
 
   Future<void> initDropDownEntriesPlacesEvent() async {
-    final managerModel =
-        (await SharedPreferencesRepository.instance.loadManagerInfo())!;
+    final managerModel = (await _managerModel)!;
     if (managerModel.establishmentEnum == EstablishmentsEnum.cdm) {
       dropDownMenuEntries = PlaceEventCDMEnum.values;
     } else if (managerModel.establishmentEnum == EstablishmentsEnum.riviera) {
@@ -114,14 +115,12 @@ class MainBanquetViewModel extends ChangeNotifier {
         errorDate == null &&
         errorTime == null &&
         errorPlace == null) {
-      final managerModel =
-          await SharedPreferencesRepository.instance.loadManagerInfo();
+      final managerModel = await _managerModel;
       if (context.mounted) {
         Navigator.of(context).pushNamed(
           AppRoute.preOrderFormPage,
-          arguments: BanqetModel(
-            nameOfManager: managerModel?.name,
-            phoneNumberOfManager: managerModel?.phoneNumber,
+          arguments: BanquetModel(
+            managerModel: managerModel!,
             nameClient: nameController.text,
             phoneNumberOfClient: phoneNumberOfClientController.text,
             prepayment: int.tryParse(prepaymentController.text),
@@ -129,10 +128,7 @@ class MainBanquetViewModel extends ChangeNotifier {
             remark: remarkController.text,
             place: placeEventController.text,
             dateStart: dateTimeManager.selectedDate!,
-            firstTimeServing: dateTimeManager.selectedTime!,
-            secondTimeServing: DateTimeFormatter.calculateNextServingTime(
-              dateTimeManager.selectedTime!,
-            ),
+            timeStart: dateTimeManager.selectedTime!,
             amountOfChildren: int.tryParse(childrenController.text),
             amountOfAdult: int.tryParse(adultController.text),
           ),

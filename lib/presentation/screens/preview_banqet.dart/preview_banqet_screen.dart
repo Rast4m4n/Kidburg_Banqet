@@ -20,7 +20,7 @@ class _PreviewBanqetScreenState extends State<PreviewBanqetScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args = ModalRoute.of(context)!.settings.arguments as BanqetModel;
+    final args = ModalRoute.of(context)!.settings.arguments as BanquetModel;
     vm = PreviewBanquerViewModel(banqetModel: args);
   }
 
@@ -110,8 +110,7 @@ class _EventCardWidget extends StatelessWidget {
                 const SizedBox(height: AppPadding.low),
                 _RowInfoWidget(
                   text: 'Домик: ${vm.banqetModel.place}',
-                  twoText:
-                      'Время: ${vm.banqetModel.firstTimeServing.format(context)}',
+                  twoText: 'Время: ${vm.banqetModel.timeStart.format(context)}',
                   fontSize: 14,
                 ),
                 const SizedBox(height: AppPadding.low),
