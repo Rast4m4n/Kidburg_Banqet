@@ -16,11 +16,19 @@ class PreviewBanqetScreen extends StatefulWidget {
 }
 
 class _PreviewBanqetScreenState extends State<PreviewBanqetScreen> {
+  late final PreviewBanquerViewModel vm;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)!.settings.arguments as BanquetModel;
+    vm = PreviewBanquerViewModel(banqetModel: args);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)!.settings.arguments as BanquetModel;
     return ChangeNotifierProvider(
-      create: (context) => PreviewBanquerViewModel(banqetModel: args),
+      create: (context) => vm,
       child: Scaffold(
         endDrawer: const CustomDrawer(),
         appBar: AppBar(
@@ -42,33 +50,21 @@ class _PreviewBanqetScreenState extends State<PreviewBanqetScreen> {
               const _EventCardWidget(),
               const SizedBox(height: AppPadding.extra),
               const _ListCardsServingWidget(),
-              const _SaveButton(),
+              ElevatedButton(
+                style: Theme.of(context).elevatedButtonTheme.style,
+                onPressed: () async {
+                  await vm.saveBanquetExcelFile(context);
+                },
+                child: const Text(
+                  'Сохранить',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: AppColor.infoCardPreviewColor,
+                  ),
+                ),
+              ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SaveButton extends StatelessWidget {
-  const _SaveButton({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final vm = context.read<PreviewBanquerViewModel>();
-    return ElevatedButton(
-      style: Theme.of(context).elevatedButtonTheme.style,
-      onPressed: () async {
-        await vm.saveBanquetExcelFile(context);
-      },
-      child: const Text(
-        'Сохранить',
-        style: TextStyle(
-          fontSize: 16,
-          color: AppColor.infoCardPreviewColor,
         ),
       ),
     );

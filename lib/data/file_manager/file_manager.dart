@@ -9,7 +9,7 @@ abstract final class FileManager {
 
   static Directory _createDirectoryByDate(BanquetModel banquet) {
     final monthOfBanquet = DateFormat('MMMM').format(banquet.dateStart);
-    final directory = Directory(
+    directory = Directory(
         '/storage/emulated/0/Download/Банкеты/${banquet.dateStart.year}/$monthOfBanquet');
     return directory;
   }
