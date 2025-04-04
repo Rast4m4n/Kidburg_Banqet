@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kidburg_banquet/data/file_manager/file_manager.dart';
+import 'package:kidburg_banquet/data/repository/excel_repository.dart';
+import 'package:kidburg_banquet/presentation/navigation/app_route.dart';
 import 'package:open_filex/open_filex.dart';
 
-class ListBanquetVM with ChangeNotifier {
+class ListBanquetVM {
   final Directory directory = FileManager.directory;
 
   Future<void> openFile(FileSystemEntity file) async {
@@ -13,19 +15,16 @@ class ListBanquetVM with ChangeNotifier {
   }
 
   Future<void> deleteFile(FileSystemEntity file) async {
-    // директория /storage/emulated/0/Download/Банкеты/"Год"/"Месяц"
-    final directoryMonth = file.parent;
-    // директория /storage/emulated/0/Download/Банкеты/"Год"
-    final directoryYear = file.parent.parent;
     await File(file.path).delete();
+  }
 
-    if (directoryMonth.listSync().isEmpty) {
-      await directoryMonth.delete();
+  Future<void> editFile(FileSystemEntity file, BuildContext context) async {
+    final excelRepo = ExcelRepository();
+    final banquet = await excelRepo.editExcelFile(file.path);
+    print(banquet.toString());
+    if (context.mounted) {
+      Navigator.of(context).pushNamed(AppRoute.mainPage, arguments: banquet);
     }
-    if (directoryYear.listSync().isEmpty) {
-      await directoryYear.delete();
-    }
-    notifyListeners();
   }
 
   List<FileSystemEntity> sortedDirectory() {
@@ -36,13 +35,14 @@ class ListBanquetVM with ChangeNotifier {
   }
 
   List<FileSystemEntity> sortedDirectoryMonth(FileSystemEntity directoryYear) {
-    final directoryMonth = Directory(directoryYear.path).listSync()
+    final directoriesMonth = Directory(directoryYear.path).listSync()
       ..sort((a, b) {
         return DateFormat("MMMM")
             .parse(b.path.split('/').last)
             .compareTo(DateFormat("MMMM").parse(a.path.split('/').last));
       });
-    return directoryMonth;
+
+    return directoriesMonth;
   }
 
   List<FileSystemEntity> sortedFilesByDateInName(

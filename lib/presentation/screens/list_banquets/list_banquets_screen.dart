@@ -17,6 +17,7 @@ class _ListBanquetsScreenState extends State<ListBanquetsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final directories = vm.sortedDirectory();
     return Scaffold(
       endDrawer: const CustomDrawer(),
       appBar: AppBar(
@@ -32,25 +33,9 @@ class _ListBanquetsScreenState extends State<ListBanquetsScreen> {
           ],
         ),
       ),
-      body: ChangeNotifierProvider(
+      body: Provider(
         create: (context) => vm,
-        child: const _DirectoryYearWidget(),
-      ),
-    );
-  }
-}
-
-class _DirectoryYearWidget extends StatelessWidget {
-  const _DirectoryYearWidget({
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<ListBanquetVM>(
-      builder: (context, vm, child) {
-        final directories = vm.sortedDirectory();
-        return ListView.builder(
+        child: ListView.builder(
           addAutomaticKeepAlives: false,
           addRepaintBoundaries: false,
           itemCount: directories.length,
@@ -67,8 +52,8 @@ class _DirectoryYearWidget extends StatelessWidget {
               ],
             );
           },
-        );
-      },
+        ),
+      ),
     );
   }
 }
@@ -83,39 +68,31 @@ class _DirectoryMonthWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ListBanquetVM>(
-      builder: (BuildContext context, vm, Widget? child) {
-        if (directoryYear.existsSync()) {
-          final directoriesMonth = vm.sortedDirectoryMonth(directoryYear);
-          return ListView.builder(
-            physics: const NeverScrollableScrollPhysics(),
-            addAutomaticKeepAlives: false,
-            addRepaintBoundaries: false,
-            shrinkWrap: true,
-            itemCount: directoriesMonth.length,
-            itemBuilder: (context, index) {
-              final directoryMonth = directoriesMonth[index];
-              return Column(
-                children: [
-                  ListTile(
-                    title: Center(
-                        child: Text(directoryMonth.path.split('/').last)),
-                    titleTextStyle: Theme.of(context).textTheme.bodyLarge,
-                  ),
-                  _FileWidget(directoryMonth: directoryMonth),
-                ],
-              );
-            },
-          );
-        } else {
-          return const SizedBox();
-        }
+    final vm = context.read<ListBanquetVM>();
+    final directoriesMonth = vm.sortedDirectoryMonth(directoryYear);
+    return ListView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      addAutomaticKeepAlives: false,
+      addRepaintBoundaries: false,
+      shrinkWrap: true,
+      itemCount: directoriesMonth.length,
+      itemBuilder: (context, index) {
+        final directoryMonth = directoriesMonth[index];
+        return Column(
+          children: [
+            ListTile(
+              title: Center(child: Text(directoryMonth.path.split('/').last)),
+              titleTextStyle: Theme.of(context).textTheme.bodyLarge,
+            ),
+            _FileWidget(directoryMonth: directoryMonth),
+          ],
+        );
       },
     );
   }
 }
 
-class _FileWidget extends StatelessWidget {
+class _FileWidget extends StatefulWidget {
   const _FileWidget({
     super.key,
     required this.directoryMonth,
@@ -124,46 +101,53 @@ class _FileWidget extends StatelessWidget {
   final FileSystemEntity directoryMonth;
 
   @override
+  State<_FileWidget> createState() => _FileWidgetState();
+}
+
+class _FileWidgetState extends State<_FileWidget> {
+  @override
   Widget build(BuildContext context) {
-    return Consumer<ListBanquetVM>(
-      builder: (context, vm, child) {
-        final files = vm.sortedFilesByDateInName(directoryMonth);
-        return ListView.builder(
-          physics: const NeverScrollableScrollPhysics(),
-          addAutomaticKeepAlives: false,
-          addRepaintBoundaries: false,
-          shrinkWrap: true,
-          itemCount: files.length,
-          itemBuilder: (context, index) {
-            final file = files[index];
-            return Card(
-              child: ListTile(
-                contentPadding: const EdgeInsets.all(8),
-                title: Text(file.path.split('/').last),
-                trailing: PopupMenuButton(
-                  icon: const Icon(Icons.more_vert),
-                  itemBuilder: (context) {
-                    return [
-                      PopupMenuItem(
-                        child: const Text('Открыть'),
-                        onTap: () async => vm.openFile(file),
-                      ),
-                      const PopupMenuItem(
-                        child: Text('Отправить'),
-                      ),
-                      PopupMenuItem(
-                        child: const Text('Удалить'),
-                        onTap: () async => vm.deleteFile(file),
-                      ),
-                    ];
-                  },
-                ),
-                onTap: () async {
-                  vm.openFile(file);
-                },
-              ),
-            );
-          },
+    final vm = context.read<ListBanquetVM>();
+    final files = vm.sortedFilesByDateInName(widget.directoryMonth);
+    return ListView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      addAutomaticKeepAlives: false,
+      addRepaintBoundaries: false,
+      shrinkWrap: true,
+      itemCount: files.length,
+      itemBuilder: (context, index) {
+        final file = files[index];
+        return Card(
+          child: ListTile(
+            contentPadding: const EdgeInsets.all(8),
+            title: Text(file.path.split('/').last),
+            trailing: PopupMenuButton(
+              icon: const Icon(Icons.more_vert),
+              itemBuilder: (context) {
+                return [
+                  PopupMenuItem(
+                    child: const Text('Редактировать'),
+                    onTap: () async {
+                      vm.editFile(file, context);
+                    },
+                  ),
+                  const PopupMenuItem(
+                    child: Text('Отправить'),
+                  ),
+                  PopupMenuItem(
+                    child: const Text('Удалить'),
+                    onTap: () async {
+                      vm.deleteFile(file);
+                      setState(() {});
+                    },
+                  ),
+                ];
+              },
+            ),
+            onTap: () async {
+              vm.openFile(file);
+            },
+          ),
         );
       },
     );
