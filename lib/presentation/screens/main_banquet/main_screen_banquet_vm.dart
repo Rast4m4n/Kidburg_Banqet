@@ -33,15 +33,6 @@ class MainBanquetViewModel extends ChangeNotifier {
   final TextEditingController remarkController;
   List<dynamic> dropDownMenuEntries = [];
 
-  // Доделать логику для редактирования банкета
-  //
-  // нужно передать аргументы в контроллеры
-  // как по умолчанию
-  void isEditBanquet(BuildContext context) {
-    final BanquetModel? args =
-        ModalRoute.of(context)?.settings.arguments as BanquetModel;
-  }
-
   final _managerModel = SharedPreferencesRepository.instance.loadManagerInfo();
 
   String formatterDate() => dateTimeManager.formatterDate;
