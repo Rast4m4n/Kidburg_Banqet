@@ -15,7 +15,7 @@ class PreOrderFormVm with ChangeNotifier {
 
   final GoogleSheetDataRepository googleSheetRepository;
 
-  late BanqetModel? banquetModel;
+  late final BanqetModel? banquetModel;
 
   final List<TableModel> _tables = [];
   List<TableModel> get tables => _tables;
@@ -66,13 +66,13 @@ class PreOrderFormVm with ChangeNotifier {
       context: context,
       initialTime: banquetModel!.timeStart,
     );
-    if (timePicked == null) return;
     final newServing = TableModel(
-      name: 'Подача на ${_timeFormat(timePicked)}',
+      name: 'Подача на ${_timeFormat(timePicked!)}',
       categories: newCategories,
       timeServing: timePicked,
     );
     _tables.add(newServing);
+    notifyListeners();
   }
 
   // Обновление количества блюд конкретного блюда
