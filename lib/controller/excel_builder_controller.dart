@@ -215,10 +215,13 @@ class ExcelBuilderController {
       topBorder: border,
       bold: true,
     );
+    final timeStart = DateTimeFormatter.convertToHHMMString(banquet.timeStart);
 
-    sheet.cell(CellIndex.indexByString('A$rowIndex')).value = TextCellValue(
-      table.name,
-    );
+    if (table.name == 'СТОЛ ДЛЯ ВЗРОСЛЫХ') {
+      sheet.cell(CellIndex.indexByString('A$rowIndex')).value = TextCellValue(
+        "${table.name} $timeStart",
+      );
+    }
 
     sheet.merge(
       CellIndex.indexByString('A$rowIndex'),

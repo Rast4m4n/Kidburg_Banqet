@@ -111,12 +111,11 @@ class PreOrderFormVm with ChangeNotifier {
       context: context,
       initialTime: banquetModel!.timeStart,
     );
-    if (picked == null) return;
     for (var table in _tables) {
-      if (table == currentTable) {
+      if (table.timeServing == currentTable.timeServing) {
         final indexTable = _tables.indexOf(table);
         _tables[indexTable] = table.copyWith(
-          name: 'Подача на ${_timeFormat(picked)}',
+          name: 'Подача на ${_timeFormat(picked!)}',
           timeServing: picked,
         );
       }
