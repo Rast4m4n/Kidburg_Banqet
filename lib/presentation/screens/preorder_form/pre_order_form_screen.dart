@@ -7,8 +7,8 @@ import 'package:kidburg_banquet/domain/model/table_model.dart';
 import 'package:kidburg_banquet/presentation/screens/preorder_form/pre_order_form_vm.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
-import 'package:kidburg_banquet/presentation/utils/date_time_formatter.dart';
 import 'package:provider/provider.dart';
+import 'package:kidburg_banquet/presentation/widgets/custom_text_field.dart';
 
 class PreOrderFormScreen extends StatefulWidget {
   const PreOrderFormScreen({super.key});
@@ -205,8 +205,6 @@ class _ListDishes extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final vm = context.read<TableViewModel>();
-
     return Column(
       children: categories.map((category) {
         return ExpansionTile(
