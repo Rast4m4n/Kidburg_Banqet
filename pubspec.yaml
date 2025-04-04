@@ -35,7 +35,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/
-    
+    - assets/template_banquet.xlsx
 flutter_intl:
   enabled: true
 

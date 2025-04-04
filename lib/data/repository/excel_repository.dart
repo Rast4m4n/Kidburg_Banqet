@@ -11,7 +11,7 @@ class ExcelRepository {
     Sheet sheet = excel.tables.values.first;
 
     final nameFile = FileManager.getFileName(banquet);
-    String filePath = FileManager.filePath(nameFile, banquet);
+    String filePath = FileManager.filePath(nameFile);
     await FileManager.existsDirectory();
 
     final ExcelBuilderController excelBuilder =
