@@ -148,11 +148,8 @@ class _FileWidget extends StatelessWidget {
                         child: const Text('Открыть'),
                         onTap: () async => vm.openFile(file),
                       ),
-                      PopupMenuItem(
-                        child: const Text('Отправить'),
-                        onTap: () async {
-                          vm.shareFile(file);
-                        },
+                      const PopupMenuItem(
+                        child: Text('Отправить'),
                       ),
                       PopupMenuItem(
                         child: const Text('Удалить'),
