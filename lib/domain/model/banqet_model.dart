@@ -1,6 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
-import 'package:kidburg_banquet/domain/model/manager_model.dart';
 
 import 'package:kidburg_banquet/domain/model/table_model.dart';
 
@@ -12,16 +11,18 @@ class BanqetModel {
     required this.firstTimeServing,
     required this.amountOfChildren,
     required this.amountOfAdult,
-    required this.managerModel,
     this.secondTimeServing,
     this.tables,
+    this.nameOfManager,
+    this.phoneNumberOfManager,
     this.phoneNumberOfClient,
     this.prepayment,
     this.cake,
     this.remark,
   });
 
-  final ManagerModel managerModel;
+  final String? nameOfManager;
+  final String? phoneNumberOfManager;
   final String nameClient;
   final String? phoneNumberOfClient;
   final String place;
@@ -37,9 +38,10 @@ class BanqetModel {
   final String? remark;
 
   BanqetModel copyWith({
-    ManagerModel? managerModel,
+    String? nameOfManager,
+    String? numberOfManager,
     String? nameClient,
-    String? phoneNumberOfClient,
+    String? numberClient,
     String? place,
     DateTime? dateStart,
     TimeOfDay? firstTimeServing,
@@ -52,9 +54,10 @@ class BanqetModel {
     String? remark,
   }) {
     return BanqetModel(
-      managerModel: managerModel ?? this.managerModel,
+      nameOfManager: nameOfManager ?? this.nameOfManager,
+      phoneNumberOfManager: numberOfManager ?? this.phoneNumberOfManager,
       nameClient: nameClient ?? this.nameClient,
-      phoneNumberOfClient: phoneNumberOfClient ?? this.phoneNumberOfClient,
+      phoneNumberOfClient: numberClient ?? this.phoneNumberOfClient,
       place: place ?? this.place,
       dateStart: dateStart ?? this.dateStart,
       firstTimeServing: firstTimeServing ?? this.firstTimeServing,
@@ -70,6 +73,6 @@ class BanqetModel {
 
   @override
   String toString() {
-    return 'BanqetModel(nameOfManager: ${managerModel.name}, numberOfManager: ${managerModel.phoneNumber}, nameClient: $nameClient, numberClient: $phoneNumberOfClient, place: $place, dateStart: $dateStart, firstTimeServing: $firstTimeServing, secondTimeServing: $secondTimeServing, tables: $tables, amountOfChildren: $amountOfChildren, amountOfAdult: $amountOfAdult, prepayment: $prepayment, cake: $cake, remark: $remark)';
+    return 'BanqetModel(nameOfManager: $nameOfManager, numberOfManager: $phoneNumberOfManager, nameClient: $nameClient, numberClient: $phoneNumberOfClient, place: $place, dateStart: $dateStart, firstTimeServing: $firstTimeServing, secondTimeServing: $secondTimeServing, tables: $tables, amountOfChildren: $amountOfChildren, amountOfAdult: $amountOfAdult, prepayment: $prepayment, cake: $cake, remark: $remark)';
   }
 }

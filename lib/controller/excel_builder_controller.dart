@@ -55,8 +55,8 @@ class ExcelBuilderController {
       'Мероприятие': 'День рождение',
       'Заказчик': banquet.nameClient,
       'Телефон': banquet.phoneNumberOfClient ?? '',
-      'Менеджер': banquet.managerModel.name,
-      'Контактный тел.': banquet.managerModel.phoneNumber,
+      'Менеджер': banquet.nameOfManager ?? '',
+      'Контактный тел.': banquet.phoneNumberOfManager ?? '',
       // lastIndexRow это самое последнее добавленное блюдо в файл
       // Он необходим для подсчёта суммы всех блюд
       "Сумма заказа": 'SUM(F11:F$lastIndexRow)-F5',

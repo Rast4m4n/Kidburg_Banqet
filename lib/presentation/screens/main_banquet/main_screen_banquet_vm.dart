@@ -34,8 +34,6 @@ class MainBanquetViewModel extends ChangeNotifier {
   final TextEditingController remarkController;
   List<dynamic> dropDownMenuEntries = [];
 
-  final _managerModel = SharedPreferencesRepository.instance.loadManagerInfo();
-
   String formatterDate() => dateTimeManager.formatterDate;
   String formatterTime() => dateTimeManager.formatterTime;
 
@@ -101,7 +99,8 @@ class MainBanquetViewModel extends ChangeNotifier {
   }
 
   Future<void> initDropDownEntriesPlacesEvent() async {
-    final managerModel = (await _managerModel)!;
+    final managerModel =
+        (await SharedPreferencesRepository.instance.loadManagerInfo())!;
     if (managerModel.establishmentEnum == EstablishmentsEnum.cdm) {
       dropDownMenuEntries = PlaceEventCDMEnum.values;
     } else if (managerModel.establishmentEnum == EstablishmentsEnum.riviera) {
@@ -115,12 +114,14 @@ class MainBanquetViewModel extends ChangeNotifier {
         errorDate == null &&
         errorTime == null &&
         errorPlace == null) {
-      final managerModel = await _managerModel;
+      final managerModel =
+          await SharedPreferencesRepository.instance.loadManagerInfo();
       if (context.mounted) {
         Navigator.of(context).pushNamed(
           AppRoute.preOrderFormPage,
           arguments: BanqetModel(
-            managerModel: managerModel!,
+            nameOfManager: managerModel?.name,
+            phoneNumberOfManager: managerModel?.phoneNumber,
             nameClient: nameController.text,
             phoneNumberOfClient: phoneNumberOfClientController.text,
             prepayment: int.tryParse(prepaymentController.text),

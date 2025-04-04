@@ -32,14 +32,12 @@ class PreOrderFormVm with ChangeNotifier {
   Future<List<TableModel>> fetchDataFromGoogleSheet() async {
     _originalCategories =
         await googleSheetRepository.fetchCategoriesAndDishes();
-    if (_tables.isEmpty) {
-      _tables.add(
-        TableModel(
-          name: 'Подача на',
-          categories: _cloneCategories(_originalCategories),
-        ),
-      );
-    }
+    _tables.add(
+      TableModel(
+        name: 'Подача на',
+        categories: _cloneCategories(_originalCategories),
+      ),
+    );
     return _tables;
   }
 
