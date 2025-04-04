@@ -1,12 +1,10 @@
 import 'package:kidburg_banquet/domain/model/manager_model.dart';
-import 'package:kidburg_banquet/domain/model/statistic_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 abstract final class StorageKey {
   static const manager = 'manager';
   static const cacheDishes = 'cacheDishes';
   static const cacheCurrentDateTime = 'cacheCurrentTime';
-  static const statistic = 'statistic';
 }
 
 class SharedPreferencesRepository {
@@ -28,35 +26,6 @@ class SharedPreferencesRepository {
       return null;
     } else {
       return ManagerModel.fromJson(json);
-    }
-  }
-
-  Future<void> saveStatisticBanquets(
-    StatisticModel statistic,
-    String keyDateStorage,
-  ) async {
-    final json = await loadStatistic(keyDateStorage);
-    if (json != null) {
-      final stat = json.copyWith(
-        sum: json.sum + statistic.sum,
-        guests: json.guests + statistic.guests,
-        numberOfOrder: json.numberOfOrder + statistic.numberOfOrder,
-      );
-      (await pref)
-          .setString(StorageKey.statistic + keyDateStorage, stat.toJson());
-    } else {
-      (await pref)
-          .setString(StorageKey.statistic + keyDateStorage, statistic.toJson());
-    }
-  }
-
-  Future<StatisticModel?> loadStatistic(String keyDateStorage) async {
-    // (await pref).remove(StorageKey.statistic + keyDateStorage);
-    final json = (await pref).getString(StorageKey.statistic + keyDateStorage);
-    if (json == null) {
-      return null;
-    } else {
-      return StatisticModel.fromJson(json);
     }
   }
 

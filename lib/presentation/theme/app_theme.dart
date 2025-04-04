@@ -31,7 +31,7 @@ class AppTheme {
     ),
     filledButtonTheme: FilledButtonThemeData(
       style: ButtonStyle(
-        shape: WidgetStateProperty.resolveWith(
+        shape: MaterialStateProperty.resolveWith(
           (states) => const RoundedRectangleBorder(
             borderRadius: BorderRadius.all(
               Radius.circular(8),
@@ -42,14 +42,14 @@ class AppTheme {
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ButtonStyle(
-        backgroundColor: WidgetStateProperty.all(
+        backgroundColor: MaterialStateProperty.all(
           AppColor.cardPreviewColor,
         ),
-        padding: const WidgetStatePropertyAll(
+        padding: const MaterialStatePropertyAll(
           EdgeInsets.all(AppPadding.extra),
         ),
         splashFactory: InkRipple.splashFactory,
-        shape: WidgetStateProperty.all(
+        shape: MaterialStateProperty.all(
           RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),

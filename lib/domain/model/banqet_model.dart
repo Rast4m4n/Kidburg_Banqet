@@ -18,7 +18,6 @@ class BanquetModel {
     this.prepayment,
     this.cake,
     this.remark,
-    this.sumOfBanquet,
   });
 
   final ManagerModel managerModel;
@@ -34,7 +33,6 @@ class BanquetModel {
   final String? cake;
   // Примечание к банкету
   final String? remark;
-  final int? sumOfBanquet;
 
   BanquetModel copyWith({
     ManagerModel? managerModel,
@@ -49,7 +47,6 @@ class BanquetModel {
     int? prepayment,
     String? cake,
     String? remark,
-    int? sumOfBanquet,
   }) {
     return BanquetModel(
       managerModel: managerModel ?? this.managerModel,
@@ -64,7 +61,6 @@ class BanquetModel {
       prepayment: prepayment ?? this.prepayment,
       cake: cake ?? this.cake,
       remark: remark ?? this.remark,
-      sumOfBanquet: sumOfBanquet ?? this.sumOfBanquet,
     );
   }
 

@@ -18,7 +18,7 @@ class ListBanquetVM with ChangeNotifier {
     await Share.shareXFiles(
       [XFile(file.path)],
       text:
-          'Это ваш бланк предзаказа по меню, проверьте, всё ли верно по времени подачи и позициям',
+          'Это ваш бланк предзаказа по меню, проверьте, всё ли верно по времени подачи и позициям из меню',
     );
   }
 
@@ -28,13 +28,13 @@ class ListBanquetVM with ChangeNotifier {
     // директория /storage/emulated/0/Download/Банкеты/"Год"
     final directoryYear = file.parent.parent;
     await File(file.path).delete();
+
     if (directoryMonth.listSync().isEmpty) {
       await directoryMonth.delete();
     }
     if (directoryYear.listSync().isEmpty) {
       await directoryYear.delete();
     }
-
     notifyListeners();
   }
 
