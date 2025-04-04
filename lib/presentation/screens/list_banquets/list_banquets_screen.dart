@@ -153,11 +153,7 @@ class _FileWidget extends StatelessWidget {
                       ),
                       PopupMenuItem(
                         child: const Text('Удалить'),
-                        onTap: () async => _dialogConfirmDeletFile(
-                          context,
-                          file,
-                          vm,
-                        ),
+                        onTap: () async => vm.deleteFile(file),
                       ),
                     ];
                   },
@@ -168,39 +164,6 @@ class _FileWidget extends StatelessWidget {
               ),
             );
           },
-        );
-      },
-    );
-  }
-
-  Future<void> _dialogConfirmDeletFile(
-      BuildContext context, FileSystemEntity file, ListBanquetVM vm) {
-    return showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Удалить файл'),
-          actions: <Widget>[
-            TextButton(
-              style: TextButton.styleFrom(
-                textStyle: Theme.of(context).textTheme.labelLarge,
-              ),
-              child: const Text('Отмена'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              style: TextButton.styleFrom(
-                textStyle: Theme.of(context).textTheme.labelLarge,
-              ),
-              child: const Text('Удалить'),
-              onPressed: () async {
-                await vm.deleteFile(file);
-                if (context.mounted) Navigator.of(context).pop();
-              },
-            ),
-          ],
         );
       },
     );
