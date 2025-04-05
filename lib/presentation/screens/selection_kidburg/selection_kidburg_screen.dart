@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kidburg_banquet/domain/model/establishments_enum.dart';
+import 'package:kidburg_banquet/domain/model/language_enum.dart';
 import 'package:kidburg_banquet/presentation/screens/selection_kidburg/selection_kidburg_vm.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
@@ -34,19 +35,18 @@ class SelectionKidburScreen extends StatelessWidget {
               child: ChangeNotifierProvider<SelectionKidburgViewModel>(
                 create: (context) => vm,
                 child: Column(
+                  spacing: AppPadding.low,
                   children: [
                     CustomTextField(
                       controller: vm.nameController,
                       label: 'Имя менеджера',
                     ),
-                    const SizedBox(height: AppPadding.low),
                     CustomTextField(
                       controller: vm.phoneNumberOfManagerController,
                       label: 'Номер менеджера',
                     ),
-                    const SizedBox(height: AppPadding.low),
                     const _EstablishmentsDropDownMenu(),
-                    const SizedBox(height: AppPadding.low),
+                    const _LanguageDropDownMenu(),
                     SizedBox(
                       width: MediaQuery.of(context).size.width,
                       child: ElevatedButton(
@@ -99,6 +99,41 @@ class _EstablishmentsDropDownMenu extends StatelessWidget {
           EstablishmentsEnum.values.map<DropdownMenuEntry<EstablishmentsEnum>>(
         (EstablishmentsEnum place) {
           return DropdownMenuEntry<EstablishmentsEnum>(
+            value: place,
+            label: place.name,
+          );
+        },
+      ).toList(),
+    );
+  }
+}
+
+class _LanguageDropDownMenu extends StatelessWidget {
+  const _LanguageDropDownMenu({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final vm = context.watch<SelectionKidburgViewModel>();
+    return DropdownMenu(
+      expandedInsets: const EdgeInsets.all(0),
+      inputDecorationTheme: const InputDecorationTheme(
+        fillColor: AppColor.textFieldColor,
+        filled: true,
+        isCollapsed: true,
+        contentPadding: EdgeInsets.all(AppPadding.low),
+        constraints: BoxConstraints(maxHeight: 60),
+      ),
+      label: Text(
+        'Язык приложения',
+        style: Theme.of(context).inputDecorationTheme.labelStyle,
+      ),
+      controller: vm.languageController,
+      dropdownMenuEntries:
+          LanguageEnum.values.map<DropdownMenuEntry<LanguageEnum>>(
+        (LanguageEnum place) {
+          return DropdownMenuEntry<LanguageEnum>(
             value: place,
             label: place.name,
           );
