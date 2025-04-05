@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:kidburg_banquet/data/repository/shared_preferences_repository.dart';
 import 'package:kidburg_banquet/presentation/screens/list_banquets/list_banquets_screen.dart';
 import 'package:kidburg_banquet/presentation/screens/main_banquet/main_banquet_screen.dart';
 import 'package:kidburg_banquet/presentation/screens/preorder_form/pre_order_form_screen.dart';
@@ -19,17 +18,13 @@ abstract final class AppRoute {
 class AppNavigation {
   String _initialRoute = AppRoute.selectionKidburgPage;
 
-  void isAuth() async {
-    final managerModel =
-        await SharedPreferencesRepository.instance.loadManagerInfo();
-    if (managerModel == null) {
-      _initialRoute;
+  String isAuth(bool isAuth) {
+    if (isAuth) {
+      return _initialRoute = AppRoute.mainPage;
     } else {
-      _initialRoute = AppRoute.mainPage;
+      return _initialRoute;
     }
   }
-
-  String get initialRoute => _initialRoute;
 
   Map<String, WidgetBuilder> routes(context) => {
         AppRoute.selectionKidburgPage: (context) => SelectionKidburScreen(),

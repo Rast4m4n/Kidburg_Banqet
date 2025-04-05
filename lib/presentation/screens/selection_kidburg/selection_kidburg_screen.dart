@@ -23,7 +23,7 @@ class SelectionKidburScreen extends StatelessWidget {
         ),
       ),
       body: FutureBuilder(
-        future: vm.loadCurrentManager(),
+        future: vm.loadCurrentManager(context),
         builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(

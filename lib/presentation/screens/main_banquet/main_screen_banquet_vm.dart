@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:kidburg_banquet/data/repository/shared_preferences_repository.dart';
+import 'package:kidburg_banquet/core/di/di_scope_provider.dart';
 import 'package:kidburg_banquet/domain/model/banqet_model.dart';
 import 'package:kidburg_banquet/domain/model/establishments_enum.dart';
 import 'package:kidburg_banquet/domain/model/place_event_enum.dart';
@@ -32,8 +32,6 @@ class MainBanquetViewModel extends ChangeNotifier {
   final TextEditingController cakeController;
   final TextEditingController remarkController;
   List<dynamic> dropDownMenuEntries = [];
-
-  final _managerModel = SharedPreferencesRepository.instance.loadManagerInfo();
 
   String formatterDate() => dateTimeManager.formatterDate;
   String formatterTime() => dateTimeManager.formatterTime;
@@ -100,8 +98,9 @@ class MainBanquetViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> initDropDownEntriesPlacesEvent() async {
-    final managerModel = (await _managerModel)!;
+  Future<void> initDropDownEntriesPlacesEvent(BuildContext context) async {
+    final managerModel =
+        (await DiScopeProvider.of(context)!.storage.loadManagerInfo())!;
     if (managerModel.establishmentEnum == EstablishmentsEnum.cdm) {
       dropDownMenuEntries = PlaceEventCDMEnum.values;
     } else if (managerModel.establishmentEnum == EstablishmentsEnum.riviera) {
@@ -115,7 +114,8 @@ class MainBanquetViewModel extends ChangeNotifier {
         errorDate == null &&
         errorTime == null &&
         errorPlace == null) {
-      final managerModel = await _managerModel;
+      final managerModel =
+          await DiScopeProvider.of(context)!.storage.loadManagerInfo();
       if (context.mounted) {
         Navigator.of(context).pushNamed(
           AppRoute.preOrderFormPage,

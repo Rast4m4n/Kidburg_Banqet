@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:kidburg_banquet/data/repository/shared_preferences_repository.dart';
+import 'package:kidburg_banquet/core/di/di_scope_provider.dart';
 import 'package:kidburg_banquet/domain/model/establishments_enum.dart';
-import 'package:kidburg_banquet/domain/model/language_enum.dart';
 import 'package:kidburg_banquet/domain/model/manager_model.dart';
 import 'package:kidburg_banquet/presentation/navigation/app_route.dart';
 
 class SelectionKidburgViewModel with ChangeNotifier {
   SelectionKidburgViewModel();
-
   final TextEditingController nameController = TextEditingController();
   final TextEditingController establishmentController = TextEditingController();
   final TextEditingController phoneNumberOfManagerController =
@@ -19,10 +17,10 @@ class SelectionKidburgViewModel with ChangeNotifier {
       name: nameController.text,
       phoneNumber: phoneNumberOfManagerController.text,
       establishmentEnum: selectEstablisment(),
-      languageEnum: selectLanguage(context),
+      locale: selectLanguage(context),
     );
 
-    await SharedPreferencesRepository.instance.saveManagerInfo(managerModel);
+    await DiScopeProvider.of(context)!.storage.saveManagerInfo(managerModel);
     try {
       if (context.mounted) {
         Navigator.of(context).pushReplacementNamed(
@@ -54,30 +52,32 @@ class SelectionKidburgViewModel with ChangeNotifier {
     }
   }
 
-  LanguageEnum selectLanguage(BuildContext context) {
+  Locale selectLanguage(BuildContext context) {
     final locale = Localizations.localeOf(context);
     switch (languageController.text) {
       case 'Руссикй':
         languageController.text = 'Русский';
-        return LanguageEnum.russian;
+        return const Locale('ru');
       case 'Английский':
         languageController.text = 'Английский';
-        return LanguageEnum.english;
+        return const Locale('en');
       default:
         return locale.toLanguageTag() == "ru"
-            ? LanguageEnum.russian
-            : LanguageEnum.english;
+            ? const Locale('ru')
+            : const Locale('en');
     }
   }
 
-  Future<void> loadCurrentManager() async {
-    final managerModel =
-        await SharedPreferencesRepository.instance.loadManagerInfo();
+  Future<void> loadCurrentManager(BuildContext context) async {
+    final di = DiScopeProvider.of(context)!.storage;
+    final managerModel = await di.loadManagerInfo();
     if (managerModel != null) {
       nameController.text = managerModel.name;
       establishmentController.text = managerModel.establishmentEnum.name;
       phoneNumberOfManagerController.text = managerModel.phoneNumber;
-      languageController.text = managerModel.languageEnum.name;
+      languageController.text = managerModel.locale.toLanguageTag() == "ru"
+          ? 'Русский'
+          : 'Английский';
     }
   }
 }

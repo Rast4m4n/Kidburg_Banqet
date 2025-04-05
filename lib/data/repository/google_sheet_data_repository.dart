@@ -1,8 +1,8 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
-import 'package:kidburg_banquet/data/repository/shared_preferences_repository.dart';
+import 'package:kidburg_banquet/core/di/di_scope_provider.dart';
 import 'package:kidburg_banquet/domain/model/category_model.dart';
 import 'package:kidburg_banquet/domain/model/dish_model.dart';
 import 'package:uuid/uuid.dart';
@@ -40,9 +40,10 @@ class GoogleSheetDataRepository {
   GoogleSheetDataRepository({required this.apiRepository});
   final ApiRepository apiRepository;
 
-  Future<List<CategoryModel>> fetchCategoriesAndDishes() async {
+  Future<List<CategoryModel>> fetchCategoriesAndDishes(
+      BuildContext context) async {
     final cacheData =
-        await SharedPreferencesRepository.instance.loadCacheCategoryModel();
+        await DiScopeProvider.of(context)!.storage.loadCacheCategoryModel();
     if (cacheData != null) {
       try {
         return _mapDataToCategories(jsonDecode(cacheData));
@@ -51,10 +52,12 @@ class GoogleSheetDataRepository {
       }
     } else {
       final data = await apiRepository.get();
-      await SharedPreferencesRepository.instance.cacheHTTPResponseDishesData(
-        data,
-        const Duration(hours: 24),
-      );
+      if (context.mounted) {
+        await DiScopeProvider.of(context)!.storage.cacheHTTPResponseDishesData(
+              data,
+              const Duration(hours: 24),
+            );
+      }
       return _mapDataToCategories(jsonDecode(data));
     }
   }

@@ -1,19 +1,19 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:kidburg_banquet/domain/model/establishments_enum.dart';
-import 'package:kidburg_banquet/domain/model/language_enum.dart';
 
 part 'manager_model.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(converters: [LocaleConverter()])
 class ManagerModel {
   ManagerModel({
     required this.name,
     required this.phoneNumber,
     required this.establishmentEnum,
-    required this.languageEnum,
+    required this.locale,
   });
 
   final String name;
@@ -23,19 +23,19 @@ class ManagerModel {
   /// Файл establishments_enum, где есть перечисления заведений
   /// Файл place_event_enum, где перечисляются места проведения мероприятия
   final EstablishmentsEnum establishmentEnum;
-  final LanguageEnum languageEnum;
+  final Locale locale;
 
   ManagerModel copyWith({
     String? name,
     String? phoneNumber,
     EstablishmentsEnum? establishmentEnum,
-    LanguageEnum? languageEnum,
+    Locale? locale,
   }) {
     return ManagerModel(
       name: name ?? this.name,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       establishmentEnum: establishmentEnum ?? this.establishmentEnum,
-      languageEnum: languageEnum ?? this.languageEnum,
+      locale: locale ?? this.locale,
     );
   }
 
@@ -51,5 +51,20 @@ class ManagerModel {
 
   @override
   String toString() =>
-      'ManagerModel(name: $name, phoneNumber: $phoneNumber, establishmentEnum: $establishmentEnum)';
+      'ManagerModel(name: $name, phoneNumber: $phoneNumber, establishmentEnum: $establishmentEnum) language: ${locale.toLanguageTag()}';
+}
+
+class LocaleConverter extends JsonConverter<Locale, String> {
+  const LocaleConverter();
+  @override
+  fromJson(stringJson) {
+    return Locale.fromSubtags(
+      languageCode: (json.decode(stringJson) as Map<String, dynamic>)["locale"],
+    );
+  }
+
+  @override
+  toJson(Locale locale) {
+    return json.encode({"locale": locale.toLanguageTag()});
+  }
 }

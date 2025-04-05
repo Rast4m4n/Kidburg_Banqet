@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:kidburg_banquet/core/di/di_scope_provider.dart';
 import 'package:kidburg_banquet/data/file_manager/file_manager.dart';
 import 'package:kidburg_banquet/data/repository/excel_repository.dart';
-import 'package:kidburg_banquet/data/repository/shared_preferences_repository.dart';
 import 'package:kidburg_banquet/domain/model/banqet_model.dart';
 import 'package:kidburg_banquet/domain/model/dish_model.dart';
 import 'package:kidburg_banquet/domain/model/statistic_model.dart';
@@ -25,24 +25,24 @@ class PreviewBanquerViewModel with ChangeNotifier {
   Future<void> saveBanquetExcelFile(BuildContext context) async {
     final repo = ExcelRepository();
     await repo.writeNewExcelFile(banqetModel);
-    await saveStatisticBanquet();
+    if (context.mounted) await saveStatisticBanquet(context);
     if (context.mounted) _showSnackBar(context);
     isSavedBanquet = true;
     notifyListeners();
   }
 
-  Future<void> saveStatisticBanquet() async {
+  Future<void> saveStatisticBanquet(BuildContext context) async {
     final guests = banqetModel.amountOfAdult! + banqetModel.amountOfChildren!;
     final keyDateStorage =
         "${banqetModel.dateStart.year}_year_${banqetModel.dateStart.month}_month";
-    SharedPreferencesRepository.instance.saveStatisticBanquets(
-      StatisticModel(
-        sum: banqetModel.sumOfBanquet!,
-        guests: guests,
-        numberOfOrder: 1,
-      ),
-      keyDateStorage,
-    );
+    DiScopeProvider.of(context)!.storage.saveStatisticBanquets(
+          StatisticModel(
+            sum: banqetModel.sumOfBanquet!,
+            guests: guests,
+            numberOfOrder: 1,
+          ),
+          keyDateStorage,
+        );
   }
 
   void _showSnackBar(BuildContext context) {

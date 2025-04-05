@@ -11,7 +11,7 @@ ManagerModel _$ManagerModelFromJson(Map<String, dynamic> json) => ManagerModel(
       phoneNumber: json['phoneNumber'] as String,
       establishmentEnum:
           $enumDecode(_$EstablishmentsEnumEnumMap, json['establishmentEnum']),
-      languageEnum: $enumDecode(_$LanguageEnumEnumMap, json['languageEnum']),
+      locale: const LocaleConverter().fromJson(json['locale'] as String),
     );
 
 Map<String, dynamic> _$ManagerModelToJson(ManagerModel instance) =>
@@ -20,15 +20,10 @@ Map<String, dynamic> _$ManagerModelToJson(ManagerModel instance) =>
       'phoneNumber': instance.phoneNumber,
       'establishmentEnum':
           _$EstablishmentsEnumEnumMap[instance.establishmentEnum]!,
-      'languageEnum': _$LanguageEnumEnumMap[instance.languageEnum]!,
+      'locale': const LocaleConverter().toJson(instance.locale),
     };
 
 const _$EstablishmentsEnumEnumMap = {
   EstablishmentsEnum.riviera: 'riviera',
   EstablishmentsEnum.cdm: 'cdm',
-};
-
-const _$LanguageEnumEnumMap = {
-  LanguageEnum.english: 'english',
-  LanguageEnum.russian: 'russian',
 };

@@ -55,7 +55,7 @@ class _MainBanquetScreenState extends State<MainBanquetScreen> {
       body: ChangeNotifierProvider(
         create: (context) => vm,
         child: FutureBuilder(
-          future: vm.initDropDownEntriesPlacesEvent(),
+          future: vm.initDropDownEntriesPlacesEvent(context),
           builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(

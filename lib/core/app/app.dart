@@ -7,8 +7,9 @@ import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
 class App extends StatefulWidget {
   const App({
     super.key,
+    required this.isAuth,
   });
-
+  final bool isAuth;
   @override
   State<App> createState() => _AppState();
 }
@@ -30,7 +31,7 @@ class _AppState extends State<App> {
         debugShowCheckedModeBanner: false,
         theme: appTheme.appThemeLight,
         routes: appNavigation.routes(context),
-        initialRoute: appNavigation.initialRoute,
+        initialRoute: appNavigation.isAuth(widget.isAuth),
       ),
     );
   }

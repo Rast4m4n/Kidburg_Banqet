@@ -16,6 +16,7 @@ abstract class IAppBuilder {
 
 class AppBuilder implements IAppBuilder {
   late final IDiScope diScope;
+  late final bool isAuth;
   @override
   Future<Widget> build() async {
     await init();
@@ -26,7 +27,7 @@ class AppBuilder implements IAppBuilder {
   Widget getApp() {
     return DiScopeProvider(
       diScope: diScope,
-      child: const App(),
+      child: App(isAuth: isAuth),
     );
   }
 
@@ -35,5 +36,6 @@ class AppBuilder implements IAppBuilder {
     WidgetsFlutterBinding.ensureInitialized();
     diScope = DiScope();
     await diScope.init();
+    isAuth = await diScope.storage.loadManagerInfo() != null ? true : false;
   }
 }

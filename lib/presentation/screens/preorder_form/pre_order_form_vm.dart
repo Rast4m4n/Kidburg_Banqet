@@ -24,17 +24,18 @@ class PreOrderFormVm with ChangeNotifier {
 
   List<CategoryModel> _originalCategories = [];
 
-  Future<List<TableModel>> getTableData() async {
+  Future<List<TableModel>> getTableData(BuildContext context) async {
     if (_tables.isEmpty) {
-      return await _fetchDataFromGoogleSheet();
+      return await _fetchDataFromGoogleSheet(context);
     } else {
       return _tables;
     }
   }
 
-  Future<List<TableModel>> _fetchDataFromGoogleSheet() async {
+  Future<List<TableModel>> _fetchDataFromGoogleSheet(
+      BuildContext context) async {
     _originalCategories =
-        await googleSheetRepository.fetchCategoriesAndDishes();
+        await googleSheetRepository.fetchCategoriesAndDishes(context);
     String formatterTime = _timeFormat(banquetModel!.timeStart);
     _tables.add(
       TableModel(

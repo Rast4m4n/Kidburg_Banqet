@@ -6,9 +6,12 @@ class DiScope implements IDiScope {
   @override
   Future<void> init() async {
     _dataStorage = SharedPreferencesStorage();
+    // _locale = (await _dataStorage.loadManagerInfo()).languageEnum;
   }
 
   @override
   IDataStorage get storage => _dataStorage;
   late final IDataStorage _dataStorage;
+  // Locale get locale => _locale;
+  // late final Locale _locale;
 }

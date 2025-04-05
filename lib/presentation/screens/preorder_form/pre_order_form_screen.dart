@@ -60,7 +60,7 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
           ),
         ),
         body: FutureBuilder<List<TableModel>>(
-          future: vm.getTableData(),
+          future: vm.getTableData(context),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(

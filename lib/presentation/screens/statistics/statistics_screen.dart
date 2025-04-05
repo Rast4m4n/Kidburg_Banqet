@@ -32,7 +32,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         ),
       ),
       body: FutureBuilder<StatisticModel?>(
-        future: vm.loadStatisticFromSharedPref(),
+        future: vm.loadStatisticFromSharedPref(context),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
