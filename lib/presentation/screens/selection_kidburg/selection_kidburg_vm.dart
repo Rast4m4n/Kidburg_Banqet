@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kidburg_banquet/data/repository/shared_preferences_repository.dart';
 import 'package:kidburg_banquet/domain/model/establishments_enum.dart';
+import 'package:kidburg_banquet/domain/model/language_enum.dart';
 import 'package:kidburg_banquet/domain/model/manager_model.dart';
 import 'package:kidburg_banquet/presentation/navigation/app_route.dart';
 
@@ -11,12 +12,14 @@ class SelectionKidburgViewModel with ChangeNotifier {
   final TextEditingController establishmentController = TextEditingController();
   final TextEditingController phoneNumberOfManagerController =
       TextEditingController();
+  final TextEditingController languageController = TextEditingController();
 
   void enterToHeaderFormScreen(BuildContext context) async {
     final managerModel = ManagerModel(
       name: nameController.text,
       phoneNumber: phoneNumberOfManagerController.text,
       establishmentEnum: selectEstablisment(),
+      languageEnum: selectLanguage(context),
     );
 
     await SharedPreferencesRepository.instance.saveManagerInfo(managerModel);
@@ -51,6 +54,22 @@ class SelectionKidburgViewModel with ChangeNotifier {
     }
   }
 
+  LanguageEnum selectLanguage(BuildContext context) {
+    final locale = Localizations.localeOf(context);
+    switch (languageController.text) {
+      case 'Руссикй':
+        languageController.text = 'Русский';
+        return LanguageEnum.russian;
+      case 'Английский':
+        languageController.text = 'Английский';
+        return LanguageEnum.english;
+      default:
+        return locale.toLanguageTag() == "ru"
+            ? LanguageEnum.russian
+            : LanguageEnum.english;
+    }
+  }
+
   Future<void> loadCurrentManager() async {
     final managerModel =
         await SharedPreferencesRepository.instance.loadManagerInfo();
@@ -58,6 +77,7 @@ class SelectionKidburgViewModel with ChangeNotifier {
       nameController.text = managerModel.name;
       establishmentController.text = managerModel.establishmentEnum.name;
       phoneNumberOfManagerController.text = managerModel.phoneNumber;
+      languageController.text = managerModel.languageEnum.name;
     }
   }
 }

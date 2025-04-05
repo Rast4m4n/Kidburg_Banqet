@@ -2,8 +2,8 @@
 import 'dart:convert';
 
 import 'package:json_annotation/json_annotation.dart';
-
 import 'package:kidburg_banquet/domain/model/establishments_enum.dart';
+import 'package:kidburg_banquet/domain/model/language_enum.dart';
 
 part 'manager_model.g.dart';
 
@@ -13,6 +13,7 @@ class ManagerModel {
     required this.name,
     required this.phoneNumber,
     required this.establishmentEnum,
+    required this.languageEnum,
   });
 
   final String name;
@@ -22,16 +23,19 @@ class ManagerModel {
   /// Файл establishments_enum, где есть перечисления заведений
   /// Файл place_event_enum, где перечисляются места проведения мероприятия
   final EstablishmentsEnum establishmentEnum;
+  final LanguageEnum languageEnum;
 
   ManagerModel copyWith({
     String? name,
     String? phoneNumber,
-    final EstablishmentsEnum? establishmentEnum,
+    EstablishmentsEnum? establishmentEnum,
+    LanguageEnum? languageEnum,
   }) {
     return ManagerModel(
       name: name ?? this.name,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       establishmentEnum: establishmentEnum ?? this.establishmentEnum,
+      languageEnum: languageEnum ?? this.languageEnum,
     );
   }
 

@@ -10,7 +10,7 @@ CategoryModel _$CategoryModelFromJson(Map<String, dynamic> json) =>
     CategoryModel(
       name: json['name'] as String,
       dishes: (json['dishes'] as List<dynamic>)
-          .map((e) => DishModel.fromJson(e))
+          .map((e) => DishModel.fromJson(e as String))
           .toList(),
     );
 
