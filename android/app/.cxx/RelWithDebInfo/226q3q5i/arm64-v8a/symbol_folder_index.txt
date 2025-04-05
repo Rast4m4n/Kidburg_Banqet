@@ -1,1 +1,0 @@
-/Users/kirillmotovilin/Flutter projects/Kidburg_Banqet/build/app/intermediates/cxx/RelWithDebInfo/226q3q5i/obj/arm64-v8a
