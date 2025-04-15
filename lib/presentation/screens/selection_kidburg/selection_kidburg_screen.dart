@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kidburg_banquet/domain/model/establishments_enum.dart';
 import 'package:kidburg_banquet/domain/model/language_enum.dart';
+import 'package:kidburg_banquet/generated/l10n.dart';
 import 'package:kidburg_banquet/presentation/screens/selection_kidburg/selection_kidburg_vm.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
@@ -16,7 +17,7 @@ class SelectionKidburScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'КидБург банкеты',
+          S.of(context).kidburgBanquets,
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -39,11 +40,11 @@ class SelectionKidburScreen extends StatelessWidget {
                   children: [
                     CustomTextField(
                       controller: vm.nameController,
-                      label: 'Имя менеджера',
+                      label: S.of(context).managerName,
                     ),
                     CustomTextField(
                       controller: vm.phoneNumberOfManagerController,
-                      label: 'Номер менеджера',
+                      label: S.of(context).managerPhoneNumber,
                     ),
                     const _EstablishmentsDropDownMenu(),
                     const _LanguageDropDownMenu(),
@@ -51,11 +52,10 @@ class SelectionKidburScreen extends StatelessWidget {
                       width: MediaQuery.of(context).size.width,
                       child: ElevatedButton(
                         style: Theme.of(context).elevatedButtonTheme.style,
-                        onPressed: () async =>
-                            vm.enterToHeaderFormScreen(context),
-                        child: const Text(
-                          'Далее',
-                          style: TextStyle(
+                        onPressed: () async => vm.enterToMainScreen(context),
+                        child: Text(
+                          S.of(context).next,
+                          style: const TextStyle(
                             fontSize: 16,
                             color: AppColor.infoCardPreviewColor,
                           ),
@@ -74,9 +74,7 @@ class SelectionKidburScreen extends StatelessWidget {
 }
 
 class _EstablishmentsDropDownMenu extends StatelessWidget {
-  const _EstablishmentsDropDownMenu({
-    super.key,
-  });
+  const _EstablishmentsDropDownMenu();
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +89,7 @@ class _EstablishmentsDropDownMenu extends StatelessWidget {
         constraints: BoxConstraints(maxHeight: 60),
       ),
       label: Text(
-        'Точка кидбурга',
+        S.of(context).establishment,
         style: Theme.of(context).inputDecorationTheme.labelStyle,
       ),
       controller: vm.establishmentController,
@@ -100,7 +98,7 @@ class _EstablishmentsDropDownMenu extends StatelessWidget {
         (EstablishmentsEnum place) {
           return DropdownMenuEntry<EstablishmentsEnum>(
             value: place,
-            label: place.name,
+            label: place.localizedName,
           );
         },
       ).toList(),
@@ -109,9 +107,7 @@ class _EstablishmentsDropDownMenu extends StatelessWidget {
 }
 
 class _LanguageDropDownMenu extends StatelessWidget {
-  const _LanguageDropDownMenu({
-    super.key,
-  });
+  const _LanguageDropDownMenu();
 
   @override
   Widget build(BuildContext context) {
@@ -126,19 +122,62 @@ class _LanguageDropDownMenu extends StatelessWidget {
         constraints: BoxConstraints(maxHeight: 60),
       ),
       label: Text(
-        'Язык приложения',
+        S.of(context).language,
         style: Theme.of(context).inputDecorationTheme.labelStyle,
       ),
       controller: vm.languageController,
+      onSelected: vm.languageController.text == ''
+          ? null
+          : (_) => _dialogConfirmDeletFile(context, vm),
       dropdownMenuEntries:
           LanguageEnum.values.map<DropdownMenuEntry<LanguageEnum>>(
         (LanguageEnum place) {
           return DropdownMenuEntry<LanguageEnum>(
             value: place,
-            label: place.name,
+            label: place.localizedName,
           );
         },
       ).toList(),
+    );
+  }
+
+  Future<void> _dialogConfirmDeletFile(
+      BuildContext context, SelectionKidburgViewModel vm) {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(S.of(context).changeLanguage),
+          content: Text(
+            S
+                .of(context)
+                .whenChangingTheLanguageTheListOfAllSavedOrdersWillBeClearedAndTheOrderDirectoryInTheFileSystemWillBeDeleted,
+          ),
+          actions: <Widget>[
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: Text(S.of(context).cancel),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              style: TextButton.styleFrom(
+                textStyle: Theme.of(context).textTheme.labelLarge,
+              ),
+              child: Text(S.of(context).changeLang),
+              onPressed: () async {
+                await vm.confirmChangeLanguage();
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                }
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }

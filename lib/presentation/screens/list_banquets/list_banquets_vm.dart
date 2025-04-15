@@ -13,19 +13,26 @@ class ListBanquetVM with ChangeNotifier {
     await OpenFilex.open(file.path);
   }
 
-  Future<void> shareFile(FileSystemEntity file) async {
+  Future<void> shareFile(FileSystemEntity file, locale) async {
     // Текст отсылается только в телеграм, но не в востапп
+    late final String text;
+    if (locale.languageCode == 'ru') {
+      text =
+          'Это ваш бланк предзаказа по меню, проверьте, всё ли верно по времени подачи и позициям';
+    } else {
+      text =
+          'This is your menu pre-order form, please check that everything is correct regarding serving time and items';
+    }
     await Share.shareXFiles(
       [XFile(file.path)],
-      text:
-          'Это ваш бланк предзаказа по меню, проверьте, всё ли верно по времени подачи и позициям',
+      text: text,
     );
   }
 
   Future<void> deleteFile(FileSystemEntity file) async {
-    // директория /storage/emulated/0/Download/Банкеты/"Год"/"Месяц"
+    // директория /storage/emulated/0/Download/Banquets/"Год"/"Месяц"
     final directoryMonth = file.parent;
-    // директория /storage/emulated/0/Download/Банкеты/"Год"
+    // директория /storage/emulated/0/Download/Banquets/"Год"
     final directoryYear = file.parent.parent;
     await File(file.path).delete();
     if (directoryMonth.listSync().isEmpty) {
@@ -42,6 +49,7 @@ class ListBanquetVM with ChangeNotifier {
     final directories = directory.listSync()
       ..sort(
           (a, b) => b.path.split('/').last.compareTo(a.path.split('/').last));
+
     return directories;
   }
 

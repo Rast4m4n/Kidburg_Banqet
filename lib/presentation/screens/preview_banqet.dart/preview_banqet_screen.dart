@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:kidburg_banquet/domain/model/banqet_model.dart';
 import 'package:kidburg_banquet/domain/model/table_model.dart';
+import 'package:kidburg_banquet/generated/l10n.dart';
 import 'package:kidburg_banquet/presentation/navigation/app_route.dart';
 import 'package:kidburg_banquet/presentation/screens/preview_banqet.dart/preview_banquet_vm.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
@@ -35,7 +36,7 @@ class _PreviewBanqetScreenState extends State<PreviewBanqetScreen> {
             children: [
               Center(
                 child: Text(
-                  'КидБург банкеты',
+                  S.of(context).kidburgBanquets,
                   style: Theme.of(context).textTheme.displaySmall,
                 ),
               ),
@@ -53,9 +54,7 @@ class _PreviewBanqetScreenState extends State<PreviewBanqetScreen> {
 }
 
 class _ActionButton extends StatelessWidget {
-  const _ActionButton({
-    super.key,
-  });
+  const _ActionButton();
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +70,9 @@ class _ActionButton extends StatelessWidget {
               );
       },
       child: Text(
-        !vm.isSavedBanquet ? 'Сохранить' : 'Перейти к списку банкетов',
+        !vm.isSavedBanquet
+            ? S.of(context).save
+            : S.of(context).goToTheListOfBanquets,
         style: const TextStyle(
           fontSize: 16,
           color: AppColor.infoCardPreviewColor,
@@ -82,9 +83,7 @@ class _ActionButton extends StatelessWidget {
 }
 
 class _EventCardWidget extends StatelessWidget {
-  const _EventCardWidget({
-    super.key,
-  });
+  const _EventCardWidget();
 
   @override
   Widget build(BuildContext context) {
@@ -104,7 +103,7 @@ class _EventCardWidget extends StatelessWidget {
               children: [
                 Center(
                   child: Text(
-                    'МЕРОПРИЯТИЕ',
+                    S.of(context).event,
                     style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                           color: AppColor.titleCardPreviewColor,
                           fontSize: 24,
@@ -113,22 +112,26 @@ class _EventCardWidget extends StatelessWidget {
                 ),
                 const SizedBox(height: AppPadding.low),
                 _RowInfoWidget(
-                  text: 'Заказчик: ${vm.banqetModel.nameClient}',
+                  text:
+                      '${S.of(context).customer}: ${vm.banqetModel.nameClient}',
                   twoText:
-                      "Дата: ${DateFormat('dd.MM.yy').format(vm.banqetModel.dateStart)}",
+                      "${S.of(context).date}: ${DateFormat('dd.MM.yy').format(vm.banqetModel.dateStart)}",
                   fontSize: 16,
                   isTitle: true,
                 ),
                 const SizedBox(height: AppPadding.low),
                 _RowInfoWidget(
-                  text: 'Домик: ${vm.banqetModel.place}',
-                  twoText: 'Время: ${vm.banqetModel.timeStart.format(context)}',
+                  text: '${S.of(context).room}: ${vm.banqetModel.place}',
+                  twoText:
+                      '${S.of(context).time}: ${vm.banqetModel.timeStart.format(context)}',
                   fontSize: 14,
                 ),
                 const SizedBox(height: AppPadding.low),
                 _RowInfoWidget(
-                  text: 'Детей: ${vm.banqetModel.amountOfChildren ?? ''}',
-                  twoText: 'Взрослых: ${vm.banqetModel.amountOfAdult ?? ''}',
+                  text:
+                      '${S.of(context).children}: ${vm.banqetModel.amountOfChildren ?? ''}',
+                  twoText:
+                      '${S.of(context).adults}: ${vm.banqetModel.amountOfAdult ?? ''}',
                   fontSize: 14,
                 ),
               ],
@@ -141,7 +144,7 @@ class _EventCardWidget extends StatelessWidget {
 }
 
 class _ListCardsServingWidget extends StatelessWidget {
-  const _ListCardsServingWidget({super.key});
+  const _ListCardsServingWidget();
 
   @override
   Widget build(BuildContext context) {
@@ -167,7 +170,6 @@ class _ListCardsServingWidget extends StatelessWidget {
 
 class _ServingDishesCardWidget extends StatelessWidget {
   const _ServingDishesCardWidget({
-    super.key,
     required this.table,
   });
   final TableModel table;
@@ -210,7 +212,8 @@ class _ServingDishesCardWidget extends StatelessWidget {
                           children: [
                             _RowInfoWidget(
                               text: dishes[index].nameDish!,
-                              twoText: "${dishes[index].count}шт",
+                              twoText:
+                                  "${dishes[index].count}${S.of(context).pcs}",
                               fontSize: 14,
                               crossAxisAlignment: CrossAxisAlignment.center,
                             ),
@@ -232,7 +235,6 @@ class _ServingDishesCardWidget extends StatelessWidget {
 
 class _RowInfoWidget extends StatelessWidget {
   const _RowInfoWidget({
-    super.key,
     required this.text,
     required this.twoText,
     required this.fontSize,

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:kidburg_banquet/api/google_sheet_api.dart';
 import 'package:kidburg_banquet/data/repository/google_sheet_data_repository.dart';
 import 'package:kidburg_banquet/domain/model/banqet_model.dart';
 import 'package:kidburg_banquet/domain/model/category_model.dart';
 import 'package:kidburg_banquet/domain/model/dish_model.dart';
 import 'package:kidburg_banquet/domain/model/table_model.dart';
+import 'package:kidburg_banquet/generated/l10n.dart';
 import 'package:kidburg_banquet/presentation/screens/preorder_form/pre_order_form_vm.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
@@ -26,7 +28,7 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
     super.initState();
     vm = PreOrderFormVm(
       googleSheetRepository: GoogleSheetDataRepository(
-        apiRepository: GoogleSheetApiRepository(),
+        iApi: GoogleSheetApi(),
       ),
     );
   }
@@ -51,7 +53,7 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Оформление',
+                S.of(context).placeAnOrder,
                 style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -90,9 +92,7 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
 }
 
 class _FloatingButton extends StatelessWidget {
-  const _FloatingButton({
-    super.key,
-  });
+  const _FloatingButton();
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +101,7 @@ class _FloatingButton extends StatelessWidget {
         return Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Text("Сумма: ${vm.getTotalSum()}",
+            Text("${S.of(context).totalSum}: ${vm.getTotalSum()}",
                 style: Theme.of(context).textTheme.bodyLarge),
             FloatingActionButton(
               backgroundColor: AppColor.cardPreviewColor,
@@ -118,7 +118,6 @@ class _FloatingButton extends StatelessWidget {
 
 class _ServingsDishes extends StatelessWidget {
   const _ServingsDishes({
-    super.key,
     required this.tables,
   });
 
@@ -137,7 +136,7 @@ class _ServingsDishes extends StatelessWidget {
                   color: Colors.red[200],
                   child: Center(
                     child: Text(
-                      'Подача удалена',
+                      S.of(context).foodServiceRemoved,
                       style: Theme.of(context).textTheme.bodyLarge,
                     ),
                   ),
@@ -177,9 +176,9 @@ class _ServingsDishes extends StatelessWidget {
               child: ElevatedButton(
                 style: Theme.of(context).elevatedButtonTheme.style,
                 onPressed: () => vm.addNewServing(context),
-                child: const Text(
-                  'Добавить подачу',
-                  style: TextStyle(
+                child: Text(
+                  S.of(context).addServingDishes,
+                  style: const TextStyle(
                     fontSize: 16,
                     color: AppColor.infoCardPreviewColor,
                   ),
@@ -195,7 +194,6 @@ class _ServingsDishes extends StatelessWidget {
 
 class _ListDishes extends StatelessWidget {
   const _ListDishes({
-    super.key,
     required this.categories,
     required this.tableIndex,
   });
@@ -238,11 +236,13 @@ class DishWidget extends StatelessWidget {
     final vm = Provider.of<PreOrderFormVm>(context);
     return ListTile(
       title: Text(dish.nameDish ?? ''),
-      subtitle: Text('${dish.weight ?? ''}  ${dish.price ?? ''}₽'),
+      subtitle: Text(
+        '${dish.weight ?? ''}  ${dish.price ?? ''}${S.of(context).markCurrency}',
+      ),
       trailing: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 70),
         child: CustomTextField(
-          label: 'Кол-во',
+          label: S.of(context).quantity,
           onChanged: (value) {
             int? count = int.tryParse(value);
             vm.updateDishCount(
