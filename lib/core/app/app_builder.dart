@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kidburg_banquet/core/app/app.dart';
 import 'package:kidburg_banquet/core/di/di_scope.dart';
-import 'package:kidburg_banquet/core/di/di_scope_provider.dart';
 import 'package:kidburg_banquet/core/di/i_di_scope.dart';
+import 'package:provider/provider.dart';
 
 abstract class IAppBuilder {
   /// Метод сборки приложения
@@ -25,8 +25,8 @@ class AppBuilder implements IAppBuilder {
 
   @override
   Widget getApp() {
-    return DiScopeProvider(
-      diScope: diScope,
+    return ChangeNotifierProvider<IDiScope>(
+      create: (context) => diScope,
       child: App(isAuth: isAuth),
     );
   }

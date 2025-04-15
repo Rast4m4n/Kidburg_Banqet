@@ -1,6 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:kidburg_banquet/core/di/i_di_scope.dart';
+import 'package:kidburg_banquet/data/file_manager/file_manager.dart';
+import 'package:kidburg_banquet/generated/l10n.dart';
 import 'package:kidburg_banquet/presentation/screens/list_banquets/list_banquets_vm.dart';
 import 'package:kidburg_banquet/presentation/widgets/custom_drawer.dart';
 import 'package:provider/provider.dart';
@@ -24,7 +27,7 @@ class _ListBanquetsScreenState extends State<ListBanquetsScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Список банкетов',
+              S.of(context).listOfBanquets,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -41,12 +44,15 @@ class _ListBanquetsScreenState extends State<ListBanquetsScreen> {
 }
 
 class _DirectoryYearWidget extends StatelessWidget {
-  const _DirectoryYearWidget({
-    super.key,
-  });
+  const _DirectoryYearWidget();
 
   @override
   Widget build(BuildContext context) {
+    if (!FileManager.directory.existsSync()) {
+      return Center(
+        child: Text(S.of(context).listIsEmpty),
+      );
+    }
     return Consumer<ListBanquetVM>(
       builder: (context, vm, child) {
         final directories = vm.sortedDirectory();
@@ -75,7 +81,6 @@ class _DirectoryYearWidget extends StatelessWidget {
 
 class _DirectoryMonthWidget extends StatelessWidget {
   const _DirectoryMonthWidget({
-    super.key,
     required this.directoryYear,
   });
 
@@ -99,7 +104,8 @@ class _DirectoryMonthWidget extends StatelessWidget {
                 children: [
                   ListTile(
                     title: Center(
-                        child: Text(directoryMonth.path.split('/').last)),
+                      child: Text(directoryMonth.path.split('/').last),
+                    ),
                     titleTextStyle: Theme.of(context).textTheme.bodyLarge,
                   ),
                   _FileWidget(directoryMonth: directoryMonth),
@@ -117,7 +123,6 @@ class _DirectoryMonthWidget extends StatelessWidget {
 
 class _FileWidget extends StatelessWidget {
   const _FileWidget({
-    super.key,
     required this.directoryMonth,
   });
 
@@ -145,17 +150,18 @@ class _FileWidget extends StatelessWidget {
                   itemBuilder: (context) {
                     return [
                       PopupMenuItem(
-                        child: const Text('Открыть'),
+                        child: Text(S.of(context).open),
                         onTap: () async => vm.openFile(file),
                       ),
                       PopupMenuItem(
-                        child: const Text('Отправить'),
+                        child: Text(S.of(context).share),
                         onTap: () async {
-                          vm.shareFile(file);
+                          vm.shareFile(
+                              file, context.read<IDiScope>().locale.locale);
                         },
                       ),
                       PopupMenuItem(
-                        child: const Text('Удалить'),
+                        child: Text(S.of(context).delete),
                         onTap: () async => _dialogConfirmDeletFile(
                           context,
                           file,
@@ -182,13 +188,13 @@ class _FileWidget extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Удалить файл'),
+          title: Text(S.of(context).deleteFile),
           actions: <Widget>[
             TextButton(
               style: TextButton.styleFrom(
                 textStyle: Theme.of(context).textTheme.labelLarge,
               ),
-              child: const Text('Отмена'),
+              child: Text(S.of(context).cancel),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -197,7 +203,7 @@ class _FileWidget extends StatelessWidget {
               style: TextButton.styleFrom(
                 textStyle: Theme.of(context).textTheme.labelLarge,
               ),
-              child: const Text('Удалить'),
+              child: Text(S.of(context).delete),
               onPressed: () async {
                 await vm.deleteFile(file);
                 if (context.mounted) Navigator.of(context).pop();

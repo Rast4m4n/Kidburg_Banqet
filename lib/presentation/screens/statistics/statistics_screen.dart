@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kidburg_banquet/domain/model/statistic_model.dart';
+import 'package:kidburg_banquet/generated/l10n.dart';
 import 'package:kidburg_banquet/presentation/screens/statistics/statistic_view_model.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/widgets/custom_drawer.dart';
@@ -23,7 +24,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Статистика',
+              S.of(context).statistic,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -42,7 +43,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
             if (snapshot.data == null) {
               return Center(
                 child: Text(
-                  'Нет данных для статистики',
+                  S.of(context).noDataForStatistic,
                   style: Theme.of(context).textTheme.headlineSmall,
                 ),
               );
@@ -76,7 +77,6 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
 
 class _ProfitBanqueter extends StatefulWidget {
   const _ProfitBanqueter({
-    super.key,
     required this.profit,
   });
   final double profit;
@@ -116,12 +116,12 @@ class _ProfitBanqueterState extends State<_ProfitBanqueter>
     return Column(
       children: [
         Text(
-          'Прибыль банкетника',
+          S.of(context).profit,
           style: Theme.of(context).textTheme.headlineSmall,
         ),
         const SizedBox(height: AppPadding.big),
         Text(
-          '${_animation.value}₽',
+          '${_animation.value}${S.of(context).markCurrency}',
           style: Theme.of(context).textTheme.displaySmall,
         )
       ],
@@ -131,7 +131,6 @@ class _ProfitBanqueterState extends State<_ProfitBanqueter>
 
 class _AverageOrderCheckStat extends StatefulWidget {
   const _AverageOrderCheckStat({
-    super.key,
     required this.averageOrderCheck,
   });
   final int averageOrderCheck;
@@ -171,12 +170,12 @@ class _AverageOrderCheckStatState extends State<_AverageOrderCheckStat>
     return Column(
       children: [
         Text(
-          'Средний чек',
+          S.of(context).averageCheck,
           style: Theme.of(context).textTheme.headlineSmall,
         ),
         const SizedBox(height: AppPadding.big),
         Text(
-          '${_animation.value}₽',
+          '${_animation.value}${S.of(context).markCurrency}',
           style: Theme.of(context).textTheme.displaySmall,
         )
       ],
@@ -186,7 +185,6 @@ class _AverageOrderCheckStatState extends State<_AverageOrderCheckStat>
 
 class _TotalGuestsStat extends StatefulWidget {
   const _TotalGuestsStat({
-    super.key,
     required this.guests,
   });
   final int guests;
@@ -225,7 +223,7 @@ class _TotalGuestsStatState extends State<_TotalGuestsStat>
     return Column(
       children: [
         Text(
-          'Общее количество гостей',
+          S.of(context).totalNumberOfGuests,
           style: Theme.of(context).textTheme.headlineSmall,
         ),
         const SizedBox(height: AppPadding.big),
@@ -240,7 +238,6 @@ class _TotalGuestsStatState extends State<_TotalGuestsStat>
 
 class _SumOfMonthStat extends StatefulWidget {
   const _SumOfMonthStat({
-    super.key,
     required this.sum,
   });
   final int sum;
@@ -279,12 +276,12 @@ class _SumOfMonthStatState extends State<_SumOfMonthStat>
     return Column(
       children: [
         Text(
-          'Общая сумма за месяц',
+          S.of(context).totalAmountForTheMonth,
           style: Theme.of(context).textTheme.headlineSmall,
         ),
         const SizedBox(height: AppPadding.big),
         Text(
-          '${_animation.value}₽',
+          '${_animation.value}${S.of(context).markCurrency}',
           style: Theme.of(context).textTheme.displaySmall,
         ),
       ],

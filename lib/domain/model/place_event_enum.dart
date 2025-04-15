@@ -1,28 +1,72 @@
+import 'package:intl/intl.dart';
+
 /// Комнаты заведения в Кидбург ЦДМ
 enum PlaceEventCDMEnum {
-  university('Университет'),
-  carlson('Карлсон'),
-  cabinCompany('Каюта-компания'),
-  magic('Магия'),
-  western('Вестерн'),
-  princess('Принцесса'),
-  cafe('Кафе');
+  university,
+  carlson,
+  cabinCompany,
+  magic,
+  western,
+  princess,
+  cafe;
 
-  final String name;
+  String get localizedName {
+    return Intl.message(
+      _getDefaultName(),
+      name: name,
+    );
+  }
 
-  const PlaceEventCDMEnum(this.name);
+  String _getDefaultName() {
+    switch (this) {
+      case PlaceEventCDMEnum.university:
+        return 'University';
+      case PlaceEventCDMEnum.carlson:
+        return 'Carlson';
+      case PlaceEventCDMEnum.cabinCompany:
+        return 'Cabin Company';
+      case PlaceEventCDMEnum.magic:
+        return 'Magic';
+      case PlaceEventCDMEnum.western:
+        return 'Western';
+      case PlaceEventCDMEnum.princess:
+        return 'Princess';
+      case PlaceEventCDMEnum.cafe:
+        return 'Cafe';
+    }
+  }
 }
 
 /// Комнаты заведения в Кидбург Ривьера
 enum PlaceEventRivieraEnum {
-  castlePrincess('Дворец принцессы'),
-  disco('Диско'),
-  cosmos('Космос'),
-  jurassicPeriod('Юрский период'),
-  miracelIsland('Чудо-остров'),
-  cafe('Кафе');
+  castlePrincess,
+  disco,
+  cosmos,
+  jurassicPeriod,
+  miracelIsland,
+  cafe;
 
-  final String name;
+  String get localizedName {
+    return Intl.message(
+      _getDefaultName(),
+      name: name,
+    );
+  }
 
-  const PlaceEventRivieraEnum(this.name);
+  String _getDefaultName() {
+    switch (this) {
+      case PlaceEventRivieraEnum.castlePrincess:
+        return 'Castle princess';
+      case PlaceEventRivieraEnum.disco:
+        return 'Disco';
+      case PlaceEventRivieraEnum.cosmos:
+        return 'Cosmos';
+      case PlaceEventRivieraEnum.jurassicPeriod:
+        return 'Jurassic Period';
+      case PlaceEventRivieraEnum.miracelIsland:
+        return 'Miracle Island';
+      case PlaceEventRivieraEnum.cafe:
+        return 'Cafe';
+    }
+  }
 }

@@ -1,8 +1,24 @@
+import 'package:intl/intl.dart';
+
 enum EstablishmentsEnum {
-  riviera('Ривьера'),
-  cdm('ЦДМ');
+  riviera,
+  cdm;
 
-  final String name;
+  const EstablishmentsEnum();
 
-  const EstablishmentsEnum(this.name);
+  String get localizedName {
+    return Intl.message(
+      _getDefaultName(),
+      name: name,
+    );
+  }
+
+  String _getDefaultName() {
+    switch (this) {
+      case EstablishmentsEnum.cdm:
+        return 'CDM';
+      case EstablishmentsEnum.riviera:
+        return 'Riviera';
+    }
+  }
 }

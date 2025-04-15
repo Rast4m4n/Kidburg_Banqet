@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:kidburg_banquet/core/di/di_scope_provider.dart';
+import 'package:kidburg_banquet/core/di/i_di_scope.dart';
 import 'package:kidburg_banquet/domain/model/banqet_model.dart';
 import 'package:kidburg_banquet/domain/model/establishments_enum.dart';
 import 'package:kidburg_banquet/domain/model/place_event_enum.dart';
+import 'package:kidburg_banquet/generated/l10n.dart';
 import 'package:kidburg_banquet/presentation/navigation/app_route.dart';
+import 'package:provider/provider.dart';
 
 class MainBanquetViewModel extends ChangeNotifier {
   MainBanquetViewModel({
@@ -41,9 +43,9 @@ class MainBanquetViewModel extends ChangeNotifier {
   String? errorTime;
   String? errorPlace;
 
-  void isValidateName() {
+  void isValidateName(BuildContext context) {
     if (nameController.text.isEmpty) {
-      errorName = 'Обязательное поле';
+      errorName = S.of(context).requiredFiled;
       notifyListeners();
     } else {
       errorName = null;
@@ -51,9 +53,9 @@ class MainBanquetViewModel extends ChangeNotifier {
     }
   }
 
-  void isValidateDate() {
+  void isValidateDate(BuildContext context) {
     if (dateController.text.isEmpty) {
-      errorDate = 'Обязательное поле';
+      errorDate = S.of(context).requiredFiled;
       notifyListeners();
     } else {
       errorDate = null;
@@ -61,9 +63,9 @@ class MainBanquetViewModel extends ChangeNotifier {
     }
   }
 
-  void isValidateTime() {
+  void isValidateTime(BuildContext context) {
     if (timeController.text.isEmpty) {
-      errorTime = 'Обязательное поле';
+      errorTime = S.of(context).requiredFiled;
       notifyListeners();
     } else {
       errorTime = null;
@@ -71,9 +73,9 @@ class MainBanquetViewModel extends ChangeNotifier {
     }
   }
 
-  void isValidatePlace() {
+  void isValidatePlace(BuildContext context) {
     if (placeEventController.text.isEmpty) {
-      errorPlace = 'Обязательное поле';
+      errorPlace = S.of(context).requiredFiled;
       notifyListeners();
     } else {
       errorPlace = null;
@@ -81,11 +83,11 @@ class MainBanquetViewModel extends ChangeNotifier {
     }
   }
 
-  void isValidateForms() {
-    isValidateTime();
-    isValidateDate();
-    isValidateName();
-    isValidatePlace();
+  void isValidateForms(BuildContext context) {
+    isValidateTime(context);
+    isValidateDate(context);
+    isValidateName(context);
+    isValidatePlace(context);
   }
 
   Future<void> showDate(BuildContext context) async {
@@ -100,7 +102,7 @@ class MainBanquetViewModel extends ChangeNotifier {
 
   Future<void> initDropDownEntriesPlacesEvent(BuildContext context) async {
     final managerModel =
-        (await DiScopeProvider.of(context)!.storage.loadManagerInfo())!;
+        (await context.read<IDiScope>().storage.loadManagerInfo())!;
     if (managerModel.establishmentEnum == EstablishmentsEnum.cdm) {
       dropDownMenuEntries = PlaceEventCDMEnum.values;
     } else if (managerModel.establishmentEnum == EstablishmentsEnum.riviera) {
@@ -109,13 +111,13 @@ class MainBanquetViewModel extends ChangeNotifier {
   }
 
   void routingToPreOrder(BuildContext context) async {
-    isValidateForms();
+    isValidateForms(context);
     if (errorName == null &&
         errorDate == null &&
         errorTime == null &&
         errorPlace == null) {
       final managerModel =
-          await DiScopeProvider.of(context)!.storage.loadManagerInfo();
+          await context.read<IDiScope>().storage.loadManagerInfo();
       if (context.mounted) {
         Navigator.of(context).pushNamed(
           AppRoute.preOrderFormPage,

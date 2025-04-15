@@ -1,8 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:kidburg_banquet/core/di/di_scope_provider.dart';
+import 'package:kidburg_banquet/core/di/i_di_scope.dart';
+import 'package:kidburg_banquet/data/file_manager/file_manager.dart';
 import 'package:kidburg_banquet/domain/model/establishments_enum.dart';
 import 'package:kidburg_banquet/domain/model/manager_model.dart';
+import 'package:kidburg_banquet/generated/l10n.dart';
 import 'package:kidburg_banquet/presentation/navigation/app_route.dart';
+import 'package:provider/provider.dart';
+
+// class LocaleViewModel with ChangeNotifier {
+//   // Присваивается локализация по умолчанию
+//   // в зависимости от локализации системы
+//   Locale locale = WidgetsBinding.instance.platformDispatcher.locale;
+
+//   Future<void> initLocale(BuildContext context) async {
+//     final savedLocale =
+//         (await DiScopeProvider.of(context)!.storage.loadManagerInfo())!.locale;
+//     locale = savedLocale;
+//   }
+
+//   /// если прописать notifyListener(), то перерисуется App
+//   /// так как там прослушиваются изменения LocaleViewModel,
+//   /// и не успеет пройти переход на другую страницу
+//   /// с помощью метода enterToMainScreen()
+//   Locale selectLanguage(BuildContext context, String text) {
+//     switch (text) {
+//       case 'Русский' || 'Russian':
+//         locale = const Locale('ru');
+//         return locale;
+//       case 'Английский' || 'English':
+//         locale = const Locale('en');
+//         return locale;
+//       default:
+//         locale = locale.languageCode == "ru"
+//             ? const Locale('ru')
+//             : const Locale('en');
+//         return locale;
+//     }
+//   }
+// }
 
 class SelectionKidburgViewModel with ChangeNotifier {
   SelectionKidburgViewModel();
@@ -12,15 +47,21 @@ class SelectionKidburgViewModel with ChangeNotifier {
       TextEditingController();
   final TextEditingController languageController = TextEditingController();
 
-  void enterToHeaderFormScreen(BuildContext context) async {
+  void enterToMainScreen(
+    BuildContext context,
+  ) async {
     final managerModel = ManagerModel(
       name: nameController.text,
       phoneNumber: phoneNumberOfManagerController.text,
-      establishmentEnum: selectEstablisment(),
+      establishmentEnum: selectEstablisment(context),
       locale: selectLanguage(context),
     );
-
-    await DiScopeProvider.of(context)!.storage.saveManagerInfo(managerModel);
+    final storage = context.read<IDiScope>().storage;
+    await storage.removeCache();
+    await storage.saveManagerInfo(managerModel);
+    if (context.mounted) {
+      context.read<IDiScope>().locale.updateLocale(selectLanguage(context));
+    }
     try {
       if (context.mounted) {
         Navigator.of(context).pushReplacementNamed(
@@ -32,52 +73,62 @@ class SelectionKidburgViewModel with ChangeNotifier {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             backgroundColor: Colors.red.shade300,
-            content: const Text('Выберите заведение'),
+            content: Text(S.of(context).selectEstablishment),
           ),
         );
       }
     }
   }
 
-  EstablishmentsEnum selectEstablisment() {
+  Locale selectLanguage(BuildContext context) {
+    Locale locale = Localizations.localeOf(context);
+    switch (languageController.text) {
+      case 'Русский' || 'Russian':
+        locale = const Locale('ru');
+        return locale;
+      case 'Английский' || 'English':
+        locale = const Locale('en');
+        return locale;
+      default:
+        locale = locale.languageCode == "ru"
+            ? const Locale('ru')
+            : const Locale('en');
+        return locale;
+    }
+  }
+
+  Future<void> confirmChangeLanguage() async {
+    if (FileManager.directory.existsSync()) {
+      await FileManager.directory.delete(recursive: true);
+    }
+  }
+
+  EstablishmentsEnum selectEstablisment(BuildContext context) {
     switch (establishmentController.text) {
-      case 'ЦДМ':
-        establishmentController.text = 'ЦДМ';
+      case 'ЦДМ' || 'CDM':
+        establishmentController.text = S.of(context).cdm;
         return EstablishmentsEnum.cdm;
-      case 'Ривьера':
-        establishmentController.text = 'ривьера';
+      case 'Ривьера' || 'Riviera':
+        establishmentController.text = S.of(context).riviera;
         return EstablishmentsEnum.riviera;
       default:
         throw Exception('No establishment selected');
     }
   }
 
-  Locale selectLanguage(BuildContext context) {
-    final locale = Localizations.localeOf(context);
-    switch (languageController.text) {
-      case 'Руссикй':
-        languageController.text = 'Русский';
-        return const Locale('ru');
-      case 'Английский':
-        languageController.text = 'Английский';
-        return const Locale('en');
-      default:
-        return locale.toLanguageTag() == "ru"
-            ? const Locale('ru')
-            : const Locale('en');
-    }
-  }
-
   Future<void> loadCurrentManager(BuildContext context) async {
-    final di = DiScopeProvider.of(context)!.storage;
+    final di = context.read<IDiScope>().storage;
     final managerModel = await di.loadManagerInfo();
     if (managerModel != null) {
       nameController.text = managerModel.name;
-      establishmentController.text = managerModel.establishmentEnum.name;
+      establishmentController.text =
+          managerModel.establishmentEnum.localizedName;
       phoneNumberOfManagerController.text = managerModel.phoneNumber;
-      languageController.text = managerModel.locale.toLanguageTag() == "ru"
-          ? 'Русский'
-          : 'Английский';
+      if (context.mounted) {
+        languageController.text = managerModel.locale.toLanguageTag() == "ru"
+            ? S.of(context).russian
+            : S.of(context).english;
+      }
     }
   }
 }

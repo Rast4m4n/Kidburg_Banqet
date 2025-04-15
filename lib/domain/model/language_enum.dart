@@ -1,8 +1,24 @@
+import 'package:intl/intl.dart';
+
 enum LanguageEnum {
-  english('Английский'),
-  russian('Русский');
+  english,
+  russian;
 
-  final String name;
+  const LanguageEnum();
 
-  const LanguageEnum(this.name);
+  String get localizedName {
+    return Intl.message(
+      _getDefaultName(),
+      name: name,
+    );
+  }
+
+  String _getDefaultName() {
+    switch (this) {
+      case LanguageEnum.russian:
+        return 'Russian';
+      case LanguageEnum.english:
+        return 'English';
+    }
+  }
 }

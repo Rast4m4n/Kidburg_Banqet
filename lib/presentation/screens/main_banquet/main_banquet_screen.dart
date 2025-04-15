@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kidburg_banquet/generated/l10n.dart';
 import 'package:kidburg_banquet/presentation/screens/main_banquet/main_screen_banquet_vm.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
@@ -44,7 +45,7 @@ class _MainBanquetScreenState extends State<MainBanquetScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Банкеты',
+              S.of(context).banquets,
               style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
@@ -75,9 +76,9 @@ class _MainBanquetScreenState extends State<MainBanquetScreen> {
                         onPressed: () {
                           vm.routingToPreOrder(context);
                         },
-                        child: const Text(
-                          'Далее',
-                          style: TextStyle(
+                        child: Text(
+                          S.of(context).next,
+                          style: const TextStyle(
                             fontSize: 16,
                             color: AppColor.infoCardPreviewColor,
                           ),
@@ -96,9 +97,7 @@ class _MainBanquetScreenState extends State<MainBanquetScreen> {
 }
 
 class _GridActionFields extends StatelessWidget {
-  const _GridActionFields({
-    super.key,
-  });
+  const _GridActionFields();
 
   @override
   Widget build(BuildContext context) {
@@ -115,21 +114,21 @@ class _GridActionFields extends StatelessWidget {
       children: [
         CustomTextField(
           controller: vm.nameController,
-          label: 'Имя заказчика',
+          label: S.of(context).customerName,
           errorText: vm.errorName,
         ),
         CustomTextField(
           controller: vm.phoneNumberOfClientController,
-          label: 'Номер заказчика',
+          label: S.of(context).customerPhoneNumber,
         ),
         CustomTextField(
-          label: 'Дата проведения',
+          label: S.of(context).dateOfEvent,
           controller: vm.dateController,
           onTap: () => vm.showDate(context),
           errorText: vm.errorDate,
         ),
         CustomTextField(
-          label: 'Время проведения',
+          label: S.of(context).timeOfEvent,
           controller: vm.timeController,
           onTap: () => vm.showTime(context),
           errorText: vm.errorTime,
@@ -137,23 +136,23 @@ class _GridActionFields extends StatelessWidget {
         const _PlaceEventDropDownMenu(),
         CustomTextField(
           controller: vm.prepaymentController,
-          label: 'Предоплата',
+          label: S.of(context).prepayment,
         ),
         CustomTextField(
           controller: vm.childrenController,
-          label: 'Дети',
+          label: S.of(context).children,
         ),
         CustomTextField(
           controller: vm.adultController,
-          label: 'Взрослые',
+          label: S.of(context).adults,
         ),
         CustomTextField(
           controller: vm.cakeController,
-          label: 'Название торта',
+          label: S.of(context).nameOfCake,
         ),
         CustomTextField(
           controller: vm.remarkController,
-          label: 'Примечание',
+          label: S.of(context).note,
         ),
       ],
     );
@@ -161,9 +160,7 @@ class _GridActionFields extends StatelessWidget {
 }
 
 class _PlaceEventDropDownMenu extends StatelessWidget {
-  const _PlaceEventDropDownMenu({
-    super.key,
-  });
+  const _PlaceEventDropDownMenu();
 
   @override
   Widget build(BuildContext context) {
@@ -185,7 +182,7 @@ class _PlaceEventDropDownMenu extends StatelessWidget {
         constraints: const BoxConstraints(maxHeight: 48),
       ),
       label: Text(
-        'Место проведения',
+        S.of(context).placeOfEvent,
         style: Theme.of(context).inputDecorationTheme.labelStyle,
       ),
       hintText: vm.errorPlace,
@@ -194,7 +191,7 @@ class _PlaceEventDropDownMenu extends StatelessWidget {
         (place) {
           return DropdownMenuEntry(
             value: place,
-            label: place.name,
+            label: place.localizedName,
           );
         },
       ).toList(),

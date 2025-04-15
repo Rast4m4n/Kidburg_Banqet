@@ -7,6 +7,7 @@ import 'package:kidburg_banquet/domain/model/banqet_model.dart';
 import 'package:kidburg_banquet/domain/model/category_model.dart';
 import 'package:kidburg_banquet/domain/model/dish_model.dart';
 import 'package:kidburg_banquet/domain/model/table_model.dart';
+import 'package:kidburg_banquet/generated/l10n.dart';
 import 'package:kidburg_banquet/presentation/navigation/app_route.dart';
 import 'package:uuid/uuid.dart';
 
@@ -37,13 +38,15 @@ class PreOrderFormVm with ChangeNotifier {
     _originalCategories =
         await googleSheetRepository.fetchCategoriesAndDishes(context);
     String formatterTime = _timeFormat(banquetModel!.timeStart);
-    _tables.add(
-      TableModel(
-        name: 'Подача на $formatterTime',
-        categories: _cloneCategories(_originalCategories),
-        timeServing: banquetModel!.timeStart,
-      ),
-    );
+    if (context.mounted) {
+      _tables.add(
+        TableModel(
+          name: '${S.of(context).servingDishesOn} $formatterTime',
+          categories: _cloneCategories(_originalCategories),
+          timeServing: banquetModel!.timeStart,
+        ),
+      );
+    }
     return _tables;
   }
 
@@ -76,12 +79,14 @@ class PreOrderFormVm with ChangeNotifier {
       initialTime: banquetModel!.timeStart,
     );
     if (timePicked == null) return;
-    final newServing = TableModel(
-      name: 'Подача на ${_timeFormat(timePicked)}',
-      categories: newCategories,
-      timeServing: timePicked,
-    );
-    _tables.add(newServing);
+    if (context.mounted) {
+      final newServing = TableModel(
+        name: '${S.of(context).servingDishesOn} ${_timeFormat(timePicked)}',
+        categories: newCategories,
+        timeServing: timePicked,
+      );
+      _tables.add(newServing);
+    }
   }
 
   // Обновление количества конкретного блюда
@@ -122,10 +127,12 @@ class PreOrderFormVm with ChangeNotifier {
     for (var table in _tables) {
       if (table == currentTable) {
         final indexTable = _tables.indexOf(table);
-        _tables[indexTable] = table.copyWith(
-          name: 'Подача на ${_timeFormat(picked)}',
-          timeServing: picked,
-        );
+        if (context.mounted) {
+          _tables[indexTable] = table.copyWith(
+            name: '${S.of(context).servingDishesOn} ${_timeFormat(picked)}',
+            timeServing: picked,
+          );
+        }
       }
     }
     notifyListeners();

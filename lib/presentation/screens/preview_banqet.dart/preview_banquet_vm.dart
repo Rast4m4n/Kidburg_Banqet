@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:kidburg_banquet/core/di/di_scope_provider.dart';
+import 'package:kidburg_banquet/core/di/i_di_scope.dart';
 import 'package:kidburg_banquet/data/file_manager/file_manager.dart';
 import 'package:kidburg_banquet/data/repository/excel_repository.dart';
 import 'package:kidburg_banquet/domain/model/banqet_model.dart';
 import 'package:kidburg_banquet/domain/model/dish_model.dart';
 import 'package:kidburg_banquet/domain/model/statistic_model.dart';
 import 'package:kidburg_banquet/domain/model/table_model.dart';
+import 'package:kidburg_banquet/generated/l10n.dart';
+import 'package:provider/provider.dart';
 
 class PreviewBanquerViewModel with ChangeNotifier {
   PreviewBanquerViewModel({
@@ -24,7 +26,7 @@ class PreviewBanquerViewModel with ChangeNotifier {
 
   Future<void> saveBanquetExcelFile(BuildContext context) async {
     final repo = ExcelRepository();
-    await repo.writeNewExcelFile(banqetModel);
+    await repo.writeNewExcelFile(banqetModel, context);
     if (context.mounted) await saveStatisticBanquet(context);
     if (context.mounted) _showSnackBar(context);
     isSavedBanquet = true;
@@ -35,7 +37,7 @@ class PreviewBanquerViewModel with ChangeNotifier {
     final guests = banqetModel.amountOfAdult! + banqetModel.amountOfChildren!;
     final keyDateStorage =
         "${banqetModel.dateStart.year}_year_${banqetModel.dateStart.month}_month";
-    DiScopeProvider.of(context)!.storage.saveStatisticBanquets(
+    context.read<IDiScope>().storage.saveStatisticBanquets(
           StatisticModel(
             sum: banqetModel.sumOfBanquet!,
             guests: guests,
@@ -51,7 +53,9 @@ class PreviewBanquerViewModel with ChangeNotifier {
       banqetModel,
     );
     final snackBar = SnackBar(
-      content: Text('Файл сохранён по директории: $pathSavedFile'),
+      content: Text(
+        '${S.of(context).theFileIsSavedInTheDirectory}: $pathSavedFile',
+      ),
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
