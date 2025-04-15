@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:kidburg_banquet/core/app/app.dart';
 import 'package:kidburg_banquet/core/di/di_scope.dart';
 import 'package:kidburg_banquet/core/di/i_di_scope.dart';
+import 'package:kidburg_banquet/core/permission_app.dart';
 import 'package:provider/provider.dart';
 
 abstract class IAppBuilder {
@@ -34,6 +35,8 @@ class AppBuilder implements IAppBuilder {
   @override
   Future<void> init() async {
     WidgetsFlutterBinding.ensureInitialized();
+    final permission = PermissionApp();
+    await permission.requestPermission();
     diScope = DiScope();
     await diScope.init();
     isAuth = await diScope.storage.loadManagerInfo() != null ? true : false;
