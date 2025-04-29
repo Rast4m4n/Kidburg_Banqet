@@ -36,56 +36,90 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args = ModalRoute.of(context)!.settings.arguments as BanquetModel;
-    vm.banquetModel = args;
+    final args = ModalRoute.of(context)?.settings.arguments as BanquetModel?;
+    if (args != null) {
+      vm.setBanquetModel = args;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider<PreOrderFormVm>(
       create: (context) => vm,
-      child: Scaffold(
-        floatingActionButton: const _FloatingButton(),
-        floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
-        endDrawer: const CustomDrawer(),
-        appBar: AppBar(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                S.of(context).placeAnOrder,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+      child: const _SwitchWidget(),
+    );
+  }
+}
+
+class _SwitchWidget extends StatelessWidget {
+  const _SwitchWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final vm = context.read<PreOrderFormVm>();
+    final (banquetModel, initialized) = vm.banquetModel;
+    if (!initialized) {
+      return const SizedBox.shrink();
+    }
+    if (banquetModel == null) {
+      return const Center(
+        child: Text('гуляй отседа'),
+      );
+    }
+    return const _MainWidget();
+  }
+}
+
+class _MainWidget extends StatelessWidget {
+  const _MainWidget({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final vm = context.read<PreOrderFormVm>();
+    return Scaffold(
+      floatingActionButton: const _FloatingButton(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.miniEndFloat,
+      endDrawer: const CustomDrawer(),
+      appBar: AppBar(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              S.of(context).placeAnOrder,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+          ],
+        ),
+      ),
+      body: FutureBuilder<List<TableModel>>(
+        future: vm.getTableData(context),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          } else if (snapshot.hasError) {
+            return Center(
+              child: Text('Ошибка: ${snapshot.error}'),
+            );
+          } else if (snapshot.hasData) {
+            final tables = snapshot.data!;
+            return SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppPadding.low),
+                child: _ServingsDishes(tables: tables),
               ),
-            ],
-          ),
-        ),
-        body: FutureBuilder<List<TableModel>>(
-          future: vm.getTableData(context),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            } else if (snapshot.hasError) {
-              return Center(
-                child: Text('Ошибка: ${snapshot.error}'),
-              );
-            } else if (snapshot.hasData) {
-              final tables = snapshot.data!;
-              return SingleChildScrollView(
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: AppPadding.low),
-                  child: _ServingsDishes(tables: tables),
-                ),
-              );
-            } else {
-              return const Center(child: Text('No data found'));
-            }
-          },
-        ),
+            );
+          } else {
+            return const Center(child: Text('No data found'));
+          }
+        },
       ),
     );
   }

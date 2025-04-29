@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 import 'package:json_annotation/json_annotation.dart';
@@ -19,6 +18,9 @@ class DishModel {
   final String? weight;
   final int count;
   final int? price;
+
+  bool get hasCount => count > 0;
+  int get totalPrice => (price ?? 0) * count;
 
   DishModel copyWith({
     String? id,

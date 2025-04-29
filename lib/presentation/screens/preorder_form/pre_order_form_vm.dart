@@ -13,19 +13,27 @@ import 'package:uuid/uuid.dart';
 
 class PreOrderFormVm with ChangeNotifier {
   PreOrderFormVm({
-    required this.googleSheetRepository,
-  });
+    required GoogleSheetDataRepository googleSheetRepository,
+  }) : _googleSheetRepository = googleSheetRepository;
 
-  final GoogleSheetDataRepository googleSheetRepository;
+  final GoogleSheetDataRepository _googleSheetRepository;
 
-  late BanquetModel? banquetModel;
+  (BanquetModel? banquetModel, bool initialized) _banquetModel = (null, false);
+  (BanquetModel? banquetModel, bool initialized) get banquetModel =>
+      _banquetModel;
 
   final List<TableModel> _tables = [];
   List<TableModel> get tables => _tables;
 
   List<CategoryModel> _originalCategories = [];
 
+  set setBanquetModel(BanquetModel? banquetModel) {
+    _banquetModel = (banquetModel, true);
+    notifyListeners();
+  }
+
   Future<List<TableModel>> getTableData(BuildContext context) async {
+    print('getTableData');
     if (_tables.isEmpty) {
       return await _fetchDataFromGoogleSheet(context);
     } else {
@@ -35,18 +43,22 @@ class PreOrderFormVm with ChangeNotifier {
 
   Future<List<TableModel>> _fetchDataFromGoogleSheet(
       BuildContext context) async {
+    final servingDishesOn = S.of(context).servingDishesOn;
+
     _originalCategories =
-        await googleSheetRepository.fetchCategoriesAndDishes(context);
-    String formatterTime = _timeFormat(banquetModel!.timeStart);
-    if (context.mounted) {
-      _tables.add(
-        TableModel(
-          name: '${S.of(context).servingDishesOn} $formatterTime',
-          categories: _cloneCategories(_originalCategories),
-          timeServing: banquetModel!.timeStart,
-        ),
-      );
-    }
+        await _googleSheetRepository.fetchCategoriesAndDishes(context);
+
+    String formatterTime =
+        _timeFormat(_banquetModel.$1?.timeStart ?? TimeOfDay.now());
+
+    _tables.add(
+      TableModel(
+        id: const Uuid().v4(),
+        name: '$servingDishesOn $formatterTime',
+        categories: _cloneCategories(_originalCategories),
+        timeServing: _banquetModel.$1?.timeStart ?? TimeOfDay.now(),
+      ),
+    );
     return _tables;
   }
 
@@ -59,34 +71,36 @@ class PreOrderFormVm with ChangeNotifier {
     );
   }
 
-  // Клонирование списка категорий и блюд
-  // и создание новых уникальных идентификаторов
-  // для блюд
+  /// Клонирование списка категорий и блюд
+  /// и создание новых уникальных идентификаторов
+  /// для блюд
   List<CategoryModel> _cloneCategories(List<CategoryModel> categories) {
     return categories.map((category) {
-      List<DishModel> clonedDishes = category.dishes.map((dish) {
-        return dish.copyWith(id: const Uuid().v4());
-      }).toList();
-      return category.copywith(dishes: clonedDishes);
+      final clonedDishes = category.dishes
+          .map((dish) => dish.copyWith(id: const Uuid().v4()))
+          .toList();
+      return category.copyWith(dishes: clonedDishes);
     }).toList();
   }
 
-  // Добавление новой подачи блюд для стола
+  /// Добавление новой подачи блюд для стола
   Future<void> addNewServing(BuildContext context) async {
+    final servingDishesOn = S.of(context).servingDishesOn;
     List<CategoryModel> newCategories = _cloneCategories(_originalCategories);
     final timePicked = await showTimePicker(
       context: context,
-      initialTime: banquetModel!.timeStart,
+      initialTime: _banquetModel.$1?.timeStart ?? TimeOfDay.now(),
     );
     if (timePicked == null) return;
-    if (context.mounted) {
-      final newServing = TableModel(
-        name: '${S.of(context).servingDishesOn} ${_timeFormat(timePicked)}',
-        categories: newCategories,
-        timeServing: timePicked,
-      );
-      _tables.add(newServing);
-    }
+
+    final newServing = TableModel(
+      id: const Uuid().v4(),
+      name: '$servingDishesOn ${_timeFormat(timePicked)}',
+      categories: newCategories,
+      timeServing: timePicked,
+    );
+    _tables.add(newServing);
+    notifyListeners();
   }
 
   // Обновление количества конкретного блюда
@@ -111,7 +125,7 @@ class PreOrderFormVm with ChangeNotifier {
     for (var table in _tables) {
       for (var category in table.categories) {
         for (var dish in category.dishes) {
-          totalPrice += (dish.price ?? 0) * dish.count;
+          totalPrice += dish.totalPrice;
         }
       }
     }
@@ -119,20 +133,19 @@ class PreOrderFormVm with ChangeNotifier {
   }
 
   Future<void> changeTime(BuildContext context, TableModel currentTable) async {
+    final servingDishesOn = S.of(context).servingDishesOn;
     final TimeOfDay? picked = await showTimePicker(
       context: context,
-      initialTime: banquetModel!.timeStart,
+      initialTime: _banquetModel.$1?.timeStart ?? TimeOfDay.now(),
     );
     if (picked == null) return;
     for (var table in _tables) {
-      if (table == currentTable) {
+      if (table.id == currentTable.id) {
         final indexTable = _tables.indexOf(table);
-        if (context.mounted) {
-          _tables[indexTable] = table.copyWith(
-            name: '${S.of(context).servingDishesOn} ${_timeFormat(picked)}',
-            timeServing: picked,
-          );
-        }
+        _tables[indexTable] = table.copyWith(
+          name: '$servingDishesOn ${_timeFormat(picked)}',
+          timeServing: picked,
+        );
       }
     }
     notifyListeners();
@@ -143,34 +156,32 @@ class PreOrderFormVm with ChangeNotifier {
     notifyListeners();
   }
 
+  /// Очистка пустых данных из списка столов
+  /// и создание нового списка столов
   List<TableModel> clearEmptyData(List<TableModel> tables) {
-    bool hasCount(DishModel dish) {
-      return dish.count > 0;
-    }
-
     // Копирую элементы существующих столов
     // чтобы сохранять изменения в списке
-    List<TableModel> copiedTables = List.from(
-      tables.map(
-        (table) => TableModel(
-          name: table.name,
-          categories: List.from(
-            table.categories.map(
-              (category) => CategoryModel(
-                name: category.name,
-                dishes: List.from(category.dishes),
-              ),
-            ),
+    List<TableModel> copiedTables = tables
+        .map(
+          (table) => table.copyWith(
+            categories: table.categories
+                .map(
+                  (category) => category.copyWith(
+                    dishes: [...category.dishes],
+                  ),
+                )
+                .toList(),
           ),
-        ),
-      ),
-    );
+        )
+        .toList();
 
     copiedTables.removeWhere((table) {
-      table.categories.removeWhere((category) {
-        category.dishes.removeWhere((dish) => !hasCount(dish));
-        return category.dishes.isEmpty;
-      });
+      table.categories.removeWhere(
+        (category) {
+          category.dishes.removeWhere((dish) => !dish.hasCount);
+          return category.dishes.isEmpty;
+        },
+      );
       return table.categories.isEmpty;
     });
     return copiedTables;
@@ -180,8 +191,8 @@ class PreOrderFormVm with ChangeNotifier {
     final tables = clearEmptyData(_tables);
     Navigator.of(context).pushNamed(
       AppRoute.previewBanquetPage,
-      arguments:
-          banquetModel!.copyWith(tables: tables, sumOfBanquet: getTotalSum()),
+      arguments: _banquetModel.$1
+          ?.copyWith(tables: tables, sumOfBanquet: getTotalSum()),
     );
   }
 }
