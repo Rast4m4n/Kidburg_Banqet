@@ -130,12 +130,10 @@ class MainBanquetViewModel {
         amountOfAdult: int.tryParse(adultController.text),
       );
 
-  @override
   void init() {
     _initDropDownEntriesPlacesEvent();
   }
 
-  @override
   void dispose() {
     dateController.dispose();
     timeController.dispose();

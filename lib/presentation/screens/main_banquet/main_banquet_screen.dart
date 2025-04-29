@@ -61,9 +61,7 @@ class _MainBanquetScreenState extends State<MainBanquetScreen> {
 }
 
 class _ViewWidget extends StatelessWidget {
-  const _ViewWidget({
-    super.key,
-  });
+  const _ViewWidget();
 
   @override
   Widget build(BuildContext context) {

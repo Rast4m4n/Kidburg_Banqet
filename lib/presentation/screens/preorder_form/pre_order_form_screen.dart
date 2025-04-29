@@ -52,9 +52,7 @@ class _PreOrderFormScreenState extends State<PreOrderFormScreen> {
 }
 
 class _SwitchWidget extends StatelessWidget {
-  const _SwitchWidget({
-    super.key,
-  });
+  const _SwitchWidget();
 
   @override
   Widget build(BuildContext context) {
@@ -73,9 +71,7 @@ class _SwitchWidget extends StatelessWidget {
 }
 
 class _MainWidget extends StatelessWidget {
-  const _MainWidget({
-    super.key,
-  });
+  const _MainWidget();
 
   @override
   Widget build(BuildContext context) {
