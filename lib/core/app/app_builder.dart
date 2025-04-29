@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:kidburg_banquet/core/app/app.dart';
 import 'package:kidburg_banquet/core/di/di_scope.dart';
 import 'package:kidburg_banquet/core/di/i_di_scope.dart';
@@ -35,6 +36,7 @@ class AppBuilder implements IAppBuilder {
   @override
   Future<void> init() async {
     WidgetsFlutterBinding.ensureInitialized();
+    await dotenv.load(fileName: 'var.env');
     final permission = PermissionApp();
     await permission.requestPermission();
     diScope = DiScope();
