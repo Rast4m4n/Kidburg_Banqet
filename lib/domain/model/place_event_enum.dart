@@ -1,7 +1,11 @@
 import 'package:intl/intl.dart';
 
+abstract class IPlaceEvent {
+  String get localizedName;
+}
+
 /// Комнаты заведения в Кидбург ЦДМ
-enum PlaceEventCDMEnum {
+enum PlaceEventCDMEnum implements IPlaceEvent {
   university,
   carlson,
   cabinCompany,
@@ -10,6 +14,7 @@ enum PlaceEventCDMEnum {
   princess,
   cafe;
 
+  @override
   String get localizedName {
     return Intl.message(
       _getDefaultName(),
@@ -38,7 +43,7 @@ enum PlaceEventCDMEnum {
 }
 
 /// Комнаты заведения в Кидбург Ривьера
-enum PlaceEventRivieraEnum {
+enum PlaceEventRivieraEnum implements IPlaceEvent {
   castlePrincess,
   disco,
   cosmos,
@@ -46,6 +51,7 @@ enum PlaceEventRivieraEnum {
   miracelIsland,
   cafe;
 
+  @override
   String get localizedName {
     return Intl.message(
       _getDefaultName(),

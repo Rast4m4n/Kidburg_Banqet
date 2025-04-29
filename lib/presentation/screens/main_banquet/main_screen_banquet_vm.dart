@@ -1,146 +1,159 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:kidburg_banquet/core/di/i_di_scope.dart';
+import 'package:kidburg_banquet/core/storage/i_data_storage.dart';
 import 'package:kidburg_banquet/domain/model/banqet_model.dart';
 import 'package:kidburg_banquet/domain/model/establishments_enum.dart';
+import 'package:kidburg_banquet/domain/model/manager_model.dart';
 import 'package:kidburg_banquet/domain/model/place_event_enum.dart';
 import 'package:kidburg_banquet/generated/l10n.dart';
 import 'package:kidburg_banquet/presentation/navigation/app_route.dart';
-import 'package:provider/provider.dart';
 
-class MainBanquetViewModel extends ChangeNotifier {
+class MainBanquetViewModel {
   MainBanquetViewModel({
-    required this.nameController,
-    required this.childrenController,
-    required this.adultController,
-    required this.placeEventController,
-    required this.dateTimeManager,
-    required this.dateController,
-    required this.timeController,
-    required this.phoneNumberOfClientController,
-    required this.prepaymentController,
-    required this.cakeController,
-    required this.remarkController,
-  });
-  final DateTimeManager dateTimeManager;
-  final TextEditingController dateController;
-  final TextEditingController timeController;
-  final TextEditingController nameController;
-  final TextEditingController placeEventController;
-  final TextEditingController childrenController;
-  final TextEditingController adultController;
-  final TextEditingController phoneNumberOfClientController;
-  final TextEditingController prepaymentController;
-  final TextEditingController cakeController;
-  final TextEditingController remarkController;
-  List<dynamic> dropDownMenuEntries = [];
+    required this.widgetState,
+    required IDataStorage storage,
+  }) : _storage = storage;
 
-  String formatterDate() => dateTimeManager.formatterDate;
-  String formatterTime() => dateTimeManager.formatterTime;
+  final IDataStorage _storage;
 
-  String? errorName;
-  String? errorDate;
-  String? errorTime;
-  String? errorPlace;
+  final State widgetState;
+  BuildContext get _context => widgetState.context;
 
-  void isValidateName(BuildContext context) {
-    if (nameController.text.isEmpty) {
-      errorName = S.of(context).requiredFiled;
-      notifyListeners();
-    } else {
-      errorName = null;
-      notifyListeners();
+  final dateTimeManager = _DateTimeImpl();
+
+  final dateController = TextEditingController();
+  final timeController = TextEditingController();
+  final nameController = TextEditingController();
+  final placeEventController = TextEditingController();
+  final childrenController = TextEditingController();
+  final adultController = TextEditingController();
+  final phoneNumberOfClientController = TextEditingController();
+  final prepaymentController = TextEditingController();
+  final cakeController = TextEditingController();
+  final remarkController = TextEditingController();
+
+  ValueNotifier<List<DropdownMenuEntry<IPlaceEvent>>>
+      dropDownMenuEntriesNotifier = ValueNotifier([]);
+  ValueNotifier<String?> errorPlaceNotifier = ValueNotifier(null);
+
+  final formKey = GlobalKey<FormState>();
+
+  String? validatorName(String? value) {
+    if (value == null || value.isEmpty) {
+      return S.of(_context).requiredFiled;
     }
+    return null;
   }
 
-  void isValidateDate(BuildContext context) {
-    if (dateController.text.isEmpty) {
-      errorDate = S.of(context).requiredFiled;
-      notifyListeners();
-    } else {
-      errorDate = null;
-      notifyListeners();
+  String? validatorDate(String? value) {
+    if (value == null || value.isEmpty) {
+      return S.of(_context).requiredFiled;
     }
+    return null;
   }
 
-  void isValidateTime(BuildContext context) {
-    if (timeController.text.isEmpty) {
-      errorTime = S.of(context).requiredFiled;
-      notifyListeners();
-    } else {
-      errorTime = null;
-      notifyListeners();
+  String? validatorTime(String? value) {
+    if (value == null || value.isEmpty) {
+      return S.of(_context).requiredFiled;
     }
+    return null;
   }
 
-  void isValidatePlace(BuildContext context) {
+  String? validatePlace() {
     if (placeEventController.text.isEmpty) {
-      errorPlace = S.of(context).requiredFiled;
-      notifyListeners();
-    } else {
-      errorPlace = null;
-      notifyListeners();
+      return S.of(_context).requiredFiled;
     }
+    return null;
   }
 
-  void isValidateForms(BuildContext context) {
-    isValidateTime(context);
-    isValidateDate(context);
-    isValidateName(context);
-    isValidatePlace(context);
+  bool validateForm() {
+    final isValid = formKey.currentState!.validate();
+    errorPlaceNotifier.value = validatePlace();
+    return isValid && errorPlaceNotifier.value == null;
   }
 
-  Future<void> showDate(BuildContext context) async {
-    dateTimeManager.showDate(context, dateController);
-    notifyListeners();
+  Future<void> showDate() async {
+    await dateTimeManager.showDate(_context, dateController);
   }
 
-  Future<void> showTime(BuildContext context) async {
-    dateTimeManager.showTime(context, timeController);
-    notifyListeners();
+  Future<void> showTime() async {
+    await dateTimeManager.showTime(_context, timeController);
   }
 
-  Future<void> initDropDownEntriesPlacesEvent(BuildContext context) async {
-    final managerModel =
-        (await context.read<IDiScope>().storage.loadManagerInfo())!;
+  // Инициализация списка мест для выбора
+  Future<void> _initDropDownEntriesPlacesEvent() async {
+    final managerModel = await _storage.loadManagerInfo();
+    if (managerModel == null) {
+      dropDownMenuEntriesNotifier.value = [];
+      return;
+    }
+
     if (managerModel.establishmentEnum == EstablishmentsEnum.cdm) {
-      dropDownMenuEntries = PlaceEventCDMEnum.values;
+      dropDownMenuEntriesNotifier.value = PlaceEventCDMEnum.values
+          .map((e) => DropdownMenuEntry(value: e, label: e.localizedName))
+          .toList();
     } else if (managerModel.establishmentEnum == EstablishmentsEnum.riviera) {
-      dropDownMenuEntries = PlaceEventRivieraEnum.values;
+      dropDownMenuEntriesNotifier.value = PlaceEventRivieraEnum.values
+          .map((e) => DropdownMenuEntry(value: e, label: e.localizedName))
+          .toList();
     }
   }
 
-  void routingToPreOrder(BuildContext context) async {
-    isValidateForms(context);
-    if (errorName == null &&
-        errorDate == null &&
-        errorTime == null &&
-        errorPlace == null) {
-      final managerModel =
-          await context.read<IDiScope>().storage.loadManagerInfo();
-      if (context.mounted) {
-        Navigator.of(context).pushNamed(
-          AppRoute.preOrderFormPage,
-          arguments: BanquetModel(
-            managerModel: managerModel!,
-            nameClient: nameController.text,
-            phoneNumberOfClient: phoneNumberOfClientController.text,
-            prepayment: int.tryParse(prepaymentController.text),
-            cake: cakeController.text,
-            remark: remarkController.text,
-            place: placeEventController.text,
-            dateStart: dateTimeManager.selectedDate!,
-            timeStart: dateTimeManager.selectedTime!,
-            amountOfChildren: int.tryParse(childrenController.text),
-            amountOfAdult: int.tryParse(adultController.text),
-          ),
-        );
-      }
-    }
+  // Переход на следующий экран с проверкой валидности формы и загрузкой данных менеджера
+  void routingToPreOrder() async {
+    if (!validateForm()) return;
+
+    final managerModel = await _storage.loadManagerInfo();
+    if (managerModel == null) return;
+
+    if (!_context.mounted) return;
+    final banquetModel = createBanquetModel(managerModel);
+
+    Navigator.of(_context).pushNamed(
+      AppRoute.preOrderFormPage,
+      arguments: banquetModel,
+    );
+  }
+
+  // Создание модели для передачи в следующий экран
+  BanquetModel createBanquetModel(ManagerModel managerModel) => BanquetModel(
+        managerModel: managerModel,
+        nameClient: nameController.text,
+        phoneNumberOfClient: phoneNumberOfClientController.text,
+        prepayment: int.tryParse(prepaymentController.text),
+        cake: cakeController.text,
+        remark: remarkController.text,
+        place: placeEventController.text,
+        dateStart: dateTimeManager.selectedDate!,
+        timeStart: dateTimeManager.selectedTime!,
+        amountOfChildren: int.tryParse(childrenController.text),
+        amountOfAdult: int.tryParse(adultController.text),
+      );
+
+  @override
+  void init() {
+    _initDropDownEntriesPlacesEvent();
+  }
+
+  @override
+  void dispose() {
+    dateController.dispose();
+    timeController.dispose();
+    nameController.dispose();
+    placeEventController.dispose();
+    childrenController.dispose();
+    adultController.dispose();
+    phoneNumberOfClientController.dispose();
+    prepaymentController.dispose();
+    cakeController.dispose();
+    remarkController.dispose();
+    dropDownMenuEntriesNotifier.dispose();
+    errorPlaceNotifier.dispose();
   }
 }
 
-abstract class DateTimeManager {
+// Абстрактный класс для управления датой и временем
+abstract class _DateTimeManager {
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
   Future<void> showDate(
@@ -155,7 +168,7 @@ abstract class DateTimeManager {
   String get formatterTime;
 }
 
-class DateTimeImpl implements DateTimeManager {
+class _DateTimeImpl implements _DateTimeManager {
   @override
   DateTime? selectedDate;
 
@@ -165,6 +178,9 @@ class DateTimeImpl implements DateTimeManager {
   @override
   String get formatterDate => DateFormat('dd.MM.yy').format(selectedDate!);
 
+  /// Форматирование времени в формате HH:mm
+  ///
+  /// 13:00
   @override
   String get formatterTime => DateFormat('HH:mm').format(
         DateTime.now().copyWith(
@@ -173,9 +189,12 @@ class DateTimeImpl implements DateTimeManager {
         ),
       );
 
+  /// Показывает календарь для выбора даты
   @override
   Future<void> showDate(
-      BuildContext context, TextEditingController dateController) async {
+    BuildContext context,
+    TextEditingController dateController,
+  ) async {
     final DateTime? picked = await showDatePicker(
       context: context,
       firstDate: DateTime.now(),
@@ -187,9 +206,12 @@ class DateTimeImpl implements DateTimeManager {
     }
   }
 
+  /// Показывает время для выбора
   @override
   Future<void> showTime(
-      BuildContext context, TextEditingController timeController) async {
+    BuildContext context,
+    TextEditingController timeController,
+  ) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: const TimeOfDay(hour: 10, minute: 50),

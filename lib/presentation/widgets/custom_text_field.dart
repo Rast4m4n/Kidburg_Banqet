@@ -15,6 +15,7 @@ class CustomTextField extends StatelessWidget {
     this.minLines,
     this.floatingLabelAlignment,
     this.errorText,
+    this.validator,
     // this.maxLength,
   });
 
@@ -28,6 +29,7 @@ class CustomTextField extends StatelessWidget {
   final int? minLines;
   final FloatingLabelAlignment? floatingLabelAlignment;
   final String? errorText;
+  final String? Function(String?)? validator;
   // final int? maxLength;
   @override
   Widget build(BuildContext context) {
@@ -35,11 +37,12 @@ class CustomTextField extends StatelessWidget {
         Theme.of(context).inputDecorationTheme;
     return ConstrainedBox(
       constraints: const BoxConstraints(maxHeight: 60),
-      child: TextField(
+      child: TextFormField(
         maxLines: maxLines,
         minLines: minLines,
         expands: true,
         onTap: onTap,
+        validator: validator,
         textAlign: textAlign ?? TextAlign.start,
         readOnly: onTap != null ? true : false,
         onChanged: onChanged,
