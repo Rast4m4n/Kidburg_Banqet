@@ -1,6 +1,7 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 abstract class IApiGoogleSheet {
-  static const String url =
-      'https://script.google.com/macros/s/AKfycbxXJeSKKUNFpWqjZcRRJDVKUEZI1xiMwUfS0ORC8tGNDykytx3WTKY5jzfN2KkHEULvuA/exec?sheet=';
+  static String url = dotenv.env['GOOGLE_API_URL'] ?? '';
 
   Future<String> get({String? languageSheet = 'en'});
 }
