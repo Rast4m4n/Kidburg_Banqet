@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
 
@@ -16,6 +17,7 @@ class CustomTextField extends StatelessWidget {
     this.floatingLabelAlignment,
     this.errorText,
     this.validator,
+    this.inputFormatters,
     // this.maxLength,
   });
 
@@ -30,6 +32,7 @@ class CustomTextField extends StatelessWidget {
   final FloatingLabelAlignment? floatingLabelAlignment;
   final String? errorText;
   final String? Function(String?)? validator;
+  final List<TextInputFormatter>? inputFormatters;
   // final int? maxLength;
   @override
   Widget build(BuildContext context) {
@@ -38,6 +41,7 @@ class CustomTextField extends StatelessWidget {
     return ConstrainedBox(
       constraints: const BoxConstraints(maxHeight: 60),
       child: TextFormField(
+        inputFormatters: inputFormatters,
         maxLines: maxLines,
         minLines: minLines,
         expands: true,

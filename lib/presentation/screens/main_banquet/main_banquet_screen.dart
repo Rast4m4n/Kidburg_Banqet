@@ -4,6 +4,7 @@ import 'package:kidburg_banquet/generated/l10n.dart';
 import 'package:kidburg_banquet/presentation/screens/main_banquet/main_screen_banquet_vm.dart';
 import 'package:kidburg_banquet/presentation/theme/app_paddings.dart';
 import 'package:kidburg_banquet/presentation/theme/app_theme.dart';
+import 'package:kidburg_banquet/presentation/utils/phone_input_formatter.dart';
 import 'package:kidburg_banquet/presentation/widgets/custom_drawer.dart';
 import 'package:kidburg_banquet/presentation/widgets/custom_text_field.dart';
 import 'package:provider/provider.dart';
@@ -129,6 +130,9 @@ class _GridActionFields extends StatelessWidget {
           CustomTextField(
             controller: vm.phoneNumberOfClientController,
             label: S.of(context).customerPhoneNumber,
+            inputFormatters: [
+              PhoneInputFormatter(vm.phoneNumberOfClientController.text)
+            ],
           ),
           CustomTextField(
             label: S.of(context).dateOfEvent,
